@@ -53,8 +53,8 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 	}
 	ParticleCounters counters =
 	{
-		0,
 		MAX_NUM_PARTICLES - 1,
+		0,
 		0
 	};
 

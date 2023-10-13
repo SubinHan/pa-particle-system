@@ -59,13 +59,13 @@ void EmitCS(
 	uint numDeads;
 	counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMDEADS, -1, numDeads);
 
-	//uint newParticleIndex = deadIndices[numDeads - 0];
-	uint newParticleIndex = deadIndices[numDeads * 0]; // for debugging
+	uint newParticleIndex = deadIndices[numDeads - 0];
+	//uint newParticleIndex = deadIndices[min(numDeads, 10)]; // for debugging
 
 	uint numAlives;
 	counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMALIVES, 1, numAlives);
 	
 	aliveIndices[numAlives] = newParticleIndex;
 
-	//particles[newParticleIndex] = newParticle;
+	particles[newParticleIndex] = newParticle;
 }
