@@ -157,10 +157,14 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="FullyGpuParticleSystem.h" />
     <ClInclude Include="Include\Core\UploadBuffer.h" />
+    <ClInclude Include="Include\Model\Emitter.h" />
     <ClInclude Include="Include\Model\Geometry.h" />
+    <ClInclude Include="Include\Model\Particle.h" />
     <ClInclude Include="Include\Util\GeometryGenerator.h" />
     <ClInclude Include="ParticleApp\ObjectConstantBuffer.h" />
     <ClInclude Include="ParticleApp\ParticleApp.h" />
+    <ClInclude Include="ParticleApp\ParticleEmitter.h" />
+    <ClInclude Include="ParticleApp\ParticleResource.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Include\Util\DxDebug.h" />
@@ -170,6 +174,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ParticleApp\ObjectConstantBuffer.cpp" />
+    <ClCompile Include="ParticleApp\ParticleEmitter.cpp" />
+    <ClCompile Include="ParticleApp\ParticleResource.cpp" />
     <ClCompile Include="Source\Core\DxDevice.cpp" />
     <ClCompile Include="Source\Core\MainWindow.cpp" />
     <ClCompile Include="FullyGpuParticleSystem.cpp" />
@@ -194,6 +200,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleApp\Shaders\Particle.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleApp\Shaders\ParticleEmitCS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleApp\Shaders\ParticleUpdateCS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleApp\Shaders\Util.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\VertexShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

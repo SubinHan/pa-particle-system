@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Particle.hlsl"
 
 cbuffer cbUpdateConstants : register(b0)
@@ -7,13 +5,13 @@ cbuffer cbUpdateConstants : register(b0)
 	float deltaTime;
 }
 
-RWStructuredBuffer<Particle> particles;
+RWStructuredBuffer<Particle> particles		: register(u0);
 
-RWStructuredBuffer<uint> aliveIndices;
-RWStructuredBuffer<uint> newAliveIndices;
-RWStructuredBuffer<uint> deadIndices;
+RWStructuredBuffer<uint> aliveIndices		: register(u1);
+RWStructuredBuffer<uint> newAliveIndices	: register(u2);
+RWStructuredBuffer<uint> deadIndices		: register(u3);
 
-RWByteAddressBuffer counters;
+RWByteAddressBuffer counters;				: register(u4);
 
 // each thread updates a particle and kills if expired.
 [numthreads(256, 1, 1)]

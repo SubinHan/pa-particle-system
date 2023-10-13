@@ -1,5 +1,3 @@
-#pragma once
-
 uint hash(uint x)
 {
 	x += (x << 10u);

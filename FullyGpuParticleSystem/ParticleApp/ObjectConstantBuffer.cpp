@@ -6,9 +6,9 @@ constexpr int NUM_DESCRIPTOR_TO_DEMAND = 1;
 
 using namespace Microsoft::WRL;
 
-ObjectConstantBuffer::ObjectConstantBuffer(ComPtr<ID3D12Device> device)
+ObjectConstantBuffer::ObjectConstantBuffer(ComPtr<ID3D12Device> device) :
+	_device(device)
 {
-	_device = device;
 }
 
 int ObjectConstantBuffer::getNumDescriptorsToDemand() const

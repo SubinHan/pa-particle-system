@@ -6,6 +6,12 @@
 
 using namespace DirectX;
 
+ParticleApp::ParticleApp(HINSTANCE hInstance) :
+	MainWindow(hInstance)
+{
+	// will be initialized through the callback function Initialize()
+}
+
 PCWSTR ParticleApp::getClassName() const
 {
 	return L"Particle App Window Class";
@@ -24,7 +30,11 @@ bool ParticleApp::initialize()
 	buildBoxGeometry();
 	buildPso();
 
+	_particleResource = std::make_unique<ParticleResource>(_device->getD3dDevice(), commandList.Get());
+
 	_device->submitCommands(commandList);
+
+	_particleEmitter = std::make_unique<ParticleEmitter>(_device->getD3dDevice(), _particleResource.get());
 
 	return true;
 }
@@ -65,6 +75,9 @@ void ParticleApp::update(const GameTimer& gt)
 void ParticleApp::draw(const GameTimer& gt)
 {
 	auto commandList = _device->startRecordingCommands();
+
+	_particleEmitter->emitParticles(commandList.Get(), 1);
+
 	auto currentBackBuffer = _device->getCurrentBackBuffer();
 	auto currentBackBufferView = _device->getCurrentBackBufferViewHandle();
 	auto depthStencilView = _device->getDepthStencilViewHandle();
@@ -308,7 +321,7 @@ void ParticleApp::buildPso()
 	ThrowIfFailed(_device->getD3dDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_pso)));
 }
 
-void ParticleApp::OnMouseLeftDown(int x, int y, short keyState)
+void ParticleApp::onMouseLeftDown(int x, int y, short keyState)
 {
 	lastMousePos.x = x;
 	lastMousePos.y = y;
@@ -316,12 +329,12 @@ void ParticleApp::OnMouseLeftDown(int x, int y, short keyState)
 	SetCapture(_hwnd);
 }
 
-void ParticleApp::OnMouseLeftUp(int x, int y, short keyState)
+void ParticleApp::onMouseLeftUp(int x, int y, short keyState)
 {
 	ReleaseCapture();
 }
 
-void ParticleApp::OnMouseMove(int x, int y, short keyState)
+void ParticleApp::onMouseMove(int x, int y, short keyState)
 {
 	if ((keyState & MK_LBUTTON) != 0)
 	{

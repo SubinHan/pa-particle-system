@@ -37,7 +37,8 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DxUtil::createDefaultBuffer(
 	ComPtr<ID3D12Resource> defaultBuffer;
 
 	auto heapPropertiesDefault = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-	auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(byteSize);
+	auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(byteSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+	auto resourceDescUpload = CD3DX12_RESOURCE_DESC::Buffer(byteSize);
 
 	// Create the actual default buffer resource.
 	ThrowIfFailed(device->CreateCommittedResource(
@@ -54,7 +55,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DxUtil::createDefaultBuffer(
 	ThrowIfFailed(device->CreateCommittedResource(
 		&heapPropertiesUpload,
 		D3D12_HEAP_FLAG_NONE,
-		&resourceDesc,
+		&resourceDescUpload,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(uploadBuffer.GetAddressOf())));

@@ -47,8 +47,8 @@ public:
 	virtual void update(const GameTimer& gt) = 0;
 	virtual void draw(const GameTimer& gt) = 0;
 
-	virtual void OnMouseLeftDown(int x, int y, short keyState) {};
-	virtual void OnMouseLeftUp(int x, int y, short keyState) {};
+	virtual void onMouseLeftDown(int x, int y, short keyState) {};
+	virtual void onMouseLeftUp(int x, int y, short keyState) {};
 	virtual void OnMouseMiddleDown(int x, int y, short keyState) {};
 	virtual void OnMouseMiddleUp(int x, int y, short keyState) {};
 	virtual void OnMouseRightDown(int x, int y, short keyState) {};
@@ -58,7 +58,7 @@ public:
 	virtual void OnMouseWheel(short delta, short keyState) {}
 	virtual void OnMouseHover(int x, int y) {}
 	virtual void OnMouseLeave() {}
-	virtual void OnMouseMove(int x, int y, short keyState) {}
+	virtual void onMouseMove(int x, int y, short keyState) {}
 
 	virtual void OnKeyDown(WPARAM windowVirtualKeyCode) {}
 	virtual void OnKeyUp(WPARAM windowVirtualKeyCode) {}

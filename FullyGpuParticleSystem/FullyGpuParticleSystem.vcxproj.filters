@@ -63,6 +63,18 @@
     <ClInclude Include="Include\Util\GeometryGenerator.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Model\Particle.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Model\Emitter.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleApp\ParticleEmitter.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleApp\ParticleResource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -98,6 +110,12 @@
     <ClCompile Include="Source\Util\GeometryGenerator.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleApp\ParticleEmitter.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleApp\ParticleResource.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FullyGpuParticleSystem.rc">
@@ -115,6 +133,10 @@
   <ItemGroup>
     <FxCompile Include="ParticleApp\Shaders\color.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\VertexShader.hlsl" />
+    <FxCompile Include="ParticleApp\Shaders\ParticleEmitCS.hlsl" />
+    <FxCompile Include="ParticleApp\Shaders\Util.hlsl" />
+    <FxCompile Include="ParticleApp\Shaders\ParticleUpdateCS.hlsl" />
+    <FxCompile Include="ParticleApp\Shaders\Particle.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

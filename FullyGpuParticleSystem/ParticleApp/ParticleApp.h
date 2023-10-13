@@ -3,6 +3,8 @@
 #include "Core/MainWindow.h"
 #include "Model/Geometry.h"
 #include "Util/MathHelper.h"
+#include "ParticleResource.h"
+#include "ParticleEmitter.h"
 
 #include "../Resource.h"
 
@@ -17,15 +19,15 @@ struct ParticleAppVertex
 class ParticleApp : public MainWindow
 {
 public:
-	ParticleApp(HINSTANCE hInstance) : MainWindow(hInstance) {}
+	ParticleApp(HINSTANCE hInstance);
 
 	virtual PCWSTR getClassName() const override;
 
 	virtual bool initialize() override;
 
-	void OnMouseLeftDown(int x, int y, short keyState) override;
-	void OnMouseLeftUp(int x, int y, short keyState) override;
-	void OnMouseMove(int x, int y, short keyState) override;
+	void onMouseLeftDown(int x, int y, short keyState) override;
+	void onMouseLeftUp(int x, int y, short keyState) override;
+	void onMouseMove(int x, int y, short keyState) override;
 
 private:
 	virtual void OnResize() override;
@@ -58,4 +60,7 @@ private:
 	float radius = 5.0f;
 
 	POINT lastMousePos;
+
+	std::unique_ptr<ParticleResource> _particleResource;
+	std::unique_ptr<ParticleEmitter> _particleEmitter;
 };
