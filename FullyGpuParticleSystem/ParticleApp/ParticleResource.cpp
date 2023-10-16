@@ -30,7 +30,7 @@ ID3D12Resource* ParticleResource::getAliveIndicesResourceFront()
 
 ID3D12Resource* ParticleResource::getAliveIndicesResourceBack()
 {
-	const auto other = _currentAliveIndicesBufferIndex + 1 % 2;
+	const auto other = (_currentAliveIndicesBufferIndex + 1) % 2;
 	return _aliveIndicesBuffer[other].Get();
 }
 

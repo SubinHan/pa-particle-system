@@ -102,7 +102,7 @@
 * 월요일:
   + ParticleEmitterCS, ParticleSimulateCS 작성
   + Particle 렌더링을 위한 쉐이더 일부 작성
-  + ParticleSimulateCS 버그: ByteAddressBuffer의 InterlockedAdd, Store, Load 사용 코드에 문제가 있어 동기화가 제대로 수행되지 않음
+  + ParticleSimulateCS 버그: ByteAddressBuffer의 InterlockedAdd, Store, Load 사용 코드에 문제가 있어 동기화가 제대로 수행되지 않음 - 해결: 쉐이더 코드가 아닌 CPU 코드에 문제가 있었음. 메모리 주소를 잘못 넘겨주어 비정상적인 값이 덮어 씌워지고 있었음.
 * 
 
 <hr/>
