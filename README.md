@@ -1,20 +1,20 @@
-## Particle System
+### Particle System
 
-### ¸ñÂ÷
-[ÇÁ·ÎÁ§Æ® °³¿ä](#ÇÁ·ÎÁ§Æ®-°³¿ä) <br>
-[¸ñÇ¥ ¹× °èÈ¹](#¸ñÇ¥-¹×-°èÈ¹) <br>
+### ëª©ì°¨
+[í”„ë¡œì íŠ¸ ê°œìš”](#í”„ë¡œì íŠ¸-ê°œìš”) <br>
+[ëª©í‘œ ë° ê³„íš](#ëª©í‘œ-ë°-ê³„íš) <br>
 [Tasks](#Tasks) <br>
-[ÀÏÁö](#ÀÏÁö) 
+[ì¼ì§€](#ì¼ì§€) 
 
 <hr/>
 
-### ÇÁ·ÎÁ§Æ® °³¿ä
+### í”„ë¡œì íŠ¸ ê°œìš”
 
-´Ü¼øÇÑ ¼öÁØÀÇ ÆÄÆ¼Å¬ ½Ã½ºÅÛÀ» D3D12·Î ±¸ÇöÇÕ´Ï´Ù. <br>
-Æ¯È÷, **SimulationÀÌ ¾Æ´Ñ Particle Control¿¡ ÁıÁß**ÇÕ´Ï´Ù. <br>
+ë‹¨ìˆœí•œ ìˆ˜ì¤€ì˜ íŒŒí‹°í´ ì‹œìŠ¤í…œì„ D3D12ë¡œ êµ¬í˜„í•©ë‹ˆë‹¤. <br>
+íŠ¹íˆ, **Simulationì´ ì•„ë‹Œ Particle Controlì— ì§‘ì¤‘**í•©ë‹ˆë‹¤. <br>
 
 
-#### ±¸Çö ¸ñÇ¥ Reference
+#### êµ¬í˜„ ëª©í‘œ Reference
 * Unreal Engine 5 Niagara <br>
 * [YouTube: ncParticleEditor](https://www.youtube.com/watch?v=RLNI5NMCJ1E) <br>
 * [YouTube: OpenGL/Imgui Engine Build Stage 3.5: Particle System](https://www.youtube.com/watch?v=rZ3ztv7u0Yk) <br>
@@ -24,90 +24,90 @@
 
 <hr/>
 
-### ¸ñÇ¥ ¹× °èÈ¹
+### ëª©í‘œ ë° ê³„íš
 
-##### 1ÁÖÂ÷: °èÈ¹ ¼±Á¤ ¹× °³¹ß È¯°æ ±¸¼º
-* ÁÖÁ¦ ¼±Á¤ ¹× Á¶»ç
-* D3D12 °³¹ß È¯°æ ±¸¼º
-
-
-##### 2~4ÁÖÂ÷: ÇÙ½É ±â´É ±¸Çö ¹× Particle System ÇĞ½À
-
-* ÇĞ½À
-* D3D12 ±âÃÊÀû ·»´õ·¯ ±¸Çö
-* emnitter, particle µî ÇÙ½É ±â´É ¼³°è ¹× ±¸Çö
-* Computing Shader ÀÛ¼º
-  + EmitterCS ÀÛ¼º
-  + SimulateCS ÀÛ¼º
-* Particle Rendering ±¸Çö
-  + VS, GS, PS ÀÛ¼º
-* ´Ü¼øÇÑ ¼öÁØÀÇ particle simulation ±¸Çö (i.e. sprinkler)
-* z-buffer¿¡ ÀÇÇÑ particle occlusion
-* *motion blur ±¸Çö (ÁøÇà »óÈ²¿¡ µû¶ó ¼öÇà)*
-* *alpha-blending (ÁøÇà »óÈ²¿¡ µû¶ó ¼öÇà)*
-  + *SortingCS ÀÛ¼º*
-  + *alpha-blending ±¸Çö*
-* *geometry¿ÍÀÇ collision (ÁøÇà »óÈ²¿¡ µû¶ó ¼öÇà)*
-
-##### 5~7ÁÖÂ÷: UI µµÀÔ ¹× »ç¿ë¼º, È®Àå¼º, À¯Áöº¸¼ö¼º Áõ´ë
-
-* imgui µµÀÔ
-* hard coding µÇ¾î ÀÖÀ» ´Ù¾çÇÑ °ªµé parameterÈ­
-* À¯¿¬ÇÑ particle controlÀ» À§ÇÑ, ÇÙ½É ±â´ÉÀÇ ±¸Á¶ °³¼±
-* ´Ù¾çÇÑ particle contorlÀ» À§ÇÑ, ±â´É ±¸Çö (i.e. gravity, drag, noise, wind, ...)
+##### 1ì£¼ì°¨: ê³„íš ì„ ì • ë° ê°œë°œ í™˜ê²½ êµ¬ì„±
+* ì£¼ì œ ì„ ì • ë° ì¡°ì‚¬
+* D3D12 ê°œë°œ í™˜ê²½ êµ¬ì„±
 
 
-##### 8ÁÖÂ÷: ¸¶¹«¸®
+##### 2~4ì£¼ì°¨: í•µì‹¬ ê¸°ëŠ¥ êµ¬í˜„ ë° Particle System í•™ìŠµ
+
+* í•™ìŠµ
+* D3D12 ê¸°ì´ˆì  ë Œë”ëŸ¬ êµ¬í˜„
+* emnitter, particle ë“± í•µì‹¬ ê¸°ëŠ¥ ì„¤ê³„ ë° êµ¬í˜„
+* Computing Shader ì‘ì„±
+  + EmitterCS ì‘ì„±
+  + SimulateCS ì‘ì„±
+* Particle Rendering êµ¬í˜„
+  + VS, GS, PS ì‘ì„±
+* ë‹¨ìˆœí•œ ìˆ˜ì¤€ì˜ particle simulation êµ¬í˜„ (i.e. sprinkler)
+* z-bufferì— ì˜í•œ particle occlusion
+* *motion blur êµ¬í˜„ (ì§„í–‰ ìƒí™©ì— ë”°ë¼ ìˆ˜í–‰)*
+* *alpha-blending (ì§„í–‰ ìƒí™©ì— ë”°ë¼ ìˆ˜í–‰)*
+  + *SortingCS ì‘ì„±*
+  + *alpha-blending êµ¬í˜„*
+* *geometryì™€ì˜ collision (ì§„í–‰ ìƒí™©ì— ë”°ë¼ ìˆ˜í–‰)*
+
+##### 5~7ì£¼ì°¨: UI ë„ì… ë° ì‚¬ìš©ì„±, í™•ì¥ì„±, ìœ ì§€ë³´ìˆ˜ì„± ì¦ëŒ€
+
+* imgui ë„ì…
+* hard coding ë˜ì–´ ìˆì„ ë‹¤ì–‘í•œ ê°’ë“¤ parameterí™”
+* ìœ ì—°í•œ particle controlì„ ìœ„í•œ, í•µì‹¬ ê¸°ëŠ¥ì˜ êµ¬ì¡° ê°œì„ 
+* ë‹¤ì–‘í•œ particle contorlì„ ìœ„í•œ, ê¸°ëŠ¥ êµ¬í˜„ (i.e. gravity, drag, noise, wind, ...)
+
+
+##### 8ì£¼ì°¨: ë§ˆë¬´ë¦¬
 * refactoring
-* visuality °³¼±
+* visuality ê°œì„ 
 
-#### À§Çè ¿ä¼Ò
-* NativeÇÑ D3D12·Î ÁøÇà (Mini Engine µî »ç¿ë X)
-* Particle System ÇĞ½À ¹Ìºñ
-* imgui »ç¿ë °æÇè ¾øÀ½
+#### ìœ„í—˜ ìš”ì†Œ
+* Nativeí•œ D3D12ë¡œ ì§„í–‰ (Mini Engine ë“± ì‚¬ìš© X)
+* Particle System í•™ìŠµ ë¯¸ë¹„
+* imgui ì‚¬ìš© ê²½í—˜ ì—†ìŒ
 
 <hr/>
 
 ### Tasks
 
-##### ÁøÇà ÁßÀÎ Task
-* Particle System ÇĞ½À
-* emitter, particle µî ÇÙ½É ±â´É ¼³°è ¹× ±¸Çö
-* Particle »ı¼º/ÆÄ±«, ½Ã¹Ä·¹ÀÌ¼ÇÀ» À§ÇÑ Computing Shader ÀÛ¼º
-* Particle SystemÀ» À§ÇÑ ·»´õ¸µ ÆÄÀÌÇÁ¶óÀÎ ±¸¼º
+##### ì§„í–‰ ì¤‘ì¸ Task
+* Particle System í•™ìŠµ
+* emitter, particle ë“± í•µì‹¬ ê¸°ëŠ¥ ì„¤ê³„ ë° êµ¬í˜„
+* Particle ìƒì„±/íŒŒê´´, ì‹œë®¬ë ˆì´ì…˜ì„ ìœ„í•œ Computing Shader ì‘ì„±
+* Particle Systemì„ ìœ„í•œ ë Œë”ë§ íŒŒì´í”„ë¼ì¸ êµ¬ì„±
 
-##### ¿Ï·áµÈ Tasks
-* D3D12 °³¹ß È¯°æ ±¸¼º (+PIX µğ¹ö°Å)
-* D3D12 ±âÃÊÀû ·»´õ·¯ ±¸Çö
+##### ì™„ë£Œëœ Tasks
+* D3D12 ê°œë°œ í™˜ê²½ êµ¬ì„± (+PIX ë””ë²„ê±°)
+* D3D12 ê¸°ì´ˆì  ë Œë”ëŸ¬ êµ¬í˜„
 
 <hr/>
 
-### ÀÏÁö
+### ì¼ì§€
  
-##### 1ÁÖÂ÷: °èÈ¹ ¼±Á¤ ¹× °³¹ß È¯°æ ±¸¼º (2023.10.10. ~ 2023.10.13.)
-* ¼ö¿äÀÏ:
-* ¸ñ¿äÀÏ:
-  + D3D12 È¯°æ ±¸¼º
-  + ·»´õ¸µ ÆÄÀÌÇÁ¶óÀÎ ±¸¼º
-* ±İ¿äÀÏ: 
-  + PIX µğ¹ö°Å ¼÷Áö ¹× È¯°æ ±¸¼º
-  + Á¤À°¸éÃ¼ ·»´õ¸µ ¿Ï·á
-  + ÀÇ»ç ³­¼ö (https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl)
-  + Emitter, Particle ÀÚ·á±¸Á¶ prototype
+##### 1ì£¼ì°¨: ê³„íš ì„ ì • ë° ê°œë°œ í™˜ê²½ êµ¬ì„± (2023.10.10. ~ 2023.10.13.)
+* ìˆ˜ìš”ì¼:
+* ëª©ìš”ì¼:
+  + D3D12 í™˜ê²½ êµ¬ì„±
+  + ë Œë”ë§ íŒŒì´í”„ë¼ì¸ êµ¬ì„±
+* ê¸ˆìš”ì¼: 
+  + PIX ë””ë²„ê±° ìˆ™ì§€ ë° í™˜ê²½ êµ¬ì„±
+  + ì •ìœ¡ë©´ì²´ ë Œë”ë§ ì™„ë£Œ
+  + ì˜ì‚¬ ë‚œìˆ˜ (https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl)
+  + Emitter, Particle ìë£Œêµ¬ì¡° prototype
   + ParticleEmitterCS, ParticleSimulateCS prototype
 
 <br> 
 
-##### 2ÁÖÂ÷: ÇÙ½É ±â´É ±¸Çö ¹× Particle System ÇĞ½À (2023.10.16. ~ 2023.10.20.)
-* ¿ù¿äÀÏ:
-  + ParticleEmitterCS, ParticleSimulateCS ÀÛ¼º
-  + Particle ·»´õ¸µÀ» À§ÇÑ ½¦ÀÌ´õ ÀÏºÎ ÀÛ¼º
-  + ParticleSimulateCS ¹ö±×: ByteAddressBufferÀÇ InterlockedAdd, Store, Load »ç¿ë ÄÚµå¿¡ ¹®Á¦°¡ ÀÖ¾î µ¿±âÈ­°¡ Á¦´ë·Î ¼öÇàµÇÁö ¾ÊÀ½
+##### 2ì£¼ì°¨: í•µì‹¬ ê¸°ëŠ¥ êµ¬í˜„ ë° Particle System í•™ìŠµ (2023.10.16. ~ 2023.10.20.)
+* ì›”ìš”ì¼:
+  + ParticleEmitterCS, ParticleSimulateCS ì‘ì„±
+  + Particle ë Œë”ë§ì„ ìœ„í•œ ì‰ì´ë” ì¼ë¶€ ì‘ì„±
+  + ParticleSimulateCS ë²„ê·¸: ByteAddressBufferì˜ InterlockedAdd, Store, Load ì‚¬ìš© ì½”ë“œì— ë¬¸ì œê°€ ìˆì–´ ë™ê¸°í™”ê°€ ì œëŒ€ë¡œ ìˆ˜í–‰ë˜ì§€ ì•ŠìŒ
 * 
 
 <hr/>
 
-### Âü°í¹®Çå
+### ì°¸ê³ ë¬¸í—Œ
 [William T. Reeves, particle systems - a technique for modeling a class of fuzzy objects](https://www.lri.fr/~mbl/ENS/IG2/devoir2/files/docs/fuzzyParticles.pdf) <br>
 [Lutz Lata, Building a Million Particle System](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=b5aa42d88a178b264f4ceb3ddb67d3d00ecbc631) <br>
 [Karl Sims, Particle animation and rendering using data parallel computation](https://www.karlsims.com/papers/ParticlesSiggraph90.pdf)
