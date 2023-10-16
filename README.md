@@ -95,16 +95,14 @@
   + 의사 난수 (https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl)
   + Emitter, Particle 자료구조 prototype
   + ParticleEmitterCS, ParticleSimulateCS prototype
-  + 추후 작성 예정
 
 <br> 
 
 ##### 2주차: 핵심 기능 구현 및 Particle System 학습 (2023.10.16. ~ 2023.10.20.)
 * 월요일:
-  + 추후 작성 예정
   + ParticleEmitterCS, ParticleSimulateCS 작성
   + Particle 렌더링을 위한 쉐이더 일부 작성
-  + 
+  + ParticleSimulateCS 버그: ByteAddressBuffer의 InterlockedAdd, Store, Load 사용 코드에 문제가 있어 동기화가 제대로 수행되지 않음
 * 
 
 <hr/>
