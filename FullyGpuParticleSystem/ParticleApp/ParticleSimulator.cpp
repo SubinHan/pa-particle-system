@@ -1,4 +1,4 @@
-#include "ParticleEmitter.h"
+#include "ParticleSimulator.h"
 
 #include "ParticleResource.h"
 #include "Util/DxDebug.h"
@@ -7,77 +7,69 @@
 
 using Microsoft::WRL::ComPtr;
 
-ParticleEmitter::ParticleEmitter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource) :
-		_device(device),
-		_resource(resource)
+ParticleSimulator::ParticleSimulator(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource) :
+	_device(device),
+	_resource(resource)
 {
 	buildRootSignature();
 	buildShaders();
 	buildPsos();
 }
 
-ID3D12RootSignature* ParticleEmitter::getRootSignature()
+ID3D12RootSignature* ParticleSimulator::getRootSignature()
 {
 	return _rootSignature.Get();
 }
 
-ID3DBlob* ParticleEmitter::getShader()
+ID3DBlob* ParticleSimulator::getShader()
 {
 	return _shader.Get();
 }
 
-ID3D12PipelineState* ParticleEmitter::getPipelineStateObject()
+ID3D12PipelineState* ParticleSimulator::getPipelineStateObject()
 {
 	return _pso.Get();
 }
 
-void ParticleEmitter::emitParticles(ID3D12GraphicsCommandList* cmdList, int numParticlesToEmit)
+void ParticleSimulator::simulateParticles(ID3D12GraphicsCommandList* cmdList, float deltaTime)
 {
-	EmitConstants c = { numParticlesToEmit, DirectX::XMFLOAT3{0.0f, 0.0f, 0.0f}, DirectX::XMFLOAT2{0.0f, 0.0f} };
+	ParticleSimulateConstants c = { deltaTime };
 
 	cmdList->SetComputeRootSignature(_rootSignature.Get());
 
-	//const auto particlesToUav = CD3DX12_RESOURCE_BARRIER::Transition(
-	//	_resource->getParticlesResource(),
-	//	D3D12_RESOURCE_STATE_GENERIC_READ,
-	//	D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-
-	//cmdList->ResourceBarrier(1, &particlesToUav);
-
 	cmdList->SetPipelineState(_pso.Get());
 
-	cmdList->SetComputeRoot32BitConstants(ROOT_SLOT_CONSTANTS_BUFFER, 6, &c, 0);
+	cmdList->SetComputeRoot32BitConstants(ROOT_SLOT_CONSTANTS_BUFFER, 1, &c, 0);
 	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_PARTICLES_BUFFER, _resource->getParticlesResource()->GetGPUVirtualAddress());
-	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_ALIVES_INDICES_BUFFER, _resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
+	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_ALIVES_INDICES_BUFFER_FRONT, _resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
+	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_ALIVES_INDICES_BUFFER_BACK, _resource->getAliveIndicesResourceBack()->GetGPUVirtualAddress());
 	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_DEADS_INDICES_BUFFER, _resource->getDeadIndicesResource()->GetGPUVirtualAddress());
 	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersResource()->GetGPUVirtualAddress());
 
-	const auto numGroupsX = static_cast<UINT>(ceilf(numParticlesToEmit / 256.0f));
+	const auto numGroupsX = static_cast<UINT>(ceilf(_resource->getMaxNumParticles() / 256.0f));
 	const auto numGroupsY = 1;
 	const UINT numGroupsZ = 1;
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
-
-	//const auto particlesToSrv = CD3DX12_RESOURCE_BARRIER::Transition(
-	//	_resource->getParticlesResource(),
-	//	D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-	//	D3D12_RESOURCE_STATE_GENERIC_READ);
-	//cmdList->ResourceBarrier(1, &particlesToSrv);
+	
+	_resource->swapAliveIndicesBuffer();
 }
 
-void ParticleEmitter::buildRootSignature()
+void ParticleSimulator::buildRootSignature()
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[6];
 
 	slotRootParameter[ROOT_SLOT_CONSTANTS_BUFFER]
-		.InitAsConstants(6, 0);
+		.InitAsConstants(1, 0);
 	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER]
 		.InitAsUnorderedAccessView(0);
-	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER]
+	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER_FRONT]
 		.InitAsUnorderedAccessView(1);
-	slotRootParameter[ROOT_SLOT_DEADS_INDICES_BUFFER]
+	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER_BACK]
 		.InitAsUnorderedAccessView(2);
-	slotRootParameter[ROOT_SLOT_COUNTERS_BUFFER]
+	slotRootParameter[ROOT_SLOT_DEADS_INDICES_BUFFER]
 		.InitAsUnorderedAccessView(3);
+	slotRootParameter[ROOT_SLOT_COUNTERS_BUFFER]
+		.InitAsUnorderedAccessView(4);
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
 		_countof(slotRootParameter),
@@ -106,16 +98,16 @@ void ParticleEmitter::buildRootSignature()
 		IID_PPV_ARGS(_rootSignature.GetAddressOf())));
 }
 
-void ParticleEmitter::buildShaders()
+void ParticleSimulator::buildShaders()
 {
 	_shader = DxUtil::compileShader(
-		L"ParticleApp\\Shaders\\ParticleEmitCS.hlsl",
+		L"ParticleApp\\Shaders\\ParticleSimulateCS.hlsl",
 		nullptr,
-		"EmitCS",
+		"SimulateCS",
 		"cs_5_1");
 }
 
-void ParticleEmitter::buildPsos()
+void ParticleSimulator::buildPsos()
 {
 	D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.pRootSignature = _rootSignature.Get();

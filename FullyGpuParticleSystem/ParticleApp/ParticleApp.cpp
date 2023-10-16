@@ -34,17 +34,22 @@ bool ParticleApp::initialize()
 
 	_device->submitCommands(commandList);
 
-	_particleEmitter = std::make_unique<ParticleEmitter>(_device->getD3dDevice(), _particleResource.get());
+	_particleEmitter = std::make_unique<ParticleEmitter>(
+		_device->getD3dDevice(),
+		_particleResource.get());
+	_particleSimulator = std::make_unique<ParticleSimulator>(
+		_device->getD3dDevice(),
+		_particleResource.get());
 
 	return true;
 }
 
-void ParticleApp::OnResize()
+void ParticleApp::onResize()
 {
-	MainWindow::OnResize();
+	MainWindow::onResize();
 
 	XMMATRIX p = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, aspectRatio(), 1.0f, 1000.0f);
-	XMStoreFloat4x4(&_matrixProjection, p);
+	XMStoreFloat4x4(&_proj, p);
 }
 
 void ParticleApp::update(const GameTimer& gt)
@@ -57,19 +62,38 @@ void ParticleApp::update(const GameTimer& gt)
 	XMVECTOR target = XMVectorZero();
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-	DirectX::XMFLOAT4X4 matrixWorld = MathHelper::identity4x4();
-	DirectX::XMFLOAT4X4 matrixView = MathHelper::identity4x4();
-
 	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&matrixView, view);
+	XMStoreFloat4x4(&_view, view);
 
-	XMMATRIX world = XMLoadFloat4x4(&matrixWorld);
-	XMMATRIX proj = XMLoadFloat4x4(&_matrixProjection);
-	XMMATRIX worldViewProj = world * view * proj;
+	XMMATRIX proj = XMLoadFloat4x4(&this->_proj);
 
-	ObjectConstants objConstants;
-	XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
-	_objectConstantBuffer->CopyData(0, objConstants);
+	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
+	auto viewDeterminant = XMMatrixDeterminant(view);
+	XMMATRIX invView = XMMatrixInverse(&viewDeterminant, view);
+	auto projDeterminant = XMMatrixDeterminant(proj);
+	XMMATRIX invProj = XMMatrixInverse(&projDeterminant, proj);
+	auto viewProjDeterminant = XMMatrixDeterminant(viewProj);
+	XMMATRIX invViewProj = XMMatrixInverse(&viewProjDeterminant, viewProj);
+
+	XMStoreFloat4x4(&_passCb.View, XMMatrixTranspose(view));
+	XMStoreFloat4x4(&_passCb.InvView, XMMatrixTranspose(invView));
+	XMStoreFloat4x4(&_passCb.Proj, XMMatrixTranspose(proj));
+	XMStoreFloat4x4(&_passCb.InvProj, XMMatrixTranspose(invProj));
+	XMStoreFloat4x4(&_passCb.ViewProj, XMMatrixTranspose(viewProj));
+	XMStoreFloat4x4(&_passCb.InvViewProj, XMMatrixTranspose(invViewProj));
+	_passCb.EyePosW = _eyePos;
+
+	auto clientWidth = _device->getClientWidth();
+	auto clientHeight = _device->getClientHeight();
+
+	_passCb.RenderTargetSize = XMFLOAT2((float)clientWidth, (float)clientHeight);
+	_passCb.InvRenderTargetSize = XMFLOAT2(1.0f / clientWidth, 1.0f / clientHeight);
+	_passCb.NearZ = 1.0f;
+	_passCb.FarZ = 1000.0f;
+	_passCb.TotalTime = gt.totalTime();
+	_passCb.DeltaTime = gt.deltaTime();
+
+	_objectConstantBuffer->copyData(0, _passCb);
 }
 
 void ParticleApp::draw(const GameTimer& gt)
@@ -77,6 +101,7 @@ void ParticleApp::draw(const GameTimer& gt)
 	auto commandList = _device->startRecordingCommands();
 
 	_particleEmitter->emitParticles(commandList.Get(), 1);
+	_particleSimulator->simulateParticles(commandList.Get(), gt.deltaTime());
 
 	auto currentBackBuffer = _device->getCurrentBackBuffer();
 	auto currentBackBufferView = _device->getCurrentBackBufferViewHandle();
@@ -126,6 +151,10 @@ void ParticleApp::draw(const GameTimer& gt)
 		0,
 		0, 
 		0);
+
+
+	//_particlePass->render(commandList.Get());
+
 
 	auto barrierDraw = CD3DX12_RESOURCE_BARRIER::Transition(
 		currentBackBuffer,

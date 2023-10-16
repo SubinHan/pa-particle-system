@@ -24,6 +24,8 @@ public:
 	ID3D12Resource* getDeadIndicesResource();
 	ID3D12Resource* getCountersResource();
 
+	int getMaxNumParticles();
+
 private:
 	void buildResources(ID3D12GraphicsCommandList* cmdList);
 

@@ -5,10 +5,11 @@
 #include "Util/MathHelper.h"
 #include "ParticleResource.h"
 #include "ParticleEmitter.h"
+#include "ParticleSimulator.h"
+#include "ParticlePass.h"
+#include "ObjectConstantBuffer.h"
 
 #include "../Resource.h"
-
-class ObjectConstantBuffer;
 
 struct ParticleAppVertex
 {
@@ -30,7 +31,7 @@ public:
 	void onMouseMove(int x, int y, short keyState) override;
 
 private:
-	virtual void OnResize() override;
+	virtual void onResize() override;
 	virtual void update(const GameTimer& gt) override;
 	virtual void draw(const GameTimer& gt) override;
 
@@ -53,7 +54,11 @@ private:
 
 	ComPtr<ID3D12PipelineState> _pso = nullptr;
 
-	DirectX::XMFLOAT4X4 _matrixProjection = MathHelper::identity4x4();
+	ObjectConstants _passCb;
+
+	DirectX::XMFLOAT3 _eyePos = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT4X4 _view = MathHelper::identity4x4();
+	DirectX::XMFLOAT4X4 _proj = MathHelper::identity4x4();
 
 	float theta = 1.5f * DirectX::XM_PI;
 	float phi = DirectX::XM_PIDIV4;
@@ -63,4 +68,6 @@ private:
 
 	std::unique_ptr<ParticleResource> _particleResource;
 	std::unique_ptr<ParticleEmitter> _particleEmitter;
+	std::unique_ptr<ParticleSimulator> _particleSimulator;
+	std::unique_ptr<ParticlePass> _particlePass;
 };

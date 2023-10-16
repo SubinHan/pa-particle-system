@@ -1,5 +1,3 @@
-#pragma once
-
 struct Particle
 {
 	float3 Position;

@@ -164,7 +164,9 @@
     <ClInclude Include="ParticleApp\ObjectConstantBuffer.h" />
     <ClInclude Include="ParticleApp\ParticleApp.h" />
     <ClInclude Include="ParticleApp\ParticleEmitter.h" />
+    <ClInclude Include="ParticleApp\ParticlePass.h" />
     <ClInclude Include="ParticleApp\ParticleResource.h" />
+    <ClInclude Include="ParticleApp\ParticleSimulator.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Include\Util\DxDebug.h" />
@@ -175,7 +177,9 @@
   <ItemGroup>
     <ClCompile Include="ParticleApp\ObjectConstantBuffer.cpp" />
     <ClCompile Include="ParticleApp\ParticleEmitter.cpp" />
+    <ClCompile Include="ParticleApp\ParticlePass.cpp" />
     <ClCompile Include="ParticleApp\ParticleResource.cpp" />
+    <ClCompile Include="ParticleApp\ParticleSimulator.cpp" />
     <ClCompile Include="Source\Core\DxDevice.cpp" />
     <ClCompile Include="Source\Core\MainWindow.cpp" />
     <ClCompile Include="FullyGpuParticleSystem.cpp" />
@@ -207,7 +211,10 @@
     <FxCompile Include="ParticleApp\Shaders\ParticleEmitCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="ParticleApp\Shaders\ParticleUpdateCS.hlsl">
+    <FxCompile Include="ParticleApp\Shaders\ParticleRender.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleApp\Shaders\ParticleSimulateCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\Util.hlsl">

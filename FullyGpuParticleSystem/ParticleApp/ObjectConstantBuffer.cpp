@@ -43,7 +43,7 @@ void ObjectConstantBuffer::buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD
 		hCpu);
 }
 
-void ObjectConstantBuffer::CopyData(int elementIndex, const ObjectConstants& data)
+void ObjectConstantBuffer::copyData(int elementIndex, const ObjectConstants& data)
 {
-	_objectConstantBuffer->CopyData(elementIndex, data);
+	_objectConstantBuffer->copyData(elementIndex, data);
 }

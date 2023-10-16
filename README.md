@@ -84,7 +84,7 @@
 
 ### 일지
  
-##### 1주차: 계획 선정 및 개발 환경 구성 (2023.10.10 ~ 2023.10.13)
+##### 1주차: 계획 선정 및 개발 환경 구성 (2023.10.10. ~ 2023.10.13.)
 * 수요일:
 * 목요일:
   + D3D12 환경 구성
@@ -94,7 +94,18 @@
   + 정육면체 렌더링 완료
   + 의사 난수 (https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl)
   + Emitter, Particle 자료구조 prototype
-  + ParticleEmitterCS, ParticleUpdateCS prototype
+  + ParticleEmitterCS, ParticleSimulateCS prototype
+  + 추후 작성 예정
+
+<br> 
+
+##### 2주차: 핵심 기능 구현 및 Particle System 학습 (2023.10.16. ~ 2023.10.20.)
+* 월요일:
+  + 추후 작성 예정
+  + ParticleEmitterCS, ParticleSimulateCS 작성
+  + Particle 렌더링을 위한 쉐이더 일부 작성
+  + 
+* 
 
 <hr/>
 

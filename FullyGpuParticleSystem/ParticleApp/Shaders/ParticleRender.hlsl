@@ -1,0 +1,98 @@
+
+cbuffer cbPass : register(b0)
+{
+	float4x4 gView;
+	float4x4 gInvView;
+	float4x4 gProj;
+	float4x4 gInvProj;
+	float4x4 gViewProj;
+	float4x4 gInvViewProj;
+	float3 gEyePosW;
+	float cbPerObjectPad1;
+	float2 gRenderTargetSize;
+	float2 gInvRenderTargetSize;
+	float gNearZ;
+	float gFarZ;
+	float gTotalTime;
+	float gDeltaTime;
+};
+
+struct VertexOut
+{
+	float3 CenterW	: POSITION;
+	float Size		: SIZE;
+};
+
+struct GeoOut
+{
+	float4 PosH : SV_POSITION;
+	float3 PosW : POSITION;
+	float3 NormalW : NORMAL;
+	float2 TexC : TEXCOORD;
+	uint PrimID : SV_PrimitiveID;
+};
+
+StructuredBuffer<Particle> particles : register(t0);
+StructuredBuffer<uint> aliveIndices : register(t1);
+
+void ParticleVS(
+	uint vid : SV_VertexID)
+{
+	const uint particleIndex = aliveIndices[vid];
+	Particle particle = particles[particleIndex];
+
+	VertexOut vertexOut;
+
+	vertexOut.PosW = particle.Position;
+	vertexOut.Size = particle.Size;
+
+	return vertexOut;
+}
+
+[maxvertexcount(4)]
+void ParticleGS(
+	point VertexOut gin[1],
+	uint primId : SV_PrimitiveID,
+	inout TriangleStream<GeoOut> triStream)
+{
+	float3 up = float3(0.0f, 1.0f, 0.0f);
+	float3 look = gEyePosW - gin[0].CenterW;
+	
+	float u = normalize(cross(up, look));
+	float v = normalize(cross(u, look));
+
+	float halfWidth = 0.5f * gin[0].SizeW.x;
+	float halfHeight = 0.5f * gin[0].SizeW.y;
+
+	float4 vertices[4];
+	v[0] = float4(gin[0].CetnerW + halfWidth * u - halfHeight * up, 1.0f);
+	v[1] = float4(gin[1].CetnerW + halfWidth * u + halfHeight * up, 1.0f);
+	v[2] = float4(gin[2].CetnerW - halfWidth * u - halfHeight * up, 1.0f);
+	v[3] = float4(gin[3].CetnerW - halfWidth * u + halfHeight * up, 1.0f);
+
+	float2 texC[4] =
+	{
+		float2(0.0f, 1.0f),
+		float2(0.0f, 0.0f),
+		float2(1.0f, 1.0f),
+		float2(1.0f, 0.0f)
+	};
+
+	GeoOut geoOut;
+	[unroll]
+	for (int i = 0; i < 4; ++i)
+	{
+		geoOut.PosH = mul(vertices[i], gViewProj);
+		geoOut.PosW = vertices[i].xyz;
+		geoOut.NormalW = look;
+		geoOut.TexC = texC[i];
+		geoOut.PrimId = primId;
+
+		triStream.Append(gout);
+	}
+}
+
+float4 ParticlePS(GeoOut pin) : SV_Target
+{
+	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+}

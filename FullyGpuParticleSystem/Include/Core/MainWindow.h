@@ -43,7 +43,7 @@ public:
 	void CreateDevice();
 	void ReleaseDevice();
 
-	virtual void OnResize();
+	virtual void onResize();
 	virtual void update(const GameTimer& gt) = 0;
 	virtual void draw(const GameTimer& gt) = 0;
 

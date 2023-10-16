@@ -44,6 +44,11 @@ ID3D12Resource* ParticleResource::getCountersResource()
 	return _countersBuffer.Get();
 }
 
+int ParticleResource::getMaxNumParticles()
+{
+	return MAX_NUM_PARTICLES;
+}
+
 void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 {
 	std::vector<UINT> deadIndices(MAX_NUM_PARTICLES);
@@ -53,7 +58,7 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 	}
 	ParticleCounters counters =
 	{
-		MAX_NUM_PARTICLES - 1,
+		MAX_NUM_PARTICLES,
 		0,
 		0
 	};

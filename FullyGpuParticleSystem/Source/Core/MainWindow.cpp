@@ -166,7 +166,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
                 isPaused = false;
                 isMinimized = false;
                 isMaximized = true;
-                OnResize();
+                onResize();
             }
             else if (wParam == SIZE_RESTORED)
             {
@@ -176,7 +176,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
                 {
                     isPaused = false;
                     isMinimized = false;
-                    OnResize();
+                    onResize();
                 }
 
                 // Restoring from maximized state?
@@ -184,7 +184,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
                 {
                     isPaused = false;
                     isMaximized = false;
-                    OnResize();
+                    onResize();
                 }
                 else if (isResizing)
                 {
@@ -199,7 +199,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
                 }
                 else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
                 {
-                    OnResize();
+                    onResize();
                 }
             }
         }
@@ -215,7 +215,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         isPaused = false;
         isResizing = false;
         timer.start();
-        OnResize();
+        onResize();
         return 0;
 
     case WM_GETMINMAXINFO:
@@ -339,10 +339,10 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 void MainWindow::CreateDevice()
 {
     _device = std::make_unique<DxDevice>(_hwnd);
-    OnResize();
+    onResize();
 }
 
-void MainWindow::OnResize()
+void MainWindow::onResize()
 {
     _device->flushCommandQueue();
     auto commandList = _device->getCommandList();

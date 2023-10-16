@@ -19,6 +19,7 @@ RWByteAddressBuffer counters			: register(u3);
 
 #define NUM_THREADS 256
 
+// TODO: should not emit when num of particles > MAX_NUM_PARTICLES
 // each thread emits a particle.
 [numthreads(256, 1, 1)]
 void EmitCS(
@@ -49,7 +50,7 @@ void EmitCS(
 	newParticle.Acceleration =
 		float3(0.0f, 0.0f, 0.0f);
 
-	newParticle.Lifetime = 1.0f;
+	newParticle.Lifetime = 10.0f;
 	newParticle.Size = 1.0f;
 	newParticle.Opacity = 1.0f;
 	newParticle.Color = float3(1.0f, 0.0f, 0.0f);
@@ -59,7 +60,7 @@ void EmitCS(
 	uint numDeads;
 	counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMDEADS, -1, numDeads);
 
-	uint newParticleIndex = deadIndices[numDeads - 0];
+	uint newParticleIndex = deadIndices[numDeads - 1];
 	//uint newParticleIndex = deadIndices[min(numDeads, 10)]; // for debugging
 
 	uint numAlives;
