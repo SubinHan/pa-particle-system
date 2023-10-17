@@ -114,7 +114,7 @@ void ParticleApp::draw(const GameTimer& gt)
 	ID3D12DescriptorHeap* descriptorHeaps[] = { cbvSrvUavDescriptorHeap.Get() };
 	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-	_particleEmitter->emitParticles(commandList.Get(), 1, gt.deltaTime());
+	_particleEmitter->emitParticles(commandList.Get(), 1000, gt.deltaTime());
 
 	_particleSimulator->simulateParticles(commandList.Get(), gt.deltaTime());
 

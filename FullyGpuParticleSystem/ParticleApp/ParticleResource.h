@@ -43,7 +43,7 @@ private:
 
 private:
 	static constexpr int NUM_RESOURCES = 5;
-	static constexpr int MAX_NUM_PARTICLES = 10'000;
+	static constexpr int MAX_NUM_PARTICLES = 1'000'000;
 
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 

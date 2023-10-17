@@ -16,6 +16,7 @@ struct EmitConstants
 	DirectX::XMFLOAT3 Position;
 	DirectX::XMFLOAT2 Orientation;
 	float DeltaTime;
+	UINT MaxNumParticles;
 };
 
 class ParticleEmitter

@@ -72,7 +72,8 @@
 
 ##### 진행 중인 Task
 * Particle System 학습
-* Lifetime, velocity 등 하드코딩 된 속성들의 매개변수화
+* Lifetime, velocity 등 GPU 코드에서 하드코딩 된 속성들을 CPU 단에서 매개변수화
+* 프레임 통계 모듈 구현
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -106,7 +107,7 @@
   + ParticleSimulateCS 버그: RWByteAddressBuffer의 InterlockedAdd, Store, Load 사용 코드에 문제가 있어 동기화가 제대로 수행되지 않음 - 해결: 쉐이더 코드가 아닌 CPU 코드에 문제가 있었음. 메모리 주소를 잘못 넘겨주어 비정상적인 값이 덮어 씌워지고 있었음.
 * 화요일:
   + 여전히 RWByteAddressBuffer와 관련한 문제가 있었음: 단순히 UnorderedAccessBuffer로서 RootSiganture에서 다루어졌지만, RawBuffer는 반드시 UnorderedAccessView를 통해 DXGI_FORMAT_R32_TYPELESS 타입과 D3D12_BUFFER_UAV_FLAG_RAW 플래그를 지정해 다루어야 함! 지식이 부족해 이를 적용하지 않았고 문제가 발생하였던 것이었음.
-  + 기본적인 파티클 렌더링 수행 완료
+  + 기본적인 파티클 렌더링 수행 완료 (100만 개)
     <img src="./img/20231017_particles.png">
   + 
 

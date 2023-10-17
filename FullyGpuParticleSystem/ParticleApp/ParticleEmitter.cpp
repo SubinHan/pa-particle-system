@@ -40,7 +40,8 @@ void ParticleEmitter::emitParticles(
 		numParticlesToEmit, 
 		DirectX::XMFLOAT3{0.0f, 0.0f, 0.0f}, 
 		DirectX::XMFLOAT2{0.0f, 0.0f},
-		deltaTime };
+		deltaTime,
+		_resource->getMaxNumParticles()};
 
 	cmdList->SetComputeRootSignature(_rootSignature.Get());
 
