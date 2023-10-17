@@ -109,7 +109,9 @@
   + 여전히 RWByteAddressBuffer와 관련한 문제가 있었음: 단순히 UnorderedAccessBuffer로서 RootSiganture에서 다루어졌지만, RawBuffer는 반드시 UnorderedAccessView를 통해 DXGI_FORMAT_R32_TYPELESS 타입과 D3D12_BUFFER_UAV_FLAG_RAW 플래그를 지정해 다루어야 함! 지식이 부족해 이를 적용하지 않았고 문제가 발생하였던 것이었음.
   + 기본적인 파티클 렌더링 수행 완료 (100만 개)
     <img src="./img/20231017_particles.png">
-  + 
+  + 정해진 최대 파티클 수량을 넘을 시 생성하지 않도록 제한
+* 수요일:
+  + 추후 작성 예정
 
 
 <hr/>
