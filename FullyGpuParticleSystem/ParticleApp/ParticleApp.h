@@ -7,7 +7,7 @@
 #include "ParticleEmitter.h"
 #include "ParticleSimulator.h"
 #include "ParticlePass.h"
-#include "ObjectConstantBuffer.h"
+#include "PassConstantBuffer.h"
 
 #include "../Resource.h"
 
@@ -49,12 +49,12 @@ private:
 
 	std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
 
-	std::shared_ptr<ObjectConstantBuffer> _objectConstantBuffer;
+	std::shared_ptr<PassConstantBuffer> _passConstantBuffer;
 	std::unique_ptr<MeshGeometry> _boxGeometry = nullptr;
 
 	ComPtr<ID3D12PipelineState> _pso = nullptr;
 
-	ObjectConstants _passCb;
+	PassConstants _passCb;
 
 	DirectX::XMFLOAT3 _eyePos = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT4X4 _view = MathHelper::identity4x4();
@@ -66,7 +66,7 @@ private:
 
 	POINT lastMousePos;
 
-	std::unique_ptr<ParticleResource> _particleResource;
+	std::shared_ptr<ParticleResource> _particleResource;
 	std::unique_ptr<ParticleEmitter> _particleEmitter;
 	std::unique_ptr<ParticleSimulator> _particleSimulator;
 	std::unique_ptr<ParticlePass> _particlePass;

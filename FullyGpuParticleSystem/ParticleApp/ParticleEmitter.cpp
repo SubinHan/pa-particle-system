@@ -31,9 +31,16 @@ ID3D12PipelineState* ParticleEmitter::getPipelineStateObject()
 	return _pso.Get();
 }
 
-void ParticleEmitter::emitParticles(ID3D12GraphicsCommandList* cmdList, int numParticlesToEmit)
+void ParticleEmitter::emitParticles(
+	ID3D12GraphicsCommandList* cmdList, 
+	int numParticlesToEmit, 
+	float deltaTime)
 {
-	EmitConstants c = { numParticlesToEmit, DirectX::XMFLOAT3{0.0f, 0.0f, 0.0f}, DirectX::XMFLOAT2{0.0f, 0.0f} };
+	EmitConstants c = { 
+		numParticlesToEmit, 
+		DirectX::XMFLOAT3{0.0f, 0.0f, 0.0f}, 
+		DirectX::XMFLOAT2{0.0f, 0.0f},
+		deltaTime };
 
 	cmdList->SetComputeRootSignature(_rootSignature.Get());
 
@@ -46,11 +53,12 @@ void ParticleEmitter::emitParticles(ID3D12GraphicsCommandList* cmdList, int numP
 
 	cmdList->SetPipelineState(_pso.Get());
 
-	cmdList->SetComputeRoot32BitConstants(ROOT_SLOT_CONSTANTS_BUFFER, 6, &c, 0);
+	cmdList->SetComputeRoot32BitConstants(ROOT_SLOT_CONSTANTS_BUFFER, sizeof(EmitConstants) / 4, &c, 0);
 	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_PARTICLES_BUFFER, _resource->getParticlesResource()->GetGPUVirtualAddress());
 	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_ALIVES_INDICES_BUFFER, _resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
 	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_DEADS_INDICES_BUFFER, _resource->getDeadIndicesResource()->GetGPUVirtualAddress());
-	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersResource()->GetGPUVirtualAddress());
+	cmdList->SetComputeRootDescriptorTable(ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersUavGpuHandle());
+	//cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersResource()->GetGPUVirtualAddress());
 
 	const auto numGroupsX = static_cast<UINT>(ceilf(numParticlesToEmit / 256.0f));
 	const auto numGroupsY = 1;
@@ -69,15 +77,18 @@ void ParticleEmitter::buildRootSignature()
 	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
 
 	slotRootParameter[ROOT_SLOT_CONSTANTS_BUFFER]
-		.InitAsConstants(6, 0);
+		.InitAsConstants(sizeof(EmitConstants) / 4, 0);
 	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER]
 		.InitAsUnorderedAccessView(0);
 	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER]
 		.InitAsUnorderedAccessView(1);
 	slotRootParameter[ROOT_SLOT_DEADS_INDICES_BUFFER]
 		.InitAsUnorderedAccessView(2);
+
+	CD3DX12_DESCRIPTOR_RANGE uavTable;
+	uavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 3);
 	slotRootParameter[ROOT_SLOT_COUNTERS_BUFFER]
-		.InitAsUnorderedAccessView(3);
+		.InitAsDescriptorTable(1, &uavTable);
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
 		_countof(slotRootParameter),

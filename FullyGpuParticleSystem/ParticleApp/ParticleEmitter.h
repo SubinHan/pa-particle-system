@@ -15,6 +15,7 @@ struct EmitConstants
 	UINT EmitCount;
 	DirectX::XMFLOAT3 Position;
 	DirectX::XMFLOAT2 Orientation;
+	float DeltaTime;
 };
 
 class ParticleEmitter
@@ -26,7 +27,7 @@ public:
 	ID3DBlob* getShader();
 	ID3D12PipelineState* getPipelineStateObject();
 
-	void emitParticles(ID3D12GraphicsCommandList* cmdList, int numParticlesToEmit);
+	void emitParticles(ID3D12GraphicsCommandList* cmdList, int numParticlesToEmit, float deltaTime);
 
 private:
 	void buildRootSignature();

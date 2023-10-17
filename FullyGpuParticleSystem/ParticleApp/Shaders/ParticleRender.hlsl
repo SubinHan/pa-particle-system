@@ -1,3 +1,4 @@
+#include "Particle.hlsl"
 
 cbuffer cbPass : register(b0)
 {
@@ -29,13 +30,13 @@ struct GeoOut
 	float3 PosW : POSITION;
 	float3 NormalW : NORMAL;
 	float2 TexC : TEXCOORD;
-	uint PrimID : SV_PrimitiveID;
+	uint PrimId : SV_PrimitiveID;
 };
 
 StructuredBuffer<Particle> particles : register(t0);
 StructuredBuffer<uint> aliveIndices : register(t1);
 
-void ParticleVS(
+VertexOut ParticleVS(
 	uint vid : SV_VertexID)
 {
 	const uint particleIndex = aliveIndices[vid];
@@ -43,7 +44,7 @@ void ParticleVS(
 
 	VertexOut vertexOut;
 
-	vertexOut.PosW = particle.Position;
+	vertexOut.CenterW = particle.Position;
 	vertexOut.Size = particle.Size;
 
 	return vertexOut;
@@ -58,17 +59,17 @@ void ParticleGS(
 	float3 up = float3(0.0f, 1.0f, 0.0f);
 	float3 look = gEyePosW - gin[0].CenterW;
 	
-	float u = normalize(cross(up, look));
-	float v = normalize(cross(u, look));
+	float3 u = normalize(cross(up, look));
+	float3 v = normalize(cross(u, look));
 
-	float halfWidth = 0.5f * gin[0].SizeW.x;
-	float halfHeight = 0.5f * gin[0].SizeW.y;
+	float halfWidth = 0.5f * gin[0].Size;
+	float halfHeight = 0.5f * gin[0].Size;
 
 	float4 vertices[4];
-	v[0] = float4(gin[0].CetnerW + halfWidth * u - halfHeight * up, 1.0f);
-	v[1] = float4(gin[1].CetnerW + halfWidth * u + halfHeight * up, 1.0f);
-	v[2] = float4(gin[2].CetnerW - halfWidth * u - halfHeight * up, 1.0f);
-	v[3] = float4(gin[3].CetnerW - halfWidth * u + halfHeight * up, 1.0f);
+	vertices[0] = float4(gin[0].CenterW + halfWidth * u - halfHeight * up, 1.0f);
+	vertices[1] = float4(gin[0].CenterW + halfWidth * u + halfHeight * up, 1.0f);
+	vertices[2] = float4(gin[0].CenterW - halfWidth * u - halfHeight * up, 1.0f);
+	vertices[3] = float4(gin[0].CenterW - halfWidth * u + halfHeight * up, 1.0f);
 
 	float2 texC[4] =
 	{
@@ -88,7 +89,7 @@ void ParticleGS(
 		geoOut.TexC = texC[i];
 		geoOut.PrimId = primId;
 
-		triStream.Append(gout);
+		triStream.Append(geoOut);
 	}
 }
 

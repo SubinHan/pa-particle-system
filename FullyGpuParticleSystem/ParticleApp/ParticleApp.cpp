@@ -1,7 +1,7 @@
 #include "ParticleApp.h"
 
 #include "Core/UploadBuffer.h"
-#include "ObjectConstantBuffer.h"
+#include "PassConstantBuffer.h"
 #include "Model/Geometry.h"
 
 using namespace DirectX;
@@ -24,15 +24,11 @@ bool ParticleApp::initialize()
 
 	auto commandList = _device->startRecordingCommands();
 
-	buildCbvSrvUavDescriptors();
-	buildRootSignature();
-	buildShadersAndInputLayout();
-	buildBoxGeometry();
-	buildPso();
+	_particleResource = std::make_shared<ParticleResource>(_device->getD3dDevice(), commandList.Get());
 
-	_particleResource = std::make_unique<ParticleResource>(_device->getD3dDevice(), commandList.Get());
-
-	_device->submitCommands(commandList);
+	_passConstantBuffer =
+		std::make_shared<PassConstantBuffer>(
+			_device->getD3dDevice());
 
 	_particleEmitter = std::make_unique<ParticleEmitter>(
 		_device->getD3dDevice(),
@@ -40,6 +36,19 @@ bool ParticleApp::initialize()
 	_particleSimulator = std::make_unique<ParticleSimulator>(
 		_device->getD3dDevice(),
 		_particleResource.get());
+	_particlePass = std::make_unique<ParticlePass>(
+		_device.get(),
+		_particleResource.get(),
+		_passConstantBuffer.get());
+
+	buildCbvSrvUavDescriptors();
+	buildRootSignature();
+	buildShadersAndInputLayout();
+	buildBoxGeometry();
+	buildPso();
+
+	_device->submitCommands(commandList);
+
 
 	return true;
 }
@@ -93,20 +102,25 @@ void ParticleApp::update(const GameTimer& gt)
 	_passCb.TotalTime = gt.totalTime();
 	_passCb.DeltaTime = gt.deltaTime();
 
-	_objectConstantBuffer->copyData(0, _passCb);
+	_passConstantBuffer->copyData(0, _passCb);
 }
 
 void ParticleApp::draw(const GameTimer& gt)
 {
 	auto commandList = _device->startRecordingCommands();
 
-	_particleEmitter->emitParticles(commandList.Get(), 1);
+	auto cbvSrvUavDescriptorHeap = _device->GetCbvSrvUavDescriptorHeap();
+
+	ID3D12DescriptorHeap* descriptorHeaps[] = { cbvSrvUavDescriptorHeap.Get() };
+	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+	_particleEmitter->emitParticles(commandList.Get(), 1, gt.deltaTime());
+
 	_particleSimulator->simulateParticles(commandList.Get(), gt.deltaTime());
 
 	auto currentBackBuffer = _device->getCurrentBackBuffer();
 	auto currentBackBufferView = _device->getCurrentBackBufferViewHandle();
 	auto depthStencilView = _device->getDepthStencilViewHandle();
-	auto cbvSrvUavDescriptorHeap = _device->GetCbvSrvUavDescriptorHeap();
 
 	commandList->RSSetViewports(1, &_device->getScreenViewport());
 	commandList->RSSetScissorRects(1, &_device->getScissorRect());
@@ -117,7 +131,6 @@ void ParticleApp::draw(const GameTimer& gt)
 		D3D12_RESOURCE_STATE_RENDER_TARGET);
 	commandList->ResourceBarrier(1, &presentToRender);
 
-
 	commandList->ClearRenderTargetView(currentBackBufferView,
 		Colors::LightSteelBlue, 0, nullptr);
 	commandList->ClearDepthStencilView(depthStencilView,
@@ -126,9 +139,6 @@ void ParticleApp::draw(const GameTimer& gt)
 
 	commandList->OMSetRenderTargets(1, &currentBackBufferView,
 		true, &depthStencilView);
-
-	ID3D12DescriptorHeap* descriptorHeaps[] = { cbvSrvUavDescriptorHeap.Get() };
-	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	commandList->SetGraphicsRootSignature(_rootSignature.Get());
 
@@ -145,15 +155,15 @@ void ParticleApp::draw(const GameTimer& gt)
 	commandList->SetPipelineState(
 		_pso.Get());
 
-	commandList->DrawIndexedInstanced(
-		_boxGeometry->DrawArgs["box"].IndexCount,
-		1, 
-		0,
-		0, 
-		0);
+	//commandList->DrawIndexedInstanced(
+	//	_boxGeometry->DrawArgs["box"].IndexCount,
+	//	1, 
+	//	0,
+	//	0, 
+	//	0);
 
 
-	//_particlePass->render(commandList.Get());
+	_particlePass->render(commandList.Get());
 
 
 	auto barrierDraw = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -173,15 +183,14 @@ void ParticleApp::buildCbvSrvUavDescriptors()
 	// register srv demander
 
 	// register cbv demander
-	_objectConstantBuffer =
-		std::make_shared<ObjectConstantBuffer>(
-			_device->getD3dDevice());
 
 	std::shared_ptr<ICbvSrvUavDemander> basePointer = 
-		std::static_pointer_cast<ICbvSrvUavDemander>(_objectConstantBuffer);
+		std::static_pointer_cast<ICbvSrvUavDemander>(_passConstantBuffer);
 	
 	_device->registerCbvSrvUavDescriptorDemander(
 		std::weak_ptr<ICbvSrvUavDemander>(basePointer));
+	_device->registerCbvSrvUavDescriptorDemander(
+		std::weak_ptr<ICbvSrvUavDemander>(_particleResource));
 
 	// create descriptor heap
 	_device->buildCbvSrvUavDescriptorHeap();

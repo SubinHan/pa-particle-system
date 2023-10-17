@@ -7,7 +7,9 @@ cbuffer cbEmitConstants : register(b0)
 {
 	uint EmitCount;
 	float3 Postion;
+
 	float2 Orientation;
+	float DeltaTime;
 }
 
 RWStructuredBuffer<Particle> particles	: register(u0);
@@ -34,24 +36,24 @@ void EmitCS(
 	// TODO: init Particle with Emit Constants
 	Particle newParticle;
 
-	float particleVelocityX = random(float(dispatchThreadId.x) + 0.1f);
-	float particleVelocityY = random(float(dispatchThreadId.x) + 0.2f);
-	float particleVelocityZ = random(float(dispatchThreadId.x) + 0.3f);
+	float particleVelocityX = random(float(dispatchThreadId.x) + DeltaTime + 0.1f);
+	float particleVelocityY = random(float(dispatchThreadId.x) + DeltaTime + 0.2f);
+	float particleVelocityZ = random(float(dispatchThreadId.x) + DeltaTime + 0.3f);
 
 	newParticle.Position =
 		float3(0.0f, 0.0f, 0.0f);
 
 	newParticle.Velocity =
 		float3(
-			particleVelocityX,
-			particleVelocityY,
-			particleVelocityZ);
+			particleVelocityX * 0.3f,
+			particleVelocityY * 0.3f,
+			particleVelocityZ * 0.3f);
 
 	newParticle.Acceleration =
 		float3(0.0f, 0.0f, 0.0f);
 
-	newParticle.Lifetime = 10.0f;
-	newParticle.Size = 1.0f;
+	newParticle.Lifetime = 2.0f;
+	newParticle.Size = 0.01f;
 	newParticle.Opacity = 1.0f;
 	newParticle.Color = float3(1.0f, 0.0f, 0.0f);
 
@@ -61,7 +63,6 @@ void EmitCS(
 	counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMDEADS, -1, numDeads);
 
 	uint newParticleIndex = deadIndices[numDeads - 1];
-	//uint newParticleIndex = deadIndices[min(numDeads, 10)]; // for debugging
 
 	uint numAlives;
 	counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMALIVES, 1, numAlives);

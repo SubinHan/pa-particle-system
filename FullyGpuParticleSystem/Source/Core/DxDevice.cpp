@@ -31,7 +31,6 @@ void DxDevice::init()
     createSwapChain();
     createRtvAndDsvDescriptorHeaps();
     createRenderTargetView();
-    createDepthStencilView();
 }
 
 void DxDevice::createDevice()
@@ -67,7 +66,7 @@ void DxDevice::getDescriptorHandleIncrementSize()
 {
     _rtvDescriptorSize = _d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     _dsvDescriptorSize = _d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-    _cbvDescriptorSize = _d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    _cbvSrvUavDescriptorSize = _d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 void DxDevice::checkMsaa()
@@ -282,8 +281,8 @@ void DxDevice::buildCbvSrvUavDescriptorHeap()
         demander->getNumDescriptorsToDemand();
 
         demander->buildCbvSrvUav(cpuHandle, gpuHandle);
-        cpuHandle.Offset(demander->getNumDescriptorsToDemand());
-        gpuHandle.Offset(demander->getNumDescriptorsToDemand());
+        cpuHandle.Offset(demander->getNumDescriptorsToDemand(), _cbvSrvUavDescriptorSize);
+        gpuHandle.Offset(demander->getNumDescriptorsToDemand(), _cbvSrvUavDescriptorSize);
     }
 }
 

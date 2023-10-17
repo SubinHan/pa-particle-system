@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/ICbvSrvUavDemander.h"
+
 #include <Windows.h>
 #include <wrl.h>
 #include <d3dx12.h>
@@ -11,10 +13,13 @@ struct ParticleCounters
 	UINT NumAlivesPostUpdate;
 };
 
-class ParticleResource
+class ParticleResource : public ICbvSrvUavDemander
 {
 public:
 	ParticleResource(Microsoft::WRL::ComPtr<ID3D12Device> device, ID3D12GraphicsCommandList* cmdList);
+
+	virtual int getNumDescriptorsToDemand() const override;
+	virtual void buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD3DX12_GPU_DESCRIPTOR_HANDLE hGpu) override;
 
 	void swapAliveIndicesBuffer();
 
@@ -23,6 +28,13 @@ public:
 	ID3D12Resource* getAliveIndicesResourceBack();
 	ID3D12Resource* getDeadIndicesResource();
 	ID3D12Resource* getCountersResource();
+
+	CD3DX12_GPU_DESCRIPTOR_HANDLE getCountersUavGpuHandle();
+
+	void transitParticlesToSrv(ID3D12GraphicsCommandList* cmdList);
+	void transitAliveIndicesToSrv(ID3D12GraphicsCommandList* cmdList);
+	void transitParticlesToUav(ID3D12GraphicsCommandList* cmdList);
+	void transitAliveIndicesToUav(ID3D12GraphicsCommandList* cmdList);
 
 	int getMaxNumParticles();
 
@@ -43,4 +55,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> _countersUploadBuffer = nullptr;
 
 	int _currentAliveIndicesBufferIndex = 0;
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE _hCounterCpuUav;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE _hCounterGpuUav;
 };

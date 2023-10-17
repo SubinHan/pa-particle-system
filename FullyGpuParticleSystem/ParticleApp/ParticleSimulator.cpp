@@ -44,58 +44,106 @@ void ParticleSimulator::simulateParticles(ID3D12GraphicsCommandList* cmdList, fl
 	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_ALIVES_INDICES_BUFFER_FRONT, _resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
 	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_ALIVES_INDICES_BUFFER_BACK, _resource->getAliveIndicesResourceBack()->GetGPUVirtualAddress());
 	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_DEADS_INDICES_BUFFER, _resource->getDeadIndicesResource()->GetGPUVirtualAddress());
-	cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersResource()->GetGPUVirtualAddress());
+	cmdList->SetComputeRootDescriptorTable(ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersUavGpuHandle());
+	//cmdList->SetComputeRootUnorderedAccessView(ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersResource()->GetGPUVirtualAddress());
 
 	const auto numGroupsX = static_cast<UINT>(ceilf(_resource->getMaxNumParticles() / 256.0f));
 	const auto numGroupsY = 1;
 	const UINT numGroupsZ = 1;
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
-	
+
+	cmdList->SetComputeRootSignature(_rootSignaturePost.Get());
+	cmdList->SetPipelineState(_psoPost.Get());
+	cmdList->SetComputeRootDescriptorTable(0, _resource->getCountersUavGpuHandle());
+	//cmdList->SetComputeRootUnorderedAccessView(0, _resource->getCountersResource()->GetGPUVirtualAddress());
+	cmdList->Dispatch(1, 1, 1);
+
 	_resource->swapAliveIndicesBuffer();
 }
 
 void ParticleSimulator::buildRootSignature()
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[6];
-
-	slotRootParameter[ROOT_SLOT_CONSTANTS_BUFFER]
-		.InitAsConstants(1, 0);
-	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER]
-		.InitAsUnorderedAccessView(0);
-	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER_FRONT]
-		.InitAsUnorderedAccessView(1);
-	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER_BACK]
-		.InitAsUnorderedAccessView(2);
-	slotRootParameter[ROOT_SLOT_DEADS_INDICES_BUFFER]
-		.InitAsUnorderedAccessView(3);
-	slotRootParameter[ROOT_SLOT_COUNTERS_BUFFER]
-		.InitAsUnorderedAccessView(4);
-
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
-		_countof(slotRootParameter),
-		slotRootParameter,
-		0,
-		nullptr,
-		D3D12_ROOT_SIGNATURE_FLAG_NONE);
-
-
-	// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
-	ComPtr<ID3DBlob> serializedRootSig = nullptr;
-	ComPtr<ID3DBlob> errorBlob = nullptr;
-	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
-
-	if (errorBlob != nullptr)
 	{
-		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	}
-	ThrowIfFailed(hr);
+		CD3DX12_ROOT_PARAMETER slotRootParameter[6];
 
-	ThrowIfFailed(_device->CreateRootSignature(
-		0,
-		serializedRootSig->GetBufferPointer(),
-		serializedRootSig->GetBufferSize(),
-		IID_PPV_ARGS(_rootSignature.GetAddressOf())));
+		slotRootParameter[ROOT_SLOT_CONSTANTS_BUFFER]
+			.InitAsConstants(1, 0);
+		slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER]
+			.InitAsUnorderedAccessView(0);
+		slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER_FRONT]
+			.InitAsUnorderedAccessView(1);
+		slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER_BACK]
+			.InitAsUnorderedAccessView(2);
+		slotRootParameter[ROOT_SLOT_DEADS_INDICES_BUFFER]
+			.InitAsUnorderedAccessView(3);
+
+		CD3DX12_DESCRIPTOR_RANGE uavTable;
+		uavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 4);
+		slotRootParameter[ROOT_SLOT_COUNTERS_BUFFER]
+			.InitAsDescriptorTable(1, &uavTable);
+
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
+			_countof(slotRootParameter),
+			slotRootParameter,
+			0,
+			nullptr,
+			D3D12_ROOT_SIGNATURE_FLAG_NONE);
+
+
+		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
+		ComPtr<ID3DBlob> serializedRootSig = nullptr;
+		ComPtr<ID3DBlob> errorBlob = nullptr;
+		HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+			serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+		if (errorBlob != nullptr)
+		{
+			::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+		}
+		ThrowIfFailed(hr);
+
+		ThrowIfFailed(_device->CreateRootSignature(
+			0,
+			serializedRootSig->GetBufferPointer(),
+			serializedRootSig->GetBufferSize(),
+			IID_PPV_ARGS(_rootSignature.GetAddressOf())));
+	}
+
+	// build post
+
+	{
+		CD3DX12_ROOT_PARAMETER slotRootParameter[1];
+		CD3DX12_DESCRIPTOR_RANGE uavTable;
+		uavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+		slotRootParameter[0]
+			.InitAsDescriptorTable(1, &uavTable);
+
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
+			_countof(slotRootParameter),
+			slotRootParameter,
+			0,
+			nullptr,
+			D3D12_ROOT_SIGNATURE_FLAG_NONE);
+
+
+		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
+		ComPtr<ID3DBlob> serializedRootSig = nullptr;
+		ComPtr<ID3DBlob> errorBlob = nullptr;
+		HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+			serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+		if (errorBlob != nullptr)
+		{
+			::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+		}
+		ThrowIfFailed(hr);
+
+		ThrowIfFailed(_device->CreateRootSignature(
+			0,
+			serializedRootSig->GetBufferPointer(),
+			serializedRootSig->GetBufferSize(),
+			IID_PPV_ARGS(_rootSignaturePost.GetAddressOf())));
+	}
 }
 
 void ParticleSimulator::buildShaders()
@@ -104,6 +152,12 @@ void ParticleSimulator::buildShaders()
 		L"ParticleApp\\Shaders\\ParticleSimulateCS.hlsl",
 		nullptr,
 		"SimulateCS",
+		"cs_5_1");
+
+	_shaderPost = DxUtil::compileShader(
+		L"ParticleApp\\Shaders\\ParticlePostSimulateCS.hlsl",
+		nullptr,
+		"PostSimulateCS",
 		"cs_5_1");
 }
 
@@ -120,4 +174,14 @@ void ParticleSimulator::buildPsos()
 	ThrowIfFailed(
 		_device->CreateComputePipelineState(
 			&psoDesc, IID_PPV_ARGS(&_pso)));
+
+	psoDesc.pRootSignature = _rootSignaturePost.Get();
+	psoDesc.CS =
+	{
+		reinterpret_cast<BYTE*>(_shaderPost->GetBufferPointer()),
+		_shaderPost->GetBufferSize()
+	};
+	ThrowIfFailed(
+		_device->CreateComputePipelineState(
+			&psoDesc, IID_PPV_ARGS(&_psoPost)));
 }

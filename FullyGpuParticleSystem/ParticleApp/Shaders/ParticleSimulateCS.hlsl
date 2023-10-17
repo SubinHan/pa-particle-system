@@ -20,11 +20,6 @@ void SimulateCS(
 	int3 dispatchThreadId : SV_DispatchThreadID)
 {
 	const int id = dispatchThreadId.x;
-	if (id == 0)
-	{
-		counters.Store(PARTICLECOUNTER_OFFSET_NUMALIVES_POST_UPDATE, 0);
-	}
-	DeviceMemoryBarrierWithGroupSync();
 
 	uint numAlives = 
 		counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
@@ -58,13 +53,5 @@ void SimulateCS(
 
 			newAliveIndices[newIndex] = particleIndex;
 		}
-	}
-
-	DeviceMemoryBarrierWithGroupSync();
-
-	if (id == 0)
-	{
-		uint newNumAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES_POST_UPDATE);
-		counters.Store(PARTICLECOUNTER_OFFSET_NUMALIVES, newNumAlives);
 	}
 }

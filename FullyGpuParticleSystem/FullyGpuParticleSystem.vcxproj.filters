@@ -54,7 +54,7 @@
     <ClInclude Include="Include\Core\UploadBuffer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleApp\ObjectConstantBuffer.h">
+    <ClInclude Include="ParticleApp\PassConstantBuffer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Include\Model\Geometry.h">
@@ -110,7 +110,7 @@
     <ClCompile Include="Source\Core\DxDevice.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleApp\ObjectConstantBuffer.cpp">
+    <ClCompile Include="ParticleApp\PassConstantBuffer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Util\GeometryGenerator.cpp">
@@ -150,6 +150,7 @@
     <FxCompile Include="ParticleApp\Shaders\ParticleSimulateCS.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\Particle.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticleRender.hlsl" />
+    <FxCompile Include="ParticleApp\Shaders\ParticlePostSimulateCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

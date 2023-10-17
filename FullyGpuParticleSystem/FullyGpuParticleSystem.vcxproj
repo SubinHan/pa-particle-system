@@ -161,7 +161,7 @@
     <ClInclude Include="Include\Model\Geometry.h" />
     <ClInclude Include="Include\Model\Particle.h" />
     <ClInclude Include="Include\Util\GeometryGenerator.h" />
-    <ClInclude Include="ParticleApp\ObjectConstantBuffer.h" />
+    <ClInclude Include="ParticleApp\PassConstantBuffer.h" />
     <ClInclude Include="ParticleApp\ParticleApp.h" />
     <ClInclude Include="ParticleApp\ParticleEmitter.h" />
     <ClInclude Include="ParticleApp\ParticlePass.h" />
@@ -175,7 +175,7 @@
     <ClInclude Include="Include\Util\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ParticleApp\ObjectConstantBuffer.cpp" />
+    <ClCompile Include="ParticleApp\PassConstantBuffer.cpp" />
     <ClCompile Include="ParticleApp\ParticleEmitter.cpp" />
     <ClCompile Include="ParticleApp\ParticlePass.cpp" />
     <ClCompile Include="ParticleApp\ParticleResource.cpp" />
@@ -209,6 +209,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\ParticleEmitCS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleApp\Shaders\ParticlePostSimulateCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\ParticleRender.hlsl">

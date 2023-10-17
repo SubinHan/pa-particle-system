@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Util/DxUtil.h"
+#include "Core/ICbvSrvUavDemander.h"
 
 #include <wrl.h>
 
@@ -45,4 +46,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shader;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature;
+
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoPost;
+	Microsoft::WRL::ComPtr<ID3DBlob> _shaderPost;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignaturePost;
+
 };

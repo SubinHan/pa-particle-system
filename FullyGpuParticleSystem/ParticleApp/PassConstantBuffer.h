@@ -4,7 +4,7 @@
 #include "Core/ICbvSrvUavDemander.h"
 #include "Core/UploadBuffer.h"
 
-struct ObjectConstants
+struct PassConstants
 {
     DirectX::XMFLOAT4X4 View = MathHelper::identity4x4();
     DirectX::XMFLOAT4X4 InvView = MathHelper::identity4x4();
@@ -22,18 +22,21 @@ struct ObjectConstants
     float DeltaTime = 0.0f;
 };
 
-class ObjectConstantBuffer : public ICbvSrvUavDemander
+class PassConstantBuffer : public ICbvSrvUavDemander
 {
 public:
-	ObjectConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device>);
+	PassConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device>);
 
 	virtual int getNumDescriptorsToDemand() const override;
 	virtual void buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD3DX12_GPU_DESCRIPTOR_HANDLE hGpu) override;
 	
-	void copyData(int elementIndex, const ObjectConstants& data);
+	void copyData(int elementIndex, const PassConstants& data);
+
+    CD3DX12_CPU_DESCRIPTOR_HANDLE getCpuHandle();
+    CD3DX12_GPU_DESCRIPTOR_HANDLE getGpuHandle();
 
 private:
-	std::unique_ptr<UploadBuffer<ObjectConstants>> _objectConstantBuffer = nullptr;
+	std::unique_ptr<UploadBuffer<PassConstants>> _passConstantBuffer = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE _hCpu;

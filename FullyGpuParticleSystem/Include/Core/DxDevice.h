@@ -100,7 +100,7 @@ private:
 
 	UINT _rtvDescriptorSize = 0;
 	UINT _dsvDescriptorSize = 0;
-	UINT _cbvDescriptorSize = 0;
+	UINT _cbvSrvUavDescriptorSize = 0;
 
 	ComPtr<ID3D12CommandQueue>			_commandQueue;
 	ComPtr<ID3D12CommandAllocator>		_commandListAllocator;
