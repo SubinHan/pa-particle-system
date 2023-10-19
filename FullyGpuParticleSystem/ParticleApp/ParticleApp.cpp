@@ -62,6 +62,9 @@ bool ParticleApp::initialize()
 	_particleSystems[0]->setMaterial(_materials["particle"].get());
 	_particleSystems[1]->setMaterial(_materials["particle"].get());
 
+	_particleSystems[0]->setSpawnRate(1000.0f);
+	_particleSystems[1]->setSpawnRate(10000.0f);
+
 	return true;
 }
 

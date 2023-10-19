@@ -76,7 +76,10 @@
 * Particle System 학습
 * Lifetime, velocity 등 GPU 코드에서 하드코딩 된 속성들을 CPU 단에서 매개변수화
 * 프레임 통계 모듈 구현
-* alpha blending 수행
+* Sorting by distance 구현
+  + Batcher's odd-even merge sort 학습
+  + Bitonic sort 학습
+  + DrawIndirect?
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -84,6 +87,8 @@
 * 간단한 수준의 Particle 생성/파괴, 시뮬레이션을 위한 Computing Shader 작성
 * 간단한 수준의 Particle System을 위한 렌더링 파이프라인 구성
 * 간단한 수준의 emitter, particle 등 핵심 기능 설계 및 구현
+* Texture mapping 수행
+* alpha blending 수행
 
 <hr/>
 
@@ -120,6 +125,11 @@
   + 여러 개의 ParticleSystem을 관리할 수 있음 (아직은 각각의 particle system이 서로 다른 world transform만 가질 수 있음)
   + 간단한 텍스처 매핑 (성능: 대략 10만 개)
     <img src="./img/20231018_particles.png">
+* 목요일:
+  + 알파 블렌딩 수행
+    <img src="./img/20231019_particles_alphablending.png">
+  + Spawn rate 조절 가능
+  + 
 
 <hr/>
 
@@ -141,6 +151,13 @@
 * simulate 단계에서 파티클의 life가 0 미만이면 deads 스택에 해당 인덱스를 삽입함.
 * 만약 여전히 살아있다면 시뮬레이션 연산을 마친 뒤 ping-pong 버퍼인 alives2 스택에 해당 파티클의 인덱스를 삽입함.
 
+#### 파티클 정렬
+* Batcher's odd-even merge sort:
+  + 반절로 나누어 정렬한다
+  + 짝수와 홀수 인덱스로 나누어 정렬한다.
+  + (2l, 2l-1)을 비교해 정렬한다. 가령 8개의 원소일 경우 (2,3), (4,5), (6,7)
+  + 이를 반복해 정렬 완료
+* Bitnoic sort:
 <hr/>
 
 
@@ -148,4 +165,5 @@
 ### 참고문헌
 [William T. Reeves, particle systems - a technique for modeling a class of fuzzy objects](https://www.lri.fr/~mbl/ENS/IG2/devoir2/files/docs/fuzzyParticles.pdf) <br>
 [Lutz Lata, Building a Million Particle System](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=b5aa42d88a178b264f4ceb3ddb67d3d00ecbc631) <br>
-[Karl Sims, Particle animation and rendering using data parallel computation](https://www.karlsims.com/papers/ParticlesSiggraph90.pdf)
+[Karl Sims, Particle animation and rendering using data parallel computation](https://www.karlsims.com/papers/ParticlesSiggraph90.pdf) <br>
+[Bathcer's Algorithm](https://math.mit.edu/~shor/18.310/batcher.pdf)

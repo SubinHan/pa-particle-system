@@ -51,7 +51,7 @@ void ParticlePass::render(
 	_resource->transitParticlesToSrv(cmdList);
 	_resource->transitAliveIndicesToSrv(cmdList);
 
-	cmdList->SetPipelineState(_pso.Get());
+	cmdList->SetPipelineState(_psoTransparency.Get());
 	cmdList->SetGraphicsRoot32BitConstants(ROOT_SLOT_OBJECT_CONSTANTS_BUFFER, sizeof(ObjectConstants) / 4, &objectConstants, 0);
 	cmdList->SetGraphicsRootDescriptorTable(
 		ROOT_SLOT_PASS_CONSTANTS_BUFFER, passCb.getGpuHandle());
@@ -151,37 +151,61 @@ void ParticlePass::buildInputLayout()
 
 void ParticlePass::buildPsos()
 {
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
-	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	psoDesc.InputLayout = { _inputLayout.data(), static_cast<UINT>(_inputLayout.size()) };
-	psoDesc.pRootSignature = _rootSignature.Get();
-	psoDesc.VS =
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
+	ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+	opaquePsoDesc.InputLayout = { _inputLayout.data(), static_cast<UINT>(_inputLayout.size()) };
+	opaquePsoDesc.pRootSignature = _rootSignature.Get();
+	opaquePsoDesc.VS =
 	{
 		reinterpret_cast<BYTE*>(_shaderVs->GetBufferPointer()),
 		_shaderVs->GetBufferSize()
 	};
-	psoDesc.GS =
+	opaquePsoDesc.GS =
 	{
 		reinterpret_cast<BYTE*>(_shaderGs->GetBufferPointer()),
 		_shaderGs->GetBufferSize()
 	};
-	psoDesc.PS =
+	opaquePsoDesc.PS =
 	{
 		reinterpret_cast<BYTE*>(_shaderPs->GetBufferPointer()),
 		_shaderPs->GetBufferSize()
 	};
-	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-	psoDesc.SampleMask = UINT_MAX;
-	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
-	psoDesc.NumRenderTargets = 1;
-	psoDesc.RTVFormats[0] = _device->getBackBufferFormat();
+	opaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	opaquePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	opaquePsoDesc.SampleMask = UINT_MAX;
+	opaquePsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
+	opaquePsoDesc.NumRenderTargets = 1;
+	opaquePsoDesc.RTVFormats[0] = _device->getBackBufferFormat();
 	bool msaaState = _device->getMsaaState();
-	psoDesc.SampleDesc.Count = msaaState ? 4 : 1;
-	psoDesc.SampleDesc.Quality = msaaState ? _device->getMsaaQuality() - 1 : 0;
-	psoDesc.DSVFormat = _device->getDepthStencilFormat();
-	ThrowIfFailed(_device->getD3dDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_pso)));
+	opaquePsoDesc.SampleDesc.Count = msaaState ? 4 : 1;
+	opaquePsoDesc.SampleDesc.Quality = msaaState ? _device->getMsaaQuality() - 1 : 0;
+	opaquePsoDesc.DSVFormat = _device->getDepthStencilFormat();
+	ThrowIfFailed(_device->getD3dDevice()->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&_psoOpaque)));
+
+
+	auto transparentPsoDesc = opaquePsoDesc;
+
+	transparentPsoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+
+	D3D12_RENDER_TARGET_BLEND_DESC transparencyBlendDesc;
+	transparencyBlendDesc.BlendEnable = true;
+	transparencyBlendDesc.LogicOpEnable = false;
+	transparencyBlendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	transparencyBlendDesc.DestBlend = D3D12_BLEND_DEST_ALPHA;
+	transparencyBlendDesc.BlendOp = D3D12_BLEND_OP_ADD;
+	transparencyBlendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+	transparencyBlendDesc.DestBlendAlpha = D3D12_BLEND_ONE;
+	transparencyBlendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	transparencyBlendDesc.LogicOp = D3D12_LOGIC_OP_NOOP;
+	transparencyBlendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	transparentPsoDesc.BlendState.RenderTarget[0] = transparencyBlendDesc;
+	ThrowIfFailed(
+		_device->getD3dDevice()->CreateGraphicsPipelineState(
+			&transparentPsoDesc, IID_PPV_ARGS(&_psoTransparency)
+		)
+	);
 }
 
 void ParticlePass::generateEmptyGeometry()

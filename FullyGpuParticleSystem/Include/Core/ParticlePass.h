@@ -43,7 +43,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderGs;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderPs;
 	std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoOpaque;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoTransparency;
 
 	std::unique_ptr<MeshGeometry> _emptyGeometry = nullptr;
 };

@@ -33,6 +33,12 @@ public:
 
 	void setWorldTransform(const DirectX::XMFLOAT4X4& newWorldTransform);
 	void setMaterial(Material* material);
+	
+	/// <summary>
+	/// Set number of particles to spawn per a second.
+	/// </summary>
+	/// <param name="spawnRate"></param>
+	void setSpawnRate(float spawnRate);
 
 private:
 	void init();
@@ -46,4 +52,7 @@ private:
 	std::unique_ptr<ParticlePass> _pass;
 
 	DirectX::XMFLOAT4X4 _world = MathHelper::identity4x4();
+	float _spawnRate;
+	float _spawnRateInv;
+	float _deltaTimeAfterSpawn;
 };

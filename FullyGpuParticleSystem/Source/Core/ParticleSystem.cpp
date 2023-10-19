@@ -11,7 +11,9 @@
 #include <iostream>
 
 ParticleSystem::ParticleSystem(DxDevice* device) :
-	_device(device)
+	_device(device),
+	_spawnRate(0.0f),
+	_deltaTimeAfterSpawn(0.0f)
 {
 	init();
 }
@@ -47,11 +49,21 @@ void ParticleSystem::onDraw(
 	//_device->getD3dDevice()->CreateQueryHeap(&heapDesc, IID_PPV_ARGS(&pQueryHeap));
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 0);
-	_emitter->emitParticles(
-		commandList,
-		objConstants,
-		max(_resource->getMaxNumParticles() / 100, 1),
-		gt.deltaTime());
+
+	_deltaTimeAfterSpawn += gt.deltaTime();
+	unsigned int numSpawn = 0;
+
+	numSpawn = _deltaTimeAfterSpawn * _spawnRate;
+	_deltaTimeAfterSpawn -= _spawnRateInv * static_cast<float>(numSpawn);
+
+	if (numSpawn > 0)
+	{
+		_emitter->emitParticles(
+			commandList,
+			objConstants,
+			numSpawn,
+			gt.deltaTime());
+	}
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 1);
 	_simulator->simulateParticles(commandList, gt.deltaTime());
@@ -115,6 +127,12 @@ void ParticleSystem::setWorldTransform(const DirectX::XMFLOAT4X4& newWorldTransf
 void ParticleSystem::setMaterial(Material* material)
 {
 	_pass->setMaterial(material);
+}
+
+void ParticleSystem::setSpawnRate(float spawnRate)
+{
+	_spawnRate = spawnRate;
+	_spawnRateInv = 1.0f / _spawnRate;
 }
 
 void ParticleSystem::init()
