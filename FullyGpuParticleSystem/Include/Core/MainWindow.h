@@ -19,7 +19,7 @@ public:
 	MainWindow(HINSTANCE hInstance);
 	virtual ~MainWindow();
 
-	BOOL Create(
+	BOOL create(
 		PCWSTR lpWindowName,
 		DWORD dwStyle,
 		DWORD dwExStyle = 0,
@@ -31,17 +31,17 @@ public:
 		HMENU hMenu = 0
 	);
 
-	int Run();
-	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	int run();
+	static LRESULT CALLBACK windowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	float aspectRatio() const;
 	virtual bool initialize();
 
 	virtual PCWSTR getClassName() const = 0;
-	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void CreateDevice();
-	void ReleaseDevice();
+	void createDevice();
+	void releaseDevice();
 
 	virtual void onResize();
 	virtual void update(const GameTimer& gt) = 0;
@@ -49,32 +49,32 @@ public:
 
 	virtual void onMouseLeftDown(int x, int y, short keyState) {};
 	virtual void onMouseLeftUp(int x, int y, short keyState) {};
-	virtual void OnMouseMiddleDown(int x, int y, short keyState) {};
-	virtual void OnMouseMiddleUp(int x, int y, short keyState) {};
-	virtual void OnMouseRightDown(int x, int y, short keyState) {};
-	virtual void OnMouseRightUp(int x, int y, short keyState) {};
-	virtual void OnMouseXDown(int x, int y, short keyState) {};
-	virtual void OnMouseXUp(int x, int y, short keyState) {};
-	virtual void OnMouseWheel(short delta, short keyState) {}
-	virtual void OnMouseHover(int x, int y) {}
-	virtual void OnMouseLeave() {}
+	virtual void onMouseMiddleDown(int x, int y, short keyState) {};
+	virtual void onMouseMiddleUp(int x, int y, short keyState) {};
+	virtual void onMouseRightDown(int x, int y, short keyState) {};
+	virtual void onMouseRightUp(int x, int y, short keyState) {};
+	virtual void onMouseXDown(int x, int y, short keyState) {};
+	virtual void onMouseXUp(int x, int y, short keyState) {};
+	virtual void onMouseWheel(short delta, short keyState) {}
+	virtual void onMouseHover(int x, int y) {}
+	virtual void onMouseLeave() {}
 	virtual void onMouseMove(int x, int y, short keyState) {}
 
-	virtual void OnKeyDown(WPARAM windowVirtualKeyCode) {}
-	virtual void OnKeyUp(WPARAM windowVirtualKeyCode) {}
+	virtual void onKeyDown(WPARAM windowVirtualKeyCode) {}
+	virtual void onKeyUp(WPARAM windowVirtualKeyCode) {}
 
 
-	void CalculateFrameStats();
+	void calculateFrameStats();
 
-	bool isPaused = false;
-	bool isMinimized = false;
-	bool isMaximized = false;
-	bool isResizing = false;
-	bool isFullscreenActivated = false;
+	bool _isPaused = false;
+	bool _isMinimized = false;
+	bool _isMaximized = false;
+	bool _isResizing = false;
+	bool _isFullscreenActivated = false;
 
 protected:
-	GameTimer timer;
-	std::wstring mainWndCaption;
+	GameTimer _timer;
+	std::wstring _mainWndCaption;
 
 	HWND _hwnd;
 	HINSTANCE _hInstance;

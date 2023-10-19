@@ -1,16 +1,24 @@
 #include "ParticleApp.h"
 
 #include "Core/UploadBuffer.h"
-#include "PassConstantBuffer.h"
+#include "Core/PassConstantBuffer.h"
+#include "Core/ParticleSystem.h"
+#include "Core/TextureBuffer.h"
 #include "Model/Geometry.h"
+#include "Model/Material.h"
+#include "Model/Texture.h"
+#include "Util/DDSTextureLoader.h"
 
 using namespace DirectX;
 
 ParticleApp::ParticleApp(HINSTANCE hInstance) :
 	MainWindow(hInstance)
 {
-	// will be initialized through the callback function Initialize()
+	// do not call initialize(). because:
+	// will be initialized through the callback function.
 }
+
+ParticleApp::~ParticleApp() = default;
 
 PCWSTR ParticleApp::getClassName() const
 {
@@ -22,26 +30,22 @@ bool ParticleApp::initialize()
 	if (!MainWindow::initialize())
 		return false;
 
-	auto commandList = _device->startRecordingCommands();
+	_particleSystems.push_back(std::move(
+		std::make_unique<ParticleSystem>(_device.get())));
 
-	_particleResource = std::make_shared<ParticleResource>(_device->getD3dDevice(), commandList.Get());
+	_particleSystems.push_back(std::move(
+		std::make_unique<ParticleSystem>(_device.get())));
+
+	auto commandList = _device->startRecordingCommands();
 
 	_passConstantBuffer =
 		std::make_shared<PassConstantBuffer>(
 			_device->getD3dDevice());
 
-	_particleEmitter = std::make_unique<ParticleEmitter>(
-		_device->getD3dDevice(),
-		_particleResource.get());
-	_particleSimulator = std::make_unique<ParticleSimulator>(
-		_device->getD3dDevice(),
-		_particleResource.get());
-	_particlePass = std::make_unique<ParticlePass>(
-		_device.get(),
-		_particleResource.get(),
-		_passConstantBuffer.get());
-
+	// be careful about order!! load texture - buildDescriptors - buildMaterials
+	loadTextures(commandList.Get());
 	buildCbvSrvUavDescriptors();
+	buildMaterials();
 	buildRootSignature();
 	buildShadersAndInputLayout();
 	buildBoxGeometry();
@@ -49,6 +53,14 @@ bool ParticleApp::initialize()
 
 	_device->submitCommands(commandList);
 
+	// init Particle Systems
+	auto newWorld = DirectX::XMMatrixRotationY(MathHelper::Pi);
+	DirectX::XMFLOAT4X4 newWorldFloat4x4;
+	DirectX::XMStoreFloat4x4(&newWorldFloat4x4, newWorld);
+	_particleSystems[0]->setWorldTransform(newWorldFloat4x4);
+
+	_particleSystems[0]->setMaterial(_materials["particle"].get());
+	_particleSystems[1]->setMaterial(_materials["particle"].get());
 
 	return true;
 }
@@ -63,17 +75,9 @@ void ParticleApp::onResize()
 
 void ParticleApp::update(const GameTimer& gt)
 {
-	float x = radius * sinf(phi) * cosf(theta);
-	float z = radius * sinf(phi) * sinf(theta);
-	float y = radius * cosf(phi);
+	updateCamera(gt);
 
-	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&_view, view);
-
+	XMMATRIX view = XMLoadFloat4x4(&this->_view);
 	XMMATRIX proj = XMLoadFloat4x4(&this->_proj);
 
 	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
@@ -84,25 +88,25 @@ void ParticleApp::update(const GameTimer& gt)
 	auto viewProjDeterminant = XMMatrixDeterminant(viewProj);
 	XMMATRIX invViewProj = XMMatrixInverse(&viewProjDeterminant, viewProj);
 
-	XMStoreFloat4x4(&_passCb.View, XMMatrixTranspose(view));
-	XMStoreFloat4x4(&_passCb.InvView, XMMatrixTranspose(invView));
-	XMStoreFloat4x4(&_passCb.Proj, XMMatrixTranspose(proj));
-	XMStoreFloat4x4(&_passCb.InvProj, XMMatrixTranspose(invProj));
-	XMStoreFloat4x4(&_passCb.ViewProj, XMMatrixTranspose(viewProj));
-	XMStoreFloat4x4(&_passCb.InvViewProj, XMMatrixTranspose(invViewProj));
-	_passCb.EyePosW = _eyePos;
+	XMStoreFloat4x4(&_passConstants.View, XMMatrixTranspose(view));
+	XMStoreFloat4x4(&_passConstants.InvView, XMMatrixTranspose(invView));
+	XMStoreFloat4x4(&_passConstants.Proj, XMMatrixTranspose(proj));
+	XMStoreFloat4x4(&_passConstants.InvProj, XMMatrixTranspose(invProj));
+	XMStoreFloat4x4(&_passConstants.ViewProj, XMMatrixTranspose(viewProj));
+	XMStoreFloat4x4(&_passConstants.InvViewProj, XMMatrixTranspose(invViewProj));
+	_passConstants.EyePosW = _eyePos;
 
 	auto clientWidth = _device->getClientWidth();
 	auto clientHeight = _device->getClientHeight();
 
-	_passCb.RenderTargetSize = XMFLOAT2((float)clientWidth, (float)clientHeight);
-	_passCb.InvRenderTargetSize = XMFLOAT2(1.0f / clientWidth, 1.0f / clientHeight);
-	_passCb.NearZ = 1.0f;
-	_passCb.FarZ = 1000.0f;
-	_passCb.TotalTime = gt.totalTime();
-	_passCb.DeltaTime = gt.deltaTime();
+	_passConstants.RenderTargetSize = XMFLOAT2((float)clientWidth, (float)clientHeight);
+	_passConstants.InvRenderTargetSize = XMFLOAT2(1.0f / clientWidth, 1.0f / clientHeight);
+	_passConstants.NearZ = 1.0f;
+	_passConstants.FarZ = 1000.0f;
+	_passConstants.TotalTime = gt.totalTime();
+	_passConstants.DeltaTime = gt.deltaTime();
 
-	_passConstantBuffer->copyData(0, _passCb);
+	_passConstantBuffer->copyData(0, _passConstants);
 }
 
 void ParticleApp::draw(const GameTimer& gt)
@@ -113,10 +117,6 @@ void ParticleApp::draw(const GameTimer& gt)
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { cbvSrvUavDescriptorHeap.Get() };
 	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
-	_particleEmitter->emitParticles(commandList.Get(), 1000, gt.deltaTime());
-
-	_particleSimulator->simulateParticles(commandList.Get(), gt.deltaTime());
 
 	auto currentBackBuffer = _device->getCurrentBackBuffer();
 	auto currentBackBufferView = _device->getCurrentBackBufferViewHandle();
@@ -162,9 +162,7 @@ void ParticleApp::draw(const GameTimer& gt)
 	//	0, 
 	//	0);
 
-
-	_particlePass->render(commandList.Get());
-
+	fireDrawToParticleSystems(commandList.Get(), gt);
 
 	auto barrierDraw = CD3DX12_RESOURCE_BARRIER::Transition(
 		currentBackBuffer,
@@ -178,23 +176,66 @@ void ParticleApp::draw(const GameTimer& gt)
 	_device->swapBuffers();
 }
 
+void ParticleApp::loadTextures(ID3D12GraphicsCommandList* commandList)
+{
+	// parallel vectors:
+	const std::vector<std::string> texturesName = {
+		"circle"
+	};
+
+	const std::vector<std::wstring> texturesPath = {
+		L"textures/circle_05.dds"
+	};
+
+	assert(texturesName.size() == texturesPath.size());
+
+	for (int i = 0; i < texturesName.size(); ++i)
+	{
+		_textures[texturesName[i]] =
+			std::move(std::make_unique<TextureBuffer>(
+				texturesPath[i],
+				_device.get(), 
+				commandList));
+	}
+}
 void ParticleApp::buildCbvSrvUavDescriptors()
 {
-	// register srv demander
+	// register particle systems
+	for (auto& particleSystem : _particleSystems)
+	{
+		_device->registerCbvSrvUavDescriptorDemander(
+			particleSystem.get());
+	}
+
+	// register textures
+	for (auto& [_, texture] : _textures)
+	{
+		_device->registerCbvSrvUavDescriptorDemander(texture.get());
+	}
 
 	// register cbv demander
 
-	std::shared_ptr<ICbvSrvUavDemander> basePointer = 
-		std::static_pointer_cast<ICbvSrvUavDemander>(_passConstantBuffer);
-	
 	_device->registerCbvSrvUavDescriptorDemander(
-		std::weak_ptr<ICbvSrvUavDemander>(basePointer));
-	_device->registerCbvSrvUavDescriptorDemander(
-		std::weak_ptr<ICbvSrvUavDemander>(_particleResource));
+		_passConstantBuffer.get());
 
 	// create descriptor heap
 	_device->buildCbvSrvUavDescriptorHeap();
 }
+
+void ParticleApp::buildMaterials()
+{
+	auto particleMat = std::make_unique<Material>();
+
+	particleMat->Name = "particle";
+	particleMat->MatCBIndex = 0;
+	particleMat->DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+	particleMat->FresnelR0 = { 0.3f, 0.3f, 0.3f };
+	particleMat->DiffuseSrvHandle = _textures["circle"]->getSrvGpuHandle();
+	particleMat->Roughness = 0.01f;
+
+	_materials[particleMat->Name] = std::move(particleMat);
+}
+
 
 void ParticleApp::buildRootSignature()
 {
@@ -359,6 +400,30 @@ void ParticleApp::buildPso()
 	ThrowIfFailed(_device->getD3dDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_pso)));
 }
 
+void ParticleApp::updateCamera(const GameTimer& gt)
+{
+	// Convert Spherical to Cartesian coordinates.
+	_eyePos.x = radius * sinf(phi) * cosf(theta);
+	_eyePos.z = radius * sinf(phi) * sinf(theta);
+	_eyePos.y = radius * cosf(phi);
+
+	// Build the view matrix.
+	XMVECTOR pos = XMVectorSet(_eyePos.x, _eyePos.y, _eyePos.z, 1.0f);
+	XMVECTOR target = XMVectorZero();
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
+	XMStoreFloat4x4(&this->_view, view);
+}
+
+void ParticleApp::fireDrawToParticleSystems(ID3D12GraphicsCommandList* cmdList, const GameTimer& gt)
+{
+	for (auto& particleSystem : _particleSystems)
+	{
+		particleSystem->onDraw(cmdList, *_passConstantBuffer, gt);
+	}
+}
+
 void ParticleApp::onMouseLeftDown(int x, int y, short keyState)
 {
 	lastMousePos.x = x;
@@ -376,7 +441,7 @@ void ParticleApp::onMouseMove(int x, int y, short keyState)
 {
 	if ((keyState & MK_LBUTTON) != 0)
 	{
-		float dx = XMConvertToRadians(0.25 * static_cast<float>(x - lastMousePos.x));
+		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - lastMousePos.x));
 		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - lastMousePos.y));
 
 		theta += dx;
@@ -391,7 +456,7 @@ void ParticleApp::onMouseMove(int x, int y, short keyState)
 
 		radius += dx - dy;
 
-		radius = MathHelper::clamp(radius, 3.0f, 15.0f);
+		radius = MathHelper::clamp(radius, 1.0f, 15.0f);
 	}
 
 	lastMousePos.x = x;

@@ -125,6 +125,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -156,17 +157,24 @@
     <ClInclude Include="Include\Core\MainWindow.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="FullyGpuParticleSystem.h" />
+    <ClInclude Include="Include\Core\TextureBuffer.h" />
     <ClInclude Include="Include\Core\UploadBuffer.h" />
     <ClInclude Include="Include\Model\Emitter.h" />
     <ClInclude Include="Include\Model\Geometry.h" />
+    <ClInclude Include="Include\Model\Material.h" />
+    <ClInclude Include="Include\Model\ObjectConstants.h" />
     <ClInclude Include="Include\Model\Particle.h" />
+    <ClInclude Include="Include\Core\ParticleSystem.h" />
+    <ClInclude Include="Include\Model\PassConstants.h" />
+    <ClInclude Include="Include\Model\Texture.h" />
+    <ClInclude Include="Include\Util\DDSTextureLoader.h" />
     <ClInclude Include="Include\Util\GeometryGenerator.h" />
-    <ClInclude Include="ParticleApp\PassConstantBuffer.h" />
+    <ClInclude Include="Include\Core\PassConstantBuffer.h" />
     <ClInclude Include="ParticleApp\ParticleApp.h" />
-    <ClInclude Include="ParticleApp\ParticleEmitter.h" />
-    <ClInclude Include="ParticleApp\ParticlePass.h" />
-    <ClInclude Include="ParticleApp\ParticleResource.h" />
-    <ClInclude Include="ParticleApp\ParticleSimulator.h" />
+    <ClInclude Include="Include\Core\ParticleEmitter.h" />
+    <ClInclude Include="Include\Core\ParticlePass.h" />
+    <ClInclude Include="Include\Core\ParticleResource.h" />
+    <ClInclude Include="Include\Core\ParticleSimulator.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Include\Util\DxDebug.h" />
@@ -175,16 +183,19 @@
     <ClInclude Include="Include\Util\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ParticleApp\PassConstantBuffer.cpp" />
-    <ClCompile Include="ParticleApp\ParticleEmitter.cpp" />
-    <ClCompile Include="ParticleApp\ParticlePass.cpp" />
-    <ClCompile Include="ParticleApp\ParticleResource.cpp" />
-    <ClCompile Include="ParticleApp\ParticleSimulator.cpp" />
+    <ClCompile Include="Source\Core\ParticleSystem.cpp" />
+    <ClCompile Include="Source\Core\PassConstantBuffer.cpp" />
+    <ClCompile Include="Source\Core\ParticleEmitter.cpp" />
+    <ClCompile Include="Source\Core\ParticlePass.cpp" />
+    <ClCompile Include="Source\Core\ParticleResource.cpp" />
+    <ClCompile Include="Source\Core\ParticleSimulator.cpp" />
     <ClCompile Include="Source\Core\DxDevice.cpp" />
     <ClCompile Include="Source\Core\MainWindow.cpp" />
     <ClCompile Include="FullyGpuParticleSystem.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ParticleApp\ParticleApp.cpp" />
+    <ClCompile Include="Source\Core\TextureBuffer.cpp" />
+    <ClCompile Include="Source\Util\DDSTextureLoader.cpp" />
     <ClCompile Include="Source\Util\DxDebug.cpp" />
     <ClCompile Include="Source\Util\DxUtil.cpp" />
     <ClCompile Include="Source\Util\GameTimer.cpp" />
@@ -218,6 +229,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\ParticleSimulateCS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleApp\Shaders\ParticleSystem.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\Util.hlsl">

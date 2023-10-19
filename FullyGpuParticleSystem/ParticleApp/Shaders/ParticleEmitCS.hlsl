@@ -1,9 +1,8 @@
 #include "Util.hlsl"
 #include "Particle.hlsl"
+#include "ParticleSystem.hlsl"
 
-// TODO: complete particle struct, cb, emitter struct
-
-cbuffer cbEmitConstants : register(b0)
+cbuffer cbEmitConstants : register(b1)
 {
 	uint EmitCount;
 	float3 Postion;
@@ -61,10 +60,10 @@ void EmitCS(
 			particleVelocityZ * 0.3f);
 
 	newParticle.Acceleration =
-		float3(0.0f, 0.0f, 0.0f);
+		float3(0.0f, -0.5f, 0.0f);
 
-	newParticle.Lifetime = 5.0f;
-	newParticle.Size = 0.01f;
+	newParticle.Lifetime = 3.0f;
+	newParticle.Size = 0.05f;
 	newParticle.Opacity = 1.0f;
 	newParticle.Color = float3(1.0f, 0.0f, 0.0f);
 

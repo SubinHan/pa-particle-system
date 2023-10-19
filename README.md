@@ -4,7 +4,9 @@
 [프로젝트 개요](#프로젝트-개요) <br>
 [목표 및 계획](#목표-및-계획) <br>
 [Tasks](#Tasks) <br>
-[일지](#일지) 
+[일지](#일지) <br>
+[세부 구현 설명](#세부-구현-설명) <br>
+[참고문헌](#참고문헌)
 
 <hr/>
 
@@ -74,6 +76,7 @@
 * Particle System 학습
 * Lifetime, velocity 등 GPU 코드에서 하드코딩 된 속성들을 CPU 단에서 매개변수화
 * 프레임 통계 모듈 구현
+* alpha blending 수행
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -111,10 +114,35 @@
     <img src="./img/20231017_particles.png">
   + 정해진 최대 파티클 수량을 넘을 시 생성하지 않도록 제한
 * 수요일:
-  + 추후 작성 예정
-
+  + Index Buffer 타입이 16bit uint라 2^16 이상의 파티클을 다루면 문제가 발생하여 해결.
+  + Particle의 평면이 항상 Camera를 바라보도록 함
+  + ParticleSystem 클래스 설계 및 구현
+  + 여러 개의 ParticleSystem을 관리할 수 있음 (아직은 각각의 particle system이 서로 다른 world transform만 가질 수 있음)
+  + 간단한 텍스처 매핑 (성능: 대략 10만 개)
+    <img src="./img/20231018_particles.png">
 
 <hr/>
+
+### 세부 구현 설명
+#### 파티클 자원
+* 파티클 정보를 담는 버퍼와 그 인덱스를 담기 위한 스택을 3개 사용
+  + 파괴되어 있는 파티클들의 인덱스를 담는 스택 [deads]
+    - 시작 시 스택이 가득 차있고, 각 원소는 0번부터 최대 파티클 수까지 초기화되어 있음. 
+  + 살아있는 파티클들의 인덱스를 담는 스택 2개 (ping-pong) [alives1, alives2]
+* RWbyteaddressbuffer.InterlockedAdd를 이용해 전역적으로 파티클의 수를 동기화
+
+#### 파티클 생성
+* 파티클 생성 시 각 스레드는 하나의 파티클을 생성함.
+* 이때 deads 스택의 최상위에서 죽어 있는 파티클의 인덱스를 가져오며, 스택의 크기를 1 감소시킴
+* 파티클을 초기화하고, alives 스택에 해당 파티클의 인덱스를 삽입함.
+
+#### 파티클 파괴 및 시뮬레이션
+* simulate 단계에서 파티클의 life가 0 미만이면 deads 스택에 해당 인덱스를 삽입함.
+* 만약 여전히 살아있다면 시뮬레이션 연산을 마친 뒤 ping-pong 버퍼인 alives2 스택에 해당 파티클의 인덱스를 삽입함.
+
+<hr/>
+
+
 
 ### 참고문헌
 [William T. Reeves, particle systems - a technique for modeling a class of fuzzy objects](https://www.lri.fr/~mbl/ENS/IG2/devoir2/files/docs/fuzzyParticles.pdf) <br>

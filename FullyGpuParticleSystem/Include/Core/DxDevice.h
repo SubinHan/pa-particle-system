@@ -26,7 +26,7 @@ public:
 	void submitCommands(ComPtr<ID3D12GraphicsCommandList> commandList);
 
 	void registerCbvSrvUavDescriptorDemander(
-		std::weak_ptr<ICbvSrvUavDemander> demander
+		ICbvSrvUavDemander* demander
 	);
 	// build descriptor heap sized by registered descriptor demanders.
 	void buildCbvSrvUavDescriptorHeap();
@@ -45,33 +45,33 @@ public:
 	ComPtr<ID3D12CommandQueue> getCommandQueue();
 	ComPtr<ID3D12CommandAllocator> getCommandListAllocator();
 	ComPtr<ID3D12GraphicsCommandList> getCommandList();
-	ComPtr<IDXGISwapChain> GetSwapChain();
+	ComPtr<IDXGISwapChain> getSwapChain();
 	void swapBuffers();
 
 	DXGI_FORMAT getBackBufferFormat();
 	DXGI_FORMAT getDepthStencilFormat();
 	bool getMsaaState();
 	UINT getMsaaQuality();
-	void Enable4xMsaa();
+	void enable4xMsaa();
 
 	UINT getClientWidth();
 	UINT getClientHeight();
 	void setClientWidth(UINT width);
 	void setClientHeight(UINT height);
-	UINT GetSwapChainBufferCount();
+	UINT getSwapChainBufferCount();
 
-	ComPtr<ID3D12Fence> GetFence();
+	ComPtr<ID3D12Fence> getFence();
 	D3D12_VIEWPORT& getScreenViewport();
 	tagRECT& getScissorRect();
-	ID3D12Resource* GetDepthStencilBuffer();
-	UINT GetCbvSrvUavDescriptorSize();
-	UINT GetDsvDescriptorSize();
-	UINT GetRtvDescriptorSize();
+	ID3D12Resource* getDepthStencilBuffer();
+	UINT getCbvSrvUavDescriptorSize();
+	UINT getDsvDescriptorSize();
+	UINT getRtvDescriptorSize();
 
-	ComPtr<ID3D12DescriptorHeap> GetDsvHeap();
-	ComPtr<ID3D12DescriptorHeap> GetRtvHeap();
+	ComPtr<ID3D12DescriptorHeap> getDsvHeap();
+	ComPtr<ID3D12DescriptorHeap> getRtvHeap();
 
-	UINT GetCurrentFence();
+	UINT getCurrentFence();
 	UINT increaseFence();
 
 
@@ -125,5 +125,5 @@ private:
 	D3D12_VIEWPORT	_screenViewport;
 	tagRECT			_scissorRect;
 
-	std::vector<std::weak_ptr<ICbvSrvUavDemander>> cbvSrvUavDescriptorDemanders;
+	std::vector<ICbvSrvUavDemander*> _cbvSrvUavDescriptorDemanders;
 };

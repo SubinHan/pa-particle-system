@@ -234,25 +234,18 @@ void DxDevice::submitCommands(ComPtr<ID3D12GraphicsCommandList> commandList)
     flushCommandQueue();
 }
 
-void DxDevice::registerCbvSrvUavDescriptorDemander(std::weak_ptr<ICbvSrvUavDemander> demander)
+void DxDevice::registerCbvSrvUavDescriptorDemander(ICbvSrvUavDemander* demander)
 {
-    cbvSrvUavDescriptorDemanders.push_back(demander);
+    _cbvSrvUavDescriptorDemanders.push_back(demander);
 }
 
 void DxDevice::buildCbvSrvUavDescriptorHeap()
 {
     int numDescriptors = 0;
 
-    for (auto weakDemander : cbvSrvUavDescriptorDemanders)
+    for (auto& demander : _cbvSrvUavDescriptorDemanders)
     {
-        if (weakDemander.expired())
-        {
-            continue;
-        }
-
-        auto demander = weakDemander.lock();
-        numDescriptors += 
-            demander->getNumDescriptorsToDemand();
+        numDescriptors += demander->getNumDescriptorsToDemand();
     }
 
     D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
@@ -270,19 +263,13 @@ void DxDevice::buildCbvSrvUavDescriptorHeap()
     auto gpuHandle =
         CD3DX12_GPU_DESCRIPTOR_HANDLE(_cbvSrvUavHeap->GetGPUDescriptorHandleForHeapStart());
 
-    for (auto weakDemander : cbvSrvUavDescriptorDemanders)
+    for (auto& demander : _cbvSrvUavDescriptorDemanders)
     {
-        if (weakDemander.expired())
-        {
-            continue;
-        }
-
-        auto demander = weakDemander.lock();
-        demander->getNumDescriptorsToDemand();
+        const auto numDescriptorsToDemand = demander->getNumDescriptorsToDemand();
 
         demander->buildCbvSrvUav(cpuHandle, gpuHandle);
-        cpuHandle.Offset(demander->getNumDescriptorsToDemand(), _cbvSrvUavDescriptorSize);
-        gpuHandle.Offset(demander->getNumDescriptorsToDemand(), _cbvSrvUavDescriptorSize);
+        cpuHandle.Offset(numDescriptorsToDemand, _cbvSrvUavDescriptorSize);
+        gpuHandle.Offset(numDescriptorsToDemand, _cbvSrvUavDescriptorSize);
     }
 }
 

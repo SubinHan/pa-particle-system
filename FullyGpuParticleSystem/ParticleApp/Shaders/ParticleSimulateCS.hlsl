@@ -43,7 +43,7 @@ void SimulateCS(
 		{
 			// TODO: Simulate particles.
 			const float3 velocityBefore = particles[particleIndex].Velocity;
-			particles[particleIndex].Velocity += particles[particleIndex].Acceleration;
+			particles[particleIndex].Velocity += particles[particleIndex].Acceleration * deltaTime;
 			particles[particleIndex].Position +=
 				(velocityBefore + particles[particleIndex].Velocity) * deltaTime * 0.5f;
 

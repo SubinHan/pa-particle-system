@@ -1,15 +1,20 @@
 #pragma once
 
 #include "Core/MainWindow.h"
-#include "Model/Geometry.h"
 #include "Util/MathHelper.h"
-#include "ParticleResource.h"
-#include "ParticleEmitter.h"
-#include "ParticleSimulator.h"
-#include "ParticlePass.h"
-#include "PassConstantBuffer.h"
+#include "Model/PassConstants.h"
 
 #include "../Resource.h"
+
+#include <unordered_map>
+
+class ParticleSystem;
+class PassConstantBuffer;
+class TextureBuffer;
+struct MeshGeometry;
+struct Material;
+
+struct ID3D12GraphicsCommandList;
 
 struct ParticleAppVertex
 {
@@ -21,6 +26,7 @@ class ParticleApp : public MainWindow
 {
 public:
 	ParticleApp(HINSTANCE hInstance);
+	~ParticleApp();
 
 	virtual PCWSTR getClassName() const override;
 
@@ -35,11 +41,17 @@ private:
 	virtual void update(const GameTimer& gt) override;
 	virtual void draw(const GameTimer& gt) override;
 
+	void loadTextures(ID3D12GraphicsCommandList* commandList);
 	void buildCbvSrvUavDescriptors();
+	void buildMaterials();
 	void buildRootSignature();
 	void buildShadersAndInputLayout();
 	void buildBoxGeometry();
 	void buildPso();
+
+	void updateCamera(const GameTimer& gt);
+
+	void fireDrawToParticleSystems(ID3D12GraphicsCommandList* cmdList, const GameTimer& gt);
 
 private:
 	ComPtr<ID3D12RootSignature> _rootSignature = nullptr;
@@ -51,10 +63,12 @@ private:
 
 	std::shared_ptr<PassConstantBuffer> _passConstantBuffer;
 	std::unique_ptr<MeshGeometry> _boxGeometry = nullptr;
+	std::unordered_map<std::string, std::unique_ptr<TextureBuffer>> _textures;
+	std::unordered_map<std::string, std::unique_ptr<Material>> _materials;
 
 	ComPtr<ID3D12PipelineState> _pso = nullptr;
 
-	PassConstants _passCb;
+	PassConstants _passConstants;
 
 	DirectX::XMFLOAT3 _eyePos = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT4X4 _view = MathHelper::identity4x4();
@@ -66,8 +80,5 @@ private:
 
 	POINT lastMousePos;
 
-	std::shared_ptr<ParticleResource> _particleResource;
-	std::unique_ptr<ParticleEmitter> _particleEmitter;
-	std::unique_ptr<ParticleSimulator> _particleSimulator;
-	std::unique_ptr<ParticlePass> _particlePass;
+	std::vector<std::unique_ptr<ParticleSystem>> _particleSystems;
 };

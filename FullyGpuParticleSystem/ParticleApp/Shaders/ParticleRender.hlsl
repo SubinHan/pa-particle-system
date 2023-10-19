@@ -1,6 +1,7 @@
 #include "Particle.hlsl"
+#include "ParticleSystem.hlsl"
 
-cbuffer cbPass : register(b0)
+cbuffer cbPass : register(b1)
 {
 	float4x4 gView;
 	float4x4 gInvView;
@@ -36,6 +37,15 @@ struct GeoOut
 StructuredBuffer<Particle> particles : register(t0);
 StructuredBuffer<uint> aliveIndices : register(t1);
 
+Texture2D diffuseMap : register(t2);
+
+SamplerState gsamPointWrap  : register(s0);
+SamplerState gsamPointClamp  : register(s1);
+SamplerState gsamLinearWrap  : register(s2);
+SamplerState gsamLinearClamp  : register(s3);
+SamplerState gsamAnisotropicWrap  : register(s4);
+SamplerState gsamAnisotropicClamp  : register(s5);
+
 VertexOut ParticleVS(
 	uint vid : SV_VertexID)
 {
@@ -44,7 +54,8 @@ VertexOut ParticleVS(
 
 	VertexOut vertexOut;
 
-	vertexOut.CenterW = particle.Position;
+	const float4 posW = mul(float4(particle.Position, 1.0f), gWorld);
+	vertexOut.CenterW = posW;
 	vertexOut.Size = particle.Size;
 
 	return vertexOut;
@@ -59,17 +70,17 @@ void ParticleGS(
 	float3 up = float3(0.0f, 1.0f, 0.0f);
 	float3 look = gEyePosW - gin[0].CenterW;
 	
-	float3 u = normalize(cross(up, look));
-	float3 v = normalize(cross(u, look));
+	float3 u = normalize(cross(look, up));
+	float3 v = normalize(cross(look, u));
 
 	float halfWidth = 0.5f * gin[0].Size;
 	float halfHeight = 0.5f * gin[0].Size;
 
 	float4 vertices[4];
-	vertices[0] = float4(gin[0].CenterW + halfWidth * u - halfHeight * up, 1.0f);
-	vertices[1] = float4(gin[0].CenterW + halfWidth * u + halfHeight * up, 1.0f);
-	vertices[2] = float4(gin[0].CenterW - halfWidth * u - halfHeight * up, 1.0f);
-	vertices[3] = float4(gin[0].CenterW - halfWidth * u + halfHeight * up, 1.0f);
+	vertices[0] = float4(gin[0].CenterW + halfWidth * u - halfHeight * v, 1.0f);
+	vertices[1] = float4(gin[0].CenterW + halfWidth * u + halfHeight * v, 1.0f);
+	vertices[2] = float4(gin[0].CenterW - halfWidth * u - halfHeight * v, 1.0f);
+	vertices[3] = float4(gin[0].CenterW - halfWidth * u + halfHeight * v, 1.0f);
 
 	float2 texC[4] =
 	{
@@ -95,5 +106,10 @@ void ParticleGS(
 
 float4 ParticlePS(GeoOut pin) : SV_Target
 {
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+	float4 diffuse = diffuseMap.Sample(gsamPointWrap, pin.TexC);
+
+	// TODO: process texture alpha value correctly. (should process dds file directly)
+	clip(diffuse.r - 0.1f);
+
+	return diffuse;
 }

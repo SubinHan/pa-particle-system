@@ -10,12 +10,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
     try {
         ParticleApp win(hInstance);
 
-        if (!win.Create(L"Learn to Program Windows", WS_OVERLAPPEDWINDOW))
+        if (!win.create(L"Learn to Program Windows", WS_OVERLAPPEDWINDOW))
         {
             return 0;
         }
 
-        win.Run();
+        win.run();
     }
     catch (DxException& e)
     {

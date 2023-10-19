@@ -14,12 +14,12 @@ MainWindow::~MainWindow()
 	CoUninitialize();
 }
 
-BOOL MainWindow::Create(PCWSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu)
+BOOL MainWindow::create(PCWSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu)
 {
     WNDCLASS wc = { 0 };
 
     wc.style = CS_DBLCLKS;
-    wc.lpfnWndProc = WindowProc;
+    wc.lpfnWndProc = windowProc;
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
     wc.hInstance = GetModuleHandle(NULL);
@@ -39,14 +39,14 @@ BOOL MainWindow::Create(PCWSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int
     return (_hwnd ? TRUE : FALSE);
 }
 
-int MainWindow::Run()
+int MainWindow::run()
 {
     ShowWindow(_hwnd, SW_SHOWNORMAL);
 
     // Run the message loop.
     bool bGotMsg;
     MSG  msg;
-    timer.reset();
+    _timer.reset();
     msg.message = WM_NULL;
     PeekMessage(&msg, NULL, 0U, 0U, PM_NOREMOVE);
 
@@ -65,23 +65,23 @@ int MainWindow::Run()
         }
 
 
-        timer.tick();
+        _timer.tick();
 
-        if (isPaused)
+        if (_isPaused)
         {
             Sleep(100);
             continue;
         }
 
-        ////CalculateFrameStats();
-        update(timer);
-        draw(timer);
+        calculateFrameStats();
+        update(_timer);
+        draw(_timer);
     }
 
     return 0;
 }
 
-LRESULT MainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT MainWindow::windowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     MainWindow* pThis = nullptr;
 
@@ -100,7 +100,7 @@ LRESULT MainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
     if (pThis)
     {
-        pThis->HandleMessage(uMsg, wParam, lParam);
+        pThis->handleMessage(uMsg, wParam, lParam);
     }
     else
     {
@@ -117,12 +117,12 @@ float MainWindow::aspectRatio() const
 
 bool MainWindow::initialize()
 {
-    CreateDevice();
+    createDevice();
 
     return true;
 }
 
-LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 
     switch (uMsg)
@@ -140,13 +140,13 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_ACTIVATE:
         if (LOWORD(wParam) == WA_INACTIVE)
         {
-            isPaused = true;
-            timer.stop();
+            _isPaused = true;
+            _timer.stop();
             return 0;
         }
 
-        isPaused = false;
-        timer.start();
+        _isPaused = false;
+        _timer.start();
         return 0;
 
     case WM_SIZE:
@@ -157,36 +157,36 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             if (wParam == SIZE_MINIMIZED)
             {
-                isPaused = true;
-                isMinimized = true;
-                isMaximized = false;
+                _isPaused = true;
+                _isMinimized = true;
+                _isMaximized = false;
             }
             else if (wParam == SIZE_MAXIMIZED)
             {
-                isPaused = false;
-                isMinimized = false;
-                isMaximized = true;
+                _isPaused = false;
+                _isMinimized = false;
+                _isMaximized = true;
                 onResize();
             }
             else if (wParam == SIZE_RESTORED)
             {
 
                 // Restoring from minimized state?
-                if (isMinimized)
+                if (_isMinimized)
                 {
-                    isPaused = false;
-                    isMinimized = false;
+                    _isPaused = false;
+                    _isMinimized = false;
                     onResize();
                 }
 
                 // Restoring from maximized state?
-                else if (isMaximized)
+                else if (_isMaximized)
                 {
-                    isPaused = false;
-                    isMaximized = false;
+                    _isPaused = false;
+                    _isMaximized = false;
                     onResize();
                 }
-                else if (isResizing)
+                else if (_isResizing)
                 {
                     // If user is dragging the resize bars, we do not resize 
                     // the buffers here because as the user continuously 
@@ -206,15 +206,15 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         return 0;
 
     case WM_ENTERSIZEMOVE:
-        isPaused = true;
-        isResizing = true;
-        timer.stop();
+        _isPaused = true;
+        _isResizing = true;
+        _timer.stop();
         return 0;
 
     case WM_EXITSIZEMOVE:
-        isPaused = false;
-        isResizing = false;
-        timer.start();
+        _isPaused = false;
+        _isResizing = false;
+        _timer.start();
         onResize();
         return 0;
 
@@ -244,7 +244,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         int keyState = GET_KEYSTATE_WPARAM(wParam);
-        OnMouseMiddleDown(xPos, yPos, keyState);
+        onMouseMiddleDown(xPos, yPos, keyState);
         break;
     }
     case WM_MBUTTONUP:
@@ -252,7 +252,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         int keyState = GET_KEYSTATE_WPARAM(wParam);
-        OnMouseMiddleUp(xPos, yPos, keyState);
+        onMouseMiddleUp(xPos, yPos, keyState);
         break;
     }
     case WM_RBUTTONDOWN:
@@ -260,7 +260,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         int keyState = GET_KEYSTATE_WPARAM(wParam);
-        OnMouseRightDown(xPos, yPos, keyState);
+        onMouseRightDown(xPos, yPos, keyState);
         break;
     }
     case WM_RBUTTONUP:
@@ -268,7 +268,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         int keyState = GET_KEYSTATE_WPARAM(wParam);
-        OnMouseRightUp(xPos, yPos, keyState);
+        onMouseRightUp(xPos, yPos, keyState);
         break;
     }
     case WM_XBUTTONDOWN:
@@ -276,7 +276,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         int keyState = GET_KEYSTATE_WPARAM(wParam);
-        OnMouseXDown(xPos, yPos, keyState);
+        onMouseXDown(xPos, yPos, keyState);
         break;
     }
     case WM_XBUTTONUP:
@@ -284,7 +284,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         int keyState = GET_KEYSTATE_WPARAM(wParam);
-        OnMouseXUp(xPos, yPos, keyState);
+        onMouseXUp(xPos, yPos, keyState);
         break;
     }
     case WM_MOUSEWHEEL:
@@ -292,7 +292,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         int keyState = GET_KEYSTATE_WPARAM(wParam);
-        OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam), keyState);
+        onMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam), keyState);
         break;
     }
     case WM_MOUSEHOVER:
@@ -300,7 +300,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         int keyState = GET_KEYSTATE_WPARAM(wParam);
-        OnMouseHover(xPos, yPos);
+        onMouseHover(xPos, yPos);
         break;
     }
     case WM_MOUSELEAVE:
@@ -308,7 +308,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         int keyState = GET_KEYSTATE_WPARAM(wParam);
-        OnMouseLeave();
+        onMouseLeave();
         break;
     }
     case WM_MOUSEMOVE:
@@ -321,12 +321,12 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
     case WM_KEYDOWN:
     {
-        OnKeyDown(wParam);
+        onKeyDown(wParam);
         break;
     }
     case WM_KEYUP:
     {
-        OnKeyUp(wParam);
+        onKeyUp(wParam);
     }
 
     default:
@@ -336,7 +336,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     return TRUE;
 }
 
-void MainWindow::CreateDevice()
+void MainWindow::createDevice()
 {
     _device = std::make_unique<DxDevice>(_hwnd);
     onResize();
@@ -364,4 +364,30 @@ void MainWindow::onResize()
 
     _device->updateScreenViewport();
     _device->updateScissorRect();
+}
+
+void MainWindow::calculateFrameStats()
+{
+    static int frameCnt = 0;
+    static float timeElapsed = 0.0f;
+
+    frameCnt++;
+    if (_timer.totalTime() - timeElapsed >= 1.0f)
+    {
+        float fps = (float)frameCnt;
+        float mspf = 1000.0f / fps;
+
+        std::wstring fpsStr = std::to_wstring(fps);
+        std::wstring mspfStr = std::to_wstring(mspf);
+
+        std::wstring windowText = _mainWndCaption + 
+			L"  fps: " + fpsStr +
+            L"  mspf: " + mspfStr;
+
+        SetWindowText(_hwnd, windowText.c_str());
+
+        frameCnt = 0;
+        timeElapsed += 1.0f;
+    }
+
 }
