@@ -76,10 +76,10 @@
 * Particle System 학습
 * Lifetime, velocity 등 GPU 코드에서 하드코딩 된 속성들을 CPU 단에서 매개변수화
 * 프레임 통계 모듈 구현
-* Sorting by distance 구현
-  + Batcher's odd-even merge sort 학습
-  + Bitonic sort 학습
-  + DrawIndirect?
+* HLSL Translator 구현
+  * 추상화된 작업들을 HLSL 코드로 변환시켜주는 클래스
+  * 가령 float4 변수를 초기화하고, 두 개의 float4 변수를 더하는 것 등
+  * 이를 기반으로 유연한 Emit, Simulate process 구현의 기반 마련
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -89,6 +89,10 @@
 * 간단한 수준의 emitter, particle 등 핵심 기능 설계 및 구현
 * Texture mapping 수행
 * alpha blending 수행
+* Sorting 구현 확인
+  + Batcher's odd-even merge sort 학습
+  + Bitonic sort 학습
+  + 간단한 구현 수행 및 결과 확인
 
 <hr/>
 
@@ -160,6 +164,10 @@
   + (2l, 2l-1)을 비교해 정렬한다. 가령 8개의 원소일 경우 (2,3), (4,5), (6,7)
   + 이를 반복해 정렬 완료
 * Bitnoic sort:
+  + descending, ascneding order를 번갈아가면서 정렬함
+  + 이들을 merge하는 작업들을 재귀적으로 수행하여 정렬 완료
+* Bitonic sort가 빠른 이유?
+  * data access 패턴이 규칙적이라 cache hit가 잘 이루어질 수 있음.
 <hr/>
 
 
