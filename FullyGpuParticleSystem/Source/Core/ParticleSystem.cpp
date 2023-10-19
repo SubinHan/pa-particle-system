@@ -4,6 +4,7 @@
 #include "Core/PassConstantBuffer.h"
 #include "Core/ParticleResource.h"
 #include "Core/ParticleEmitter.h"
+#include "Core/ParticleSorter.h"
 #include "Core/ParticleSimulator.h"
 #include "Core/ParticlePass.h"
 #include "Model/ObjectConstants.h"
@@ -67,6 +68,8 @@ void ParticleSystem::onDraw(
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 1);
 	_simulator->simulateParticles(commandList, gt.deltaTime());
+
+	_sorter->sortParticles(commandList);
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 2);
 	_pass->render(commandList, objConstants, passCb);
@@ -143,6 +146,9 @@ void ParticleSystem::init()
 		_device->getD3dDevice(), 
 		commandList.Get());
 	_emitter = std::make_unique<ParticleEmitter>(
+		_device->getD3dDevice(),
+		_resource.get());
+	_sorter = std::make_unique<ParticleSorter>(
 		_device->getD3dDevice(),
 		_resource.get());
 	_simulator = std::make_unique<ParticleSimulator>(

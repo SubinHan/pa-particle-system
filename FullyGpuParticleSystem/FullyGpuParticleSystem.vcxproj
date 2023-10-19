@@ -157,6 +157,7 @@
     <ClInclude Include="Include\Core\MainWindow.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="FullyGpuParticleSystem.h" />
+    <ClInclude Include="Include\Core\ParticleSorter.h" />
     <ClInclude Include="Include\Core\TextureBuffer.h" />
     <ClInclude Include="Include\Core\UploadBuffer.h" />
     <ClInclude Include="Include\Model\Emitter.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="Include\Util\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Core\ParticleSorter.cpp" />
     <ClCompile Include="Source\Core\ParticleSystem.cpp" />
     <ClCompile Include="Source\Core\PassConstantBuffer.cpp" />
     <ClCompile Include="Source\Core\ParticleEmitter.cpp" />
@@ -229,6 +231,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\ParticleSimulateCS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleApp\Shaders\ParticleSortCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\ParticleSystem.hlsl">

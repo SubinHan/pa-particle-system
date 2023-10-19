@@ -6,7 +6,7 @@
 #include "d3dx12.h"
 #include "d3d11.h"
 
-static constexpr int MAX_NUM_PARTICLES = 50'000;
+static constexpr int MAX_NUM_PARTICLES = 32'768;
 
 using namespace DirectX;
 
@@ -249,4 +249,21 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 		D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
 	cmdList->ResourceBarrier(1, &deadIndicesToUav);
+
+	{
+		const UINT64 particlesByteSize = MAX_NUM_PARTICLES * sizeof(Particle);
+		const auto buffer =
+			CD3DX12_RESOURCE_DESC::Buffer(particlesByteSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+		ThrowIfFailed(
+			_device->CreateCommittedResource(
+				&heapProperties,
+				D3D12_HEAP_FLAG_NONE,
+				&buffer,
+				D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+				nullptr,
+				IID_PPV_ARGS(&_particlesBuffer)
+			)
+		);
+	}
+
 }

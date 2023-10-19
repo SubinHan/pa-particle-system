@@ -9,6 +9,7 @@
 class DxDevice;
 class ParticleResource;
 class ParticleEmitter;
+class ParticleSorter;
 class ParticleSimulator;
 class ParticlePass;
 class PassConstantBuffer;
@@ -48,6 +49,7 @@ private:
 
 	std::unique_ptr<ParticleResource> _resource;
 	std::unique_ptr<ParticleEmitter> _emitter;
+	std::unique_ptr<ParticleSorter> _sorter;
 	std::unique_ptr<ParticleSimulator> _simulator;
 	std::unique_ptr<ParticlePass> _pass;
 

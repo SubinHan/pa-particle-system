@@ -102,6 +102,9 @@
     <ClInclude Include="Include\Model\Material.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Core\ParticleSorter.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -158,6 +161,9 @@
     <ClCompile Include="Source\Core\TextureBuffer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Core\ParticleSorter.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FullyGpuParticleSystem.rc">
@@ -182,6 +188,7 @@
     <FxCompile Include="ParticleApp\Shaders\ParticleRender.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticlePostSimulateCS.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticleSystem.hlsl" />
+    <FxCompile Include="ParticleApp\Shaders\ParticleSortCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

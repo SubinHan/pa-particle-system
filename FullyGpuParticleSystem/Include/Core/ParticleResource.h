@@ -13,6 +13,12 @@ struct ParticleCounters
 	UINT NumAlivesPostUpdate;
 };
 
+struct ParticleSortData
+{
+	UINT ParticleIndex;
+	float Distance;
+};
+
 class ParticleResource : public ICbvSrvUavDemander
 {
 public:
@@ -42,7 +48,7 @@ private:
 	void buildResources(ID3D12GraphicsCommandList* cmdList);
 
 private:
-	static constexpr int NUM_RESOURCES = 5;
+	static constexpr int NUM_RESOURCES = 6;
 
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 
@@ -52,6 +58,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> _deadIndicesUploadBuffer = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> _countersBuffer;
 	Microsoft::WRL::ComPtr<ID3D12Resource> _countersUploadBuffer = nullptr;
+	
+	Microsoft::WRL::ComPtr<ID3D12Resource> _sortBuffer;
 
 	int _currentAliveIndicesBufferIndex = 0;
 

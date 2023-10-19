@@ -129,7 +129,9 @@
   + 알파 블렌딩 수행
     <img src="./img/20231019_particles_alphablending.png">
   + Spawn rate 조절 가능
-  + 
+  + Batcher's odd-even merge sort 학습
+  + Bitonic sort 학습
+  + Bitonic sort prototype (단순히 인덱스를 기준으로 정렬해보았음)
 
 <hr/>
 
