@@ -13,12 +13,15 @@ using namespace DirectX;
 ParticleResource::ParticleResource(Microsoft::WRL::ComPtr<ID3D12Device> device, ID3D12GraphicsCommandList* cmdList) :
 	_device(device)
 {
+	_commandSizePerFrame = getMaxNumParticles() * sizeof(ParticleIndirectCommand);
+	_commandBufferCounterOffset = alignForUavCounter(ParticleResource::_commandSizePerFrame);
+
 	buildResources(cmdList);
 }
 
 int ParticleResource::getNumDescriptorsToDemand() const
 {
-	return 2;
+	return 3;
 }
 
 void ParticleResource::buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD3DX12_GPU_DESCRIPTOR_HANDLE hGpu)
@@ -26,17 +29,42 @@ void ParticleResource::buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD3DX1
 	_hCounterCpuUav = hCpu;
 	_hCounterGpuUav = hGpu;
 
-	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-	uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-	uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
-	uavDesc.Buffer.NumElements = sizeof(ParticleCounters) / 4;
+	{
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
+		uavDesc.Buffer.NumElements = sizeof(ParticleCounters) / 4;
 
-	_device->CreateUnorderedAccessView(
-		_countersBuffer.Get(),
-		nullptr,
-		&uavDesc,
-		_hCounterCpuUav);
+		_device->CreateUnorderedAccessView(
+			_countersBuffer.Get(),
+			nullptr,
+			&uavDesc,
+			_hCounterCpuUav);
+	}
+
+	_hIndirectCommandCpuUav =
+		hCpu.Offset(_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+	_hIndirectCommandGpuUav =
+		hGpu.Offset(_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+
+
+	{
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+		uavDesc.Buffer.FirstElement = 0;
+		uavDesc.Buffer.NumElements = getMaxNumParticles();
+		uavDesc.Buffer.StructureByteStride = sizeof(ParticleIndirectCommand);
+		uavDesc.Buffer.CounterOffsetInBytes = _commandBufferCounterOffset;
+		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+
+		_device->CreateUnorderedAccessView(
+			_indirectCommandsBuffer.Get(),
+			_indirectCommandsBuffer.Get(),
+			&uavDesc,
+			_hIndirectCommandCpuUav);
+	}
 }
 
 void ParticleResource::swapAliveIndicesBuffer()
@@ -70,9 +98,29 @@ ID3D12Resource* ParticleResource::getCountersResource()
 	return _countersBuffer.Get();
 }
 
+ID3D12Resource* ParticleResource::getIndirectCommandsResource()
+{
+	return _indirectCommandsBuffer.Get();
+}
+
+ID3D12Resource* ParticleResource::getIndirectCommandsCounterResetResource()
+{
+	return _indirectCommandsCounterResetBuffer.Get();
+}
+
+UINT ParticleResource::getCommandBufferCounterOffset()
+{
+	return _commandBufferCounterOffset;
+}
+
 CD3DX12_GPU_DESCRIPTOR_HANDLE ParticleResource::getCountersUavGpuHandle()
 {
 	return _hCounterGpuUav;
+}
+
+CD3DX12_GPU_DESCRIPTOR_HANDLE ParticleResource::getIndirectCommandsUavGpuHandle()
+{
+	return _hIndirectCommandGpuUav;
 }
 
 void ParticleResource::transitParticlesToSrv(ID3D12GraphicsCommandList* cmdList)
@@ -266,4 +314,38 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 		);
 	}
 
+	{
+		auto heapPropertiesDefault = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(_commandBufferCounterOffset + sizeof(UINT), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+
+
+		// Create the actual default buffer resource.
+		ThrowIfFailed(_device->CreateCommittedResource(
+			&heapPropertiesDefault,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			IID_PPV_ARGS(_indirectCommandsBuffer.GetAddressOf())));
+	}
+
+	{
+		auto heapPropertiesDefault = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(UINT));
+
+		ThrowIfFailed(_device->CreateCommittedResource(
+			&heapPropertiesDefault,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(_indirectCommandsCounterResetBuffer.GetAddressOf())));
+
+		UINT8* mappedCounterReset = nullptr;
+		CD3DX12_RANGE readRange(0, 0);
+		
+		ThrowIfFailed(_indirectCommandsCounterResetBuffer->Map(0, &readRange, reinterpret_cast<void**>(&mappedCounterReset)));
+		ZeroMemory(mappedCounterReset, sizeof(UINT));
+		_indirectCommandsCounterResetBuffer->Unmap(0, nullptr);
+	}
 }

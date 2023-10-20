@@ -153,11 +153,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Include\Core\DxDevice.h" />
+    <ClInclude Include="Include\Core\Hashable.h" />
+    <ClInclude Include="Include\Core\HlslTranslatorEmit.h" />
     <ClInclude Include="Include\Core\ICbvSrvUavDemander.h" />
     <ClInclude Include="Include\Core\MainWindow.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="FullyGpuParticleSystem.h" />
     <ClInclude Include="Include\Core\ParticleSorter.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewFloat.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewFloat3.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewFloat4.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat3.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat4.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetAlpha.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.h" />
     <ClInclude Include="Include\Core\TextureBuffer.h" />
     <ClInclude Include="Include\Core\UploadBuffer.h" />
     <ClInclude Include="Include\Model\Emitter.h" />
@@ -167,10 +177,12 @@
     <ClInclude Include="Include\Model\Particle.h" />
     <ClInclude Include="Include\Core\ParticleSystem.h" />
     <ClInclude Include="Include\Model\PassConstants.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNode.h" />
     <ClInclude Include="Include\Model\Texture.h" />
     <ClInclude Include="Include\Util\DDSTextureLoader.h" />
     <ClInclude Include="Include\Util\GeometryGenerator.h" />
     <ClInclude Include="Include\Core\PassConstantBuffer.h" />
+    <ClInclude Include="Include\Core\HlslTranslator.h" />
     <ClInclude Include="ParticleApp\ParticleApp.h" />
     <ClInclude Include="Include\Core\ParticleEmitter.h" />
     <ClInclude Include="Include\Core\ParticlePass.h" />
@@ -184,6 +196,13 @@
     <ClInclude Include="Include\Util\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Core\Hashable.cpp" />
+    <ClCompile Include="Source\Core\HlslTranslatorEmit.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat1.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat3.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat4.cpp" />
+    <ClCompile Include="Source\Core\HlslTranslator.cpp" />
     <ClCompile Include="Source\Core\ParticleSorter.cpp" />
     <ClCompile Include="Source\Core\ParticleSystem.cpp" />
     <ClCompile Include="Source\Core\PassConstantBuffer.cpp" />
@@ -196,6 +215,11 @@
     <ClCompile Include="FullyGpuParticleSystem.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ParticleApp\ParticleApp.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNode.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat3.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat4.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetAlpha.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.cpp" />
     <ClCompile Include="Source\Core\TextureBuffer.cpp" />
     <ClCompile Include="Source\Util\DDSTextureLoader.cpp" />
     <ClCompile Include="Source\Util\DxDebug.cpp" />
@@ -220,6 +244,12 @@
     </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\Particle.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleApp\Shaders\ParticleComputeIndirectCommands.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\ParticleEmitCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

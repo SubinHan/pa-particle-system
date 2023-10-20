@@ -105,6 +105,42 @@
     <ClInclude Include="Include\Core\ParticleSorter.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Core\HlslTranslator.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNode.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewFloat4.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat4.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetAlpha.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\HlslTranslatorEmit.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewFloat3.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewFloat.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat3.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\Hashable.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -164,6 +200,42 @@
     <ClCompile Include="Source\Core\ParticleSorter.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNode.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HlslTranslator.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat4.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat4.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetAlpha.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HlslTranslatorEmit.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat3.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat1.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat3.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Hashable.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FullyGpuParticleSystem.rc">
@@ -189,6 +261,7 @@
     <FxCompile Include="ParticleApp\Shaders\ParticlePostSimulateCS.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticleSystem.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticleSortCS.hlsl" />
+    <FxCompile Include="ParticleApp\Shaders\ParticleComputeIndirectCommands.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

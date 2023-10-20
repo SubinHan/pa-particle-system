@@ -19,6 +19,11 @@ struct ParticleSortData
 	float Distance;
 };
 
+struct ParticleIndirectCommand
+{
+	D3D12_DRAW_ARGUMENTS DrawArguments;
+};
+
 class ParticleResource : public ICbvSrvUavDemander
 {
 public:
@@ -34,8 +39,13 @@ public:
 	ID3D12Resource* getAliveIndicesResourceBack();
 	ID3D12Resource* getDeadIndicesResource();
 	ID3D12Resource* getCountersResource();
+	ID3D12Resource* getIndirectCommandsResource();
+	ID3D12Resource* getIndirectCommandsCounterResetResource();
+
+	UINT getCommandBufferCounterOffset();
 
 	CD3DX12_GPU_DESCRIPTOR_HANDLE getCountersUavGpuHandle();
+	CD3DX12_GPU_DESCRIPTOR_HANDLE getIndirectCommandsUavGpuHandle();
 
 	void transitParticlesToSrv(ID3D12GraphicsCommandList* cmdList);
 	void transitAliveIndicesToSrv(ID3D12GraphicsCommandList* cmdList);
@@ -48,8 +58,6 @@ private:
 	void buildResources(ID3D12GraphicsCommandList* cmdList);
 
 private:
-	static constexpr int NUM_RESOURCES = 6;
-
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> _particlesBuffer;
@@ -58,6 +66,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> _deadIndicesUploadBuffer = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> _countersBuffer;
 	Microsoft::WRL::ComPtr<ID3D12Resource> _countersUploadBuffer = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> _indirectCommandsBuffer;
+	Microsoft::WRL::ComPtr<ID3D12Resource> _indirectCommandsCounterResetBuffer;
 	
 	Microsoft::WRL::ComPtr<ID3D12Resource> _sortBuffer;
 
@@ -65,4 +75,19 @@ private:
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE _hCounterCpuUav;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE _hCounterGpuUav;
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE _hCounterCpuSrv;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE _hCounterGpuSrv;
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE _hIndirectCommandCpuUav;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE _hIndirectCommandGpuUav;
+
+	UINT _commandSizePerFrame;
+	UINT _commandBufferCounterOffset;
+
+	static inline UINT alignForUavCounter(UINT bufferSize)
+	{
+		const UINT alignment = D3D12_UAV_COUNTER_PLACEMENT_ALIGNMENT;
+		return (bufferSize + (alignment - 1)) & ~(alignment - 1);
+	}
 };

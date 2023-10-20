@@ -1,10 +1,14 @@
 #include "Core/ParticleEmitter.h"
 
 #include "Core/ParticleResource.h"
+#include "Core/HlslTranslatorEmit.h"
 #include "Model/ObjectConstants.h"
 #include "Util/DxDebug.h"
 
 #include "d3dx12.h"
+
+static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
+static const std::wstring BASE_EMITTER_SHADER_PATH = L"ParticleSystemShaders/ParticleEmitCSBase.hlsl";
 
 using Microsoft::WRL::ComPtr;
 
@@ -16,13 +20,17 @@ constexpr int ROOT_SLOT_DEADS_INDICES_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER +
 constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_DEADS_INDICES_BUFFER + 1;
 
 ParticleEmitter::ParticleEmitter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource) :
-		_device(device),
-		_resource(resource)
+	Hashable(),
+	_device(device),
+	_resource(resource),
+	_hlslTranslator(std::make_unique<HlslTranslatorEmit>(BASE_EMITTER_SHADER_PATH))
 {
 	buildRootSignature();
 	buildShaders();
 	buildPsos();
 }
+
+ParticleEmitter::~ParticleEmitter() = default;
 
 ID3D12RootSignature* ParticleEmitter::getRootSignature()
 {
@@ -67,6 +75,19 @@ void ParticleEmitter::emitParticles(
 	const auto numGroupsY = 1;
 	const UINT numGroupsZ = 1;
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
+}
+
+void ParticleEmitter::compileShader()
+{
+	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
+
+	_hlslTranslator->compile(shaderPath);
+
+	_shader = DxUtil::compileShader(
+		shaderPath,
+		nullptr,
+		"EmitCS",
+		"cs_5_1");
 }
 
 void ParticleEmitter::buildRootSignature()
@@ -114,15 +135,26 @@ void ParticleEmitter::buildRootSignature()
 		serializedRootSig->GetBufferPointer(),
 		serializedRootSig->GetBufferSize(),
 		IID_PPV_ARGS(_rootSignature.GetAddressOf())));
+
 }
 
 void ParticleEmitter::buildShaders()
 {
-	_shader = DxUtil::compileShader(
-		L"ParticleApp\\Shaders\\ParticleEmitCS.hlsl",
-		nullptr,
-		"EmitCS",
-		"cs_5_1");
+	UINT positionIndex = _hlslTranslator->newFloat3(0.0f, 0.0f, 0.0f);
+	UINT velocityIndex = _hlslTranslator->randFloat3();
+	UINT accelerationIndex = _hlslTranslator->newFloat3(0.0f, -0.1f, 0.0f);
+	UINT lifetimeIndex = _hlslTranslator->newFloat1(4.0f);
+	UINT sizeIndex = _hlslTranslator->newFloat1(0.05f);
+	UINT opacityIndex = _hlslTranslator->newFloat1(1.0f);
+
+	_hlslTranslator->setInitialPosition(positionIndex);
+	_hlslTranslator->setInitialVelocity(velocityIndex);
+	_hlslTranslator->setInitialAcceleration(accelerationIndex);
+	_hlslTranslator->setInitialLifetime(lifetimeIndex);
+	_hlslTranslator->setInitialSize(sizeIndex);
+	_hlslTranslator->setInitialOpacity(opacityIndex);
+
+	compileShader();
 }
 
 void ParticleEmitter::buildPsos()

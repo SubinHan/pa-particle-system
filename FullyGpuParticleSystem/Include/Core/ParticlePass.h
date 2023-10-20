@@ -29,6 +29,7 @@ public:
 
 private:
 	void buildRootSignature();
+	void buildCommandSignature();
 	void buildShaders();
 	void buildInputLayout();
 	void buildPsos();
@@ -38,13 +39,20 @@ private:
 	ParticleResource* _resource;
 	Material* _material;
 
+	// for rendering
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature;
+	// for compute indirect commands.
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> _computeRootSignature;
+	Microsoft::WRL::ComPtr<ID3D12CommandSignature> _commandSignature;
+
+	Microsoft::WRL::ComPtr<ID3DBlob> _shaderIndirectCommand;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderVs;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderGs;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderPs;
 	std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoOpaque;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoTransparency;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoCompute;
 
 	std::unique_ptr<MeshGeometry> _emptyGeometry = nullptr;
 };

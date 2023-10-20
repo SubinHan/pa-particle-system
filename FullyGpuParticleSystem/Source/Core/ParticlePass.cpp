@@ -17,11 +17,14 @@ constexpr int ROOT_SLOT_PARTICLES_BUFFER = ROOT_SLOT_PASS_CONSTANTS_BUFFER + 1;
 constexpr int ROOT_SLOT_ALIVES_INDICES_BUFFER = ROOT_SLOT_PARTICLES_BUFFER + 1;
 constexpr int ROOT_SLOT_DIFFUSE_MAP_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER + 1;
 
+constexpr int ROOT_SLOT_SRV_UAV_TABLE = 0;
+
 ParticlePass::ParticlePass(DxDevice* device, ParticleResource* resource) :
 	_device(device),
 	_resource(resource)
 {
 	buildRootSignature();
+	buildCommandSignature();
 	buildShaders();
 	buildInputLayout();
 	buildPsos();
@@ -38,6 +41,34 @@ void ParticlePass::render(
 	const ObjectConstants& objectConstants,
 	const PassConstantBuffer& passCb)
 {
+	cmdList->SetComputeRootSignature(_computeRootSignature.Get());
+	cmdList->SetPipelineState(_psoCompute.Get());
+
+	cmdList->SetComputeRootDescriptorTable(
+		0,
+		_resource->getCountersUavGpuHandle());
+	cmdList->SetComputeRootDescriptorTable(
+		1,
+		_resource->getIndirectCommandsUavGpuHandle());
+
+	cmdList->CopyBufferRegion(
+		_resource->getIndirectCommandsResource(),
+		_resource->getCommandBufferCounterOffset(),
+		_resource->getIndirectCommandsCounterResetResource(),
+		0,
+		sizeof(UINT));
+
+	D3D12_RESOURCE_BARRIER toUav =
+		CD3DX12_RESOURCE_BARRIER::Transition(
+			_resource->getIndirectCommandsResource(),
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	cmdList->ResourceBarrier(1, &toUav);
+
+	cmdList->Dispatch(static_cast<UINT>(ceil(static_cast<float>(_resource->getMaxNumParticles()) / 256.0f)), 1, 1);
+	
+	//
+
 	cmdList->SetGraphicsRootSignature(_rootSignature.Get());
 
 	auto vertexBuffers = _emptyGeometry->VertexBufferView();
@@ -63,11 +94,12 @@ void ParticlePass::render(
 		ROOT_SLOT_DIFFUSE_MAP_BUFFER, _material->DiffuseSrvHandle);
 
 	// TODO: change to executeindirect
-	cmdList->DrawIndexedInstanced(
+	cmdList->ExecuteIndirect(
+		_commandSignature.Get(),
 		_resource->getMaxNumParticles(),
-		1,
+		_resource->getIndirectCommandsResource(),
 		0,
-		0,
+		nullptr,
 		0);
 
 	_resource->transitParticlesToUav(cmdList);
@@ -76,55 +108,125 @@ void ParticlePass::render(
 
 void ParticlePass::buildRootSignature()
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
-	slotRootParameter[ROOT_SLOT_OBJECT_CONSTANTS_BUFFER].InitAsConstants(sizeof(ObjectConstants) / 4, 0);
-
-	CD3DX12_DESCRIPTOR_RANGE passCbvTable;
-	passCbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-	slotRootParameter[ROOT_SLOT_PASS_CONSTANTS_BUFFER].InitAsDescriptorTable(1, &passCbvTable);
-
-	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER].InitAsShaderResourceView(0); // particles
-	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER].InitAsShaderResourceView(1); // aliveIndices
-
-	CD3DX12_DESCRIPTOR_RANGE texSrvTable;
-	texSrvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
-	slotRootParameter[ROOT_SLOT_DIFFUSE_MAP_BUFFER].InitAsDescriptorTable(1, &texSrvTable);
-
-	auto staticSamplers = DxUtil::getStaticSamplers();
-
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
-		_countof(slotRootParameter),
-		slotRootParameter,
-		staticSamplers.size(),
-		staticSamplers.data(),
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
-	);
-
-	ComPtr<ID3DBlob> serializedRootSig = nullptr;
-	ComPtr<ID3DBlob> errorBlob = nullptr;
-	HRESULT hr = D3D12SerializeRootSignature(
-		&rootSigDesc,
-		D3D_ROOT_SIGNATURE_VERSION_1,
-		serializedRootSig.GetAddressOf(),
-		errorBlob.GetAddressOf()
-	);
-
-	if (errorBlob != nullptr)
+	// build graphics root signature
 	{
-		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	}
-	ThrowIfFailed(hr);
+		CD3DX12_ROOT_PARAMETER slotRootParameter[5];
+		slotRootParameter[ROOT_SLOT_OBJECT_CONSTANTS_BUFFER].InitAsConstants(sizeof(ObjectConstants) / 4, 0);
 
-	ThrowIfFailed(_device->getD3dDevice()->CreateRootSignature(
-		0,
-		serializedRootSig->GetBufferPointer(),
-		serializedRootSig->GetBufferSize(),
-		IID_PPV_ARGS(&_rootSignature))
-	);
+		CD3DX12_DESCRIPTOR_RANGE passCbvTable;
+		passCbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+		slotRootParameter[ROOT_SLOT_PASS_CONSTANTS_BUFFER].InitAsDescriptorTable(1, &passCbvTable);
+
+		slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER].InitAsShaderResourceView(0); // particles
+		slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER].InitAsShaderResourceView(1); // aliveIndices
+
+		CD3DX12_DESCRIPTOR_RANGE texSrvTable;
+		texSrvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
+		slotRootParameter[ROOT_SLOT_DIFFUSE_MAP_BUFFER].InitAsDescriptorTable(1, &texSrvTable);
+
+		auto staticSamplers = DxUtil::getStaticSamplers();
+
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
+			_countof(slotRootParameter),
+			slotRootParameter,
+			staticSamplers.size(),
+			staticSamplers.data(),
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+		);
+
+		ComPtr<ID3DBlob> serializedRootSig = nullptr;
+		ComPtr<ID3DBlob> errorBlob = nullptr;
+		HRESULT hr = D3D12SerializeRootSignature(
+			&rootSigDesc,
+			D3D_ROOT_SIGNATURE_VERSION_1,
+			serializedRootSig.GetAddressOf(),
+			errorBlob.GetAddressOf()
+		);
+
+		if (errorBlob != nullptr)
+		{
+			::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+		}
+		ThrowIfFailed(hr);
+
+		ThrowIfFailed(_device->getD3dDevice()->CreateRootSignature(
+			0,
+			serializedRootSig->GetBufferPointer(),
+			serializedRootSig->GetBufferSize(),
+			IID_PPV_ARGS(&_rootSignature))
+		);
+	}
+
+	// build compute root signature
+	{
+		CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+
+		CD3DX12_DESCRIPTOR_RANGE counterTable;
+		counterTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+
+		slotRootParameter[0]
+			.InitAsDescriptorTable(1, &counterTable);
+
+		CD3DX12_DESCRIPTOR_RANGE uavTable;
+		uavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
+
+		slotRootParameter[1]
+			.InitAsDescriptorTable(1, &uavTable);
+
+		auto staticSamplers = DxUtil::getStaticSamplers();
+
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
+			_countof(slotRootParameter),
+			slotRootParameter,
+			0,
+			nullptr,
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+		);
+
+		ComPtr<ID3DBlob> serializedRootSig = nullptr;
+		ComPtr<ID3DBlob> errorBlob = nullptr;
+		HRESULT hr = D3D12SerializeRootSignature(
+			&rootSigDesc,
+			D3D_ROOT_SIGNATURE_VERSION_1,
+			serializedRootSig.GetAddressOf(),
+			errorBlob.GetAddressOf()
+		);
+
+		if (errorBlob != nullptr)
+		{
+			::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+		}
+		ThrowIfFailed(hr);
+
+		ThrowIfFailed(_device->getD3dDevice()->CreateRootSignature(
+			0,
+			serializedRootSig->GetBufferPointer(),
+			serializedRootSig->GetBufferSize(),
+			IID_PPV_ARGS(&_computeRootSignature)));
+	}
+}
+
+void ParticlePass::buildCommandSignature()
+{
+	D3D12_INDIRECT_ARGUMENT_DESC argumentDescs[1] = {};
+	argumentDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW;
+
+	D3D12_COMMAND_SIGNATURE_DESC commandSignatureDesc = {};
+	commandSignatureDesc.pArgumentDescs = argumentDescs;
+	commandSignatureDesc.NumArgumentDescs = _countof(argumentDescs);
+	commandSignatureDesc.ByteStride = sizeof(ParticleIndirectCommand);
+
+	ThrowIfFailed(_device->getD3dDevice()->CreateCommandSignature(
+		&commandSignatureDesc, _rootSignature.Get(), IID_PPV_ARGS(&_commandSignature)));
 }
 
 void ParticlePass::buildShaders()
 {
+	_shaderIndirectCommand = DxUtil::compileShader(
+		L"ParticleApp\\Shaders\\ParticleComputeIndirectCommands.hlsl",
+		nullptr,
+		"ComputeIndirectCommandsCS",
+		"cs_5_1");
 	_shaderVs = DxUtil::compileShader(
 		L"ParticleApp\\Shaders\\ParticleRender.hlsl",
 		nullptr,
@@ -206,6 +308,17 @@ void ParticlePass::buildPsos()
 			&transparentPsoDesc, IID_PPV_ARGS(&_psoTransparency)
 		)
 	);
+
+	D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
+	psoDesc.pRootSignature = _computeRootSignature.Get();
+	psoDesc.CS =
+	{
+		reinterpret_cast<BYTE*>(_shaderIndirectCommand->GetBufferPointer()),
+		_shaderIndirectCommand->GetBufferSize()
+	};
+	ThrowIfFailed(
+		_device->getD3dDevice()->CreateComputePipelineState(
+			&psoDesc, IID_PPV_ARGS(&_psoCompute)));
 }
 
 void ParticlePass::generateEmptyGeometry()

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Hashable.h"
 #include "Util/DxUtil.h"
 
 #include <wrl.h>
@@ -9,6 +10,7 @@ struct ID3D12PipelineState;
 struct ID3D12RootSignature;
 
 class ParticleResource;
+class HlslTranslatorEmit;
 struct ObjectConstants;
 
 struct EmitConstants
@@ -20,10 +22,11 @@ struct EmitConstants
 	UINT MaxNumParticles;
 };
 
-class ParticleEmitter
+class ParticleEmitter : public Hashable
 {
 public:
 	ParticleEmitter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource);
+	virtual ~ParticleEmitter();
 
 	ID3D12RootSignature* getRootSignature();
 	ID3DBlob* getShader();
@@ -35,15 +38,18 @@ public:
 		int numParticlesToEmit, 
 		float deltaTime);
 
+	void compileShader();
+
 private:
 	void buildRootSignature();
 	void buildShaders();
 	void buildPsos();
 
 private:
-
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 	ParticleResource* _resource;
+
+	std::unique_ptr<HlslTranslatorEmit> _hlslTranslator;
 
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shader;

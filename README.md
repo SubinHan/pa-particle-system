@@ -17,7 +17,7 @@
 
 
 #### 구현 목표 Reference
-* Unreal Engine 5 Niagara <br>
+* ***Unreal Engine 5 Niagara*** <br>
 * [YouTube: ncParticleEditor](https://www.youtube.com/watch?v=RLNI5NMCJ1E) <br>
 * [YouTube: OpenGL/Imgui Engine Build Stage 3.5: Particle System](https://www.youtube.com/watch?v=rZ3ztv7u0Yk) <br>
 * [YouTube: 2D Game Particle tool using IMGUI in DirectX11](https://www.youtube.com/watch?v=TXf4D8Ess6s) <br>
@@ -72,14 +72,20 @@
 
 ### Tasks
 
+##### Backlogs
+* ParticlePass, ParticleSimulator에도 HlslTranslator 적용 및 관련한 Control 추상화
+* 프레임 통계 모듈 구현
+* Motion blur 구현
+* Geometry와의 collision
+* imgui 도입
+* Ribbon mesh 지원
+* Shader generation에서 node dependency 무결성 확인
+  * i.e.) float3에 float4를 대입하지는 않는지?
+  * 각 node들이 type 정보를 유지하여 적절한 input임을 검증해야 함
+
 ##### 진행 중인 Task
 * Particle System 학습
-* Lifetime, velocity 등 GPU 코드에서 하드코딩 된 속성들을 CPU 단에서 매개변수화
-* 프레임 통계 모듈 구현
-* HLSL Translator 구현
-  * 추상화된 작업들을 HLSL 코드로 변환시켜주는 클래스
-  * 가령 float4 변수를 초기화하고, 두 개의 float4 변수를 더하는 것 등
-  * 이를 기반으로 유연한 Emit, Simulate process 구현의 기반 마련
+* DrawIndexedIndirect(), ExecuteIndirect() 학습 및 적용
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -93,6 +99,10 @@
   + Batcher's odd-even merge sort 학습
   + Bitonic sort 학습
   + 간단한 구현 수행 및 결과 확인
+* HLSL Translator 구현
+  * 추상화된 작업들을 HLSL 코드로 변환시켜주는 클래스
+  * 가령 float4 변수를 초기화하고, 두 개의 float4 변수를 더하는 것 등
+  * 이를 기반으로 유연한 Emit, Simulate process 구현의 기반 마련
 
 <hr/>
 
@@ -136,6 +146,15 @@
   + Batcher's odd-even merge sort 학습
   + Bitonic sort 학습
   + Bitonic sort prototype (단순히 인덱스를 기준으로 정렬해보았음)
+* 금요일:
+  * 렌더링과 관련 없는 utils의 자동화 유닛 테스트 환경 구축
+  * HlslTranslator (ParticleEmitter에만 시험적으로 적용)
+    * Graph 자료구조 기반으로 hlsl을 생성하는 클래스
+    * base shader 파일을 기반으로 특정 지점에 동적으로 코드 삽입 후 컴파일
+  * Object hashing
+    * 각 particle system 마다의 shader 관리를 위한 object 수준에서의 hashing 구현
+    * 객체 생성 시점을 이용해 hashing 
+  * DrawIndexedIndirect(), ExecuteIndirect() 학습
 
 <hr/>
 
@@ -166,14 +185,31 @@
 * Bitnoic sort:
   + descending, ascneding order를 번갈아가면서 정렬함
   + 이들을 merge하는 작업들을 재귀적으로 수행하여 정렬 완료
-* Bitonic sort가 빠른 이유?
+* Bitonic sort가 더 빠른 이유?
   * data access 패턴이 규칙적이라 cache hit가 잘 이루어질 수 있음.
+
+#### 쉐이더 동적 생성
+* Graph 자료구조를 기반으로 statements의 dependency를 관리
+* Base 쉐이더 파일이 입력되며, statements가 삽입될 지점은 "%s"로 표시
+* 클라이언트는 HlslTranslator 객체의 함수를 이용해 원하는 로직 생성
+  * 구체적으로는 statement node를 생성 후 그들 간의 관계를 정의
+* in link가 없는 node들을 시작으로 BFS 탐색하여 statements들을 쉐이더 코드에 순차적으로 삽입 후 컴파일
+* 이때 쉐이더의 최종 출력 값은 사전에 정해져 있음.
+  * 가령 EmitCS의 경우 InitalPosition, InitialVelocity 따위를 받음.
+* 생성된 Shader 파일들의 이름은 객체 생성 시점을 해싱한 값으로 구분
 <hr/>
 
 
 
-### 참고문헌
-[William T. Reeves, particle systems - a technique for modeling a class of fuzzy objects](https://www.lri.fr/~mbl/ENS/IG2/devoir2/files/docs/fuzzyParticles.pdf) <br>
-[Lutz Lata, Building a Million Particle System](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=b5aa42d88a178b264f4ceb3ddb67d3d00ecbc631) <br>
-[Karl Sims, Particle animation and rendering using data parallel computation](https://www.karlsims.com/papers/ParticlesSiggraph90.pdf) <br>
-[Bathcer's Algorithm](https://math.mit.edu/~shor/18.310/batcher.pdf)
+### 참고문헌 및 코드
+* Particle System
+  * [William T. Reeves, particle systems - a technique for modeling a class of fuzzy objects](https://www.lri.fr/~mbl/ENS/IG2/devoir2/files/docs/fuzzyParticles.pdf)
+  * [Lutz Lata, Building a Million Particle System](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=b5aa42d88a178b264f4ceb3ddb67d3d00ecbc631)
+  * [Karl Sims, Particle animation and rendering using data parallel computation](https://www.karlsims.com/papers/ParticlesSiggraph90.pdf)
+  * [GPU based paritlce system - Wicked engine](https://wickedengine.net/2017/11/07/gpu-based-particle-simulation/)
+  * DirectX12 Mini Engine
+
+* Parallel sort
+  * [Bathcer's Algorithm](https://math.mit.edu/~shor/18.310/batcher.pdf)
+  * [Bitonic sorter](https://en.wikipedia.org/wiki/Bitonic_sorter)
+
