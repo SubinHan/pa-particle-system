@@ -11,6 +11,9 @@ RWStructuredBuffer<uint> aliveIndices	: register(u0);
 
 #define NUM_THREADS 256
 
+// TODO: 현재 버그 있음.
+// 특정 값들이 swap 대신 덮어쓰기 되어 몇몇 값들은 누락되고, 몇몇 값들은 복제되는 현상.
+
 // each thread emits a particle.
 [numthreads(NUM_THREADS, 1, 1)]
 void BitonicSortCS(

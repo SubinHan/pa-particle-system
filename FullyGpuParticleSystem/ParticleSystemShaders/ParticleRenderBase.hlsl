@@ -16,7 +16,7 @@ cbuffer cbPass : register(b1)
 	float gNearZ;
 	float gFarZ;
 	float gTotalTime;
-	float gDeltaTime;
+	float DeltaTime;
 };
 
 struct VertexOut
@@ -106,13 +106,9 @@ void ParticleGS(
 
 float4 ParticlePS(GeoOut pin) : SV_Target
 {
-	float4 diffuse = diffuseMap.Sample(gsamPointWrap, pin.TexC);
+	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	// TODO: process texture alpha value correctly. (should process dds file directly)
-	diffuse.a = saturate(diffuse.r - 0.5f);
-	diffuse.rgb = float3(0.05f, 0.05f, 0.05f);
+	%s
 
-	clip(diffuse.a - 0.1f);
-
-	return diffuse;
+	return color;
 }

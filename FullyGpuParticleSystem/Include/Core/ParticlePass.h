@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Hashable.h"
 #include "Util/DxUtil.h"
 #include "Model/Geometry.h"
 
@@ -12,10 +13,11 @@ struct ID3D12RootSignature;
 class DxDevice;
 class ParticleResource;
 class PassConstantBuffer;
+class HlslTranslatorRender;
 struct ObjectConstants;
 struct Material;
 
-class ParticlePass
+class ParticlePass : public Hashable
 {
 public:
 	ParticlePass(DxDevice* device, ParticleResource* resource);
@@ -26,6 +28,8 @@ public:
 		ID3D12GraphicsCommandList* cmdList,
 		const ObjectConstants& objectConstants,
 		const PassConstantBuffer& passCb);
+
+	void compileShaders();
 
 private:
 	void buildRootSignature();
@@ -38,6 +42,8 @@ private:
 	DxDevice* _device;
 	ParticleResource* _resource;
 	Material* _material;
+
+	std::unique_ptr<HlslTranslatorRender> _hlslTranslator;
 
 	// for rendering
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature;

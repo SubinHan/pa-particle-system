@@ -1,18 +1,23 @@
 #include "Core/ShaderStatementNode/ShaderStatementNodeSetAlpha.h"
 
-ShaderStatementNodeSetAlpha::ShaderStatementNodeSetAlpha(std::string variableName, float value) :
-	ShaderStatementNode(variableName),
-	_value(value)
+ShaderStatementNodeSetAlpha::ShaderStatementNodeSetAlpha(std::string variableName) :
+	ShaderStatementNode(variableName)
 {
 }
 
 std::string ShaderStatementNodeSetAlpha::generateStatements() const
 {
-	assert(_input);
-	return "float4 " + _variableName + " = float4(" + _input->getVariableName() + ".xyz, " + std::to_string(_value) + ");";
+	assert(_inputFloat4);
+	assert(_inputAlpha);
+	return "float4 " + _variableName + " = float4(" + _inputFloat4->getVariableName() + ".xyz, " + _inputAlpha->getVariableName() + ");";
 }
 
-void ShaderStatementNodeSetAlpha::setInput(std::shared_ptr<ShaderStatementNode> input)
+void ShaderStatementNodeSetAlpha::setInputFloat4(std::shared_ptr<ShaderStatementNode> inputFloat4)
 {
-	_input = input;
+	_inputFloat4 = inputFloat4;
+}
+
+void ShaderStatementNodeSetAlpha::setInputAlpha(std::shared_ptr<ShaderStatementNode> inputAlpha)
+{
+	_inputAlpha = inputAlpha;
 }

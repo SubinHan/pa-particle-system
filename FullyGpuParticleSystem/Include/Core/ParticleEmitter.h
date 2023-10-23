@@ -38,7 +38,7 @@ public:
 		int numParticlesToEmit, 
 		float deltaTime);
 
-	void compileShader();
+	void compileShaders();
 
 private:
 	void buildRootSignature();

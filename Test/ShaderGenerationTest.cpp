@@ -92,7 +92,8 @@ namespace Test
 			HlslTranslator translator(PROJECT_DIR + L"FullyGpuParticleSystem/ParticleSystemShaders/ParticleEmitCSBase.hlsl");
 			UINT float4Index1 = translator.newFloat4(1.0f, 1.0f, 1.0f, 1.0f);
 			UINT float4Index2 = translator.randFloat4();
-			UINT float4Index3 = translator.setAlpha(float4Index2, 1.0f);
+			UINT float4Index5 = translator.newFloat1(1.0f);
+			UINT float4Index3 = translator.setAlpha(float4Index2, float4Index5);
 			UINT float4Index4 = translator.addFloat4(float4Index1, float4Index3);
 
 			translator.compile(OUTPUT_PATH);

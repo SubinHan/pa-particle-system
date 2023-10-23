@@ -69,7 +69,7 @@ void ParticleSystem::onDraw(
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 1);
 	_simulator->simulateParticles(commandList, gt.deltaTime());
 
-	_sorter->sortParticles(commandList);
+	//_sorter->sortParticles(commandList);
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 2);
 	_pass->render(commandList, objConstants, passCb);

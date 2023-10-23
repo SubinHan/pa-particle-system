@@ -1,20 +1,27 @@
 #include "Core/ParticleSimulator.h"
 
 #include "Core/ParticleResource.h"
+#include "Core/HlslTranslatorSimulate.h"
 #include "Util/DxDebug.h"
 
 #include "d3dx12.h"
+
+static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
+static const std::wstring BASE_SIMULATOR_SHADER_PATH = L"ParticleSystemShaders/ParticleSimulateCSBase.hlsl";
 
 using Microsoft::WRL::ComPtr;
 
 ParticleSimulator::ParticleSimulator(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource) :
 	_device(device),
-	_resource(resource)
+	_resource(resource),
+	_hlslTranslator(std::make_unique<HlslTranslatorSimulate>(BASE_SIMULATOR_SHADER_PATH))
 {
 	buildRootSignature();
 	buildShaders();
 	buildPsos();
 }
+
+ParticleSimulator::~ParticleSimulator() = default;
 
 ID3D12RootSignature* ParticleSimulator::getRootSignature()
 {
@@ -59,6 +66,25 @@ void ParticleSimulator::simulateParticles(ID3D12GraphicsCommandList* cmdList, fl
 	cmdList->Dispatch(1, 1, 1);
 
 	_resource->swapAliveIndicesBuffer();
+}
+
+void ParticleSimulator::compileShader()
+{
+	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
+
+	_hlslTranslator->compile(shaderPath);
+
+	_shader = DxUtil::compileShader(
+		shaderPath,
+		nullptr,
+		"SimulateCS",
+		"cs_5_1");
+
+	_shaderPost = DxUtil::compileShader(
+		L"ParticleApp\\Shaders\\ParticlePostSimulateCS.hlsl",
+		nullptr,
+		"PostSimulateCS",
+		"cs_5_1");
 }
 
 void ParticleSimulator::buildRootSignature()
@@ -148,17 +174,19 @@ void ParticleSimulator::buildRootSignature()
 
 void ParticleSimulator::buildShaders()
 {
-	_shader = DxUtil::compileShader(
-		L"ParticleApp\\Shaders\\ParticleSimulateCS.hlsl",
-		nullptr,
-		"SimulateCS",
-		"cs_5_1");
+	UINT deltaTimeIndex = _hlslTranslator->getDeltaTime();
+	UINT positionIndex = _hlslTranslator->getPositionAfterSimulatingVelocity();
+	UINT randFloat3 = _hlslTranslator->randFloat3();
+	UINT minusHalf = _hlslTranslator->newFloat3(-0.5f, -0.5f, -0.5f);
+	UINT minusHalfToPlusHalf = _hlslTranslator->addFloat3(randFloat3, minusHalf);
+	UINT noisedPositionOffset = _hlslTranslator->multiplyFloat3ByScalar(minusHalfToPlusHalf, deltaTimeIndex);
+	UINT multiplier = _hlslTranslator->newFloat1(5.0f);
+	UINT noisedPositionOffsetMultiplied = _hlslTranslator->multiplyFloat3ByScalar(noisedPositionOffset, multiplier);
+	UINT positionResult = _hlslTranslator->addFloat3(positionIndex, noisedPositionOffsetMultiplied);
 
-	_shaderPost = DxUtil::compileShader(
-		L"ParticleApp\\Shaders\\ParticlePostSimulateCS.hlsl",
-		nullptr,
-		"PostSimulateCS",
-		"cs_5_1");
+	_hlslTranslator->setPosition(positionResult);
+
+	compileShader();
 }
 
 void ParticleSimulator::buildPsos()

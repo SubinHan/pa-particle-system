@@ -1,8 +1,10 @@
 #pragma once
 
-#include "Util/DxUtil.h"
 #include "Core/ICbvSrvUavDemander.h"
+#include "Core/Hashable.h"
+#include "Util/DxUtil.h"
 
+#include <memory>
 #include <wrl.h>
 
 struct ID3D12Device;
@@ -10,22 +12,26 @@ struct ID3D12PipelineState;
 struct ID3D12RootSignature;
 
 class ParticleResource;
+class HlslTranslatorSimulate;
 
 struct ParticleSimulateConstants
 {
 	float DeltaTime;
 };
 
-class ParticleSimulator
+class ParticleSimulator : public Hashable
 {
 public:
 	ParticleSimulator(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource);
+	~ParticleSimulator();
 
 	ID3D12RootSignature* getRootSignature();
 	ID3DBlob* getShader();
 	ID3D12PipelineState* getPipelineStateObject();
 
 	void simulateParticles(ID3D12GraphicsCommandList* cmdList, float deltaTime);
+
+	void compileShader();
 
 private:
 	void buildRootSignature();
@@ -42,6 +48,8 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 	ParticleResource* _resource;
+
+	std::unique_ptr<HlslTranslatorSimulate> _hlslTranslator;
 
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shader;

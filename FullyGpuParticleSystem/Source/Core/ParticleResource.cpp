@@ -6,7 +6,7 @@
 #include "d3dx12.h"
 #include "d3d11.h"
 
-static constexpr int MAX_NUM_PARTICLES = 32'768;
+static constexpr int MAX_NUM_PARTICLES = 65'536;
 
 using namespace DirectX;
 
@@ -161,6 +161,26 @@ void ParticleResource::transitAliveIndicesToUav(ID3D12GraphicsCommandList* cmdLi
 		D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
 	cmdList->ResourceBarrier(1, &aliveIndicesToUav);
+}
+
+void ParticleResource::transitCommandBufferToIndirectArgument(ID3D12GraphicsCommandList* cmdList)
+{
+	const auto commandBufferToIndirectArgument= CD3DX12_RESOURCE_BARRIER::Transition(
+		_indirectCommandsBuffer.Get(),
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+		D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT);
+
+	cmdList->ResourceBarrier(1, &commandBufferToIndirectArgument);
+}
+
+void ParticleResource::transitCommandBufferToUav(ID3D12GraphicsCommandList* cmdList)
+{
+	const auto commandBufferToUav = CD3DX12_RESOURCE_BARRIER::Transition(
+		_indirectCommandsBuffer.Get(),
+		D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT,
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
+	cmdList->ResourceBarrier(1, &commandBufferToUav);
 }
 
 int ParticleResource::getMaxNumParticles()
@@ -348,4 +368,11 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 		ZeroMemory(mappedCounterReset, sizeof(UINT));
 		_indirectCommandsCounterResetBuffer->Unmap(0, nullptr);
 	}
+
+	const auto commandBufferToIndirectArgument = CD3DX12_RESOURCE_BARRIER::Transition(
+		_indirectCommandsBuffer.Get(),
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT);
+
+	cmdList->ResourceBarrier(1, &commandBufferToIndirectArgument);
 }

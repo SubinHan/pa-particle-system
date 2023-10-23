@@ -1,6 +1,7 @@
 #include "Core/ParticlePass.h"
 
 #include "Core/DxDevice.h"
+#include "Core/HlslTranslatorRender.h"
 #include "Core/ParticleResource.h"
 #include "Core/PassConstantBuffer.h"
 #include "Model/Material.h"
@@ -8,6 +9,9 @@
 #include "Util/DxDebug.h"
 
 #include "d3dx12.h"
+
+static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
+static const std::wstring BASE_RENDER_SHADER_PATH = L"ParticleSystemShaders/ParticleRenderBase.hlsl";
 
 using Microsoft::WRL::ComPtr;
 
@@ -21,7 +25,8 @@ constexpr int ROOT_SLOT_SRV_UAV_TABLE = 0;
 
 ParticlePass::ParticlePass(DxDevice* device, ParticleResource* resource) :
 	_device(device),
-	_resource(resource)
+	_resource(resource),
+	_hlslTranslator(std::make_unique<HlslTranslatorRender>(BASE_RENDER_SHADER_PATH))
 {
 	buildRootSignature();
 	buildCommandSignature();
@@ -51,6 +56,13 @@ void ParticlePass::render(
 		1,
 		_resource->getIndirectCommandsUavGpuHandle());
 
+	D3D12_RESOURCE_BARRIER toCopy =
+		CD3DX12_RESOURCE_BARRIER::Transition(
+			_resource->getIndirectCommandsResource(),
+			D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT,
+			D3D12_RESOURCE_STATE_COPY_DEST);
+	cmdList->ResourceBarrier(1, &toCopy);
+
 	cmdList->CopyBufferRegion(
 		_resource->getIndirectCommandsResource(),
 		_resource->getCommandBufferCounterOffset(),
@@ -66,8 +78,11 @@ void ParticlePass::render(
 	cmdList->ResourceBarrier(1, &toUav);
 
 	cmdList->Dispatch(static_cast<UINT>(ceil(static_cast<float>(_resource->getMaxNumParticles()) / 256.0f)), 1, 1);
-	
+
 	//
+
+	_resource->transitParticlesToSrv(cmdList);
+	_resource->transitAliveIndicesToSrv(cmdList);
 
 	cmdList->SetGraphicsRootSignature(_rootSignature.Get());
 
@@ -78,9 +93,6 @@ void ParticlePass::render(
 	cmdList->IASetIndexBuffer(&indexBuffer);
 
 	cmdList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_POINTLIST);
-
-	_resource->transitParticlesToSrv(cmdList);
-	_resource->transitAliveIndicesToSrv(cmdList);
 
 	cmdList->SetPipelineState(_psoTransparency.Get());
 	cmdList->SetGraphicsRoot32BitConstants(ROOT_SLOT_OBJECT_CONSTANTS_BUFFER, sizeof(ObjectConstants) / 4, &objectConstants, 0);
@@ -93,17 +105,44 @@ void ParticlePass::render(
 	cmdList->SetGraphicsRootDescriptorTable(
 		ROOT_SLOT_DIFFUSE_MAP_BUFFER, _material->DiffuseSrvHandle);
 
+	_resource->transitCommandBufferToIndirectArgument(cmdList);
+
 	// TODO: change to executeindirect
 	cmdList->ExecuteIndirect(
 		_commandSignature.Get(),
 		_resource->getMaxNumParticles(),
 		_resource->getIndirectCommandsResource(),
 		0,
-		nullptr,
-		0);
+		_resource->getIndirectCommandsResource(),
+		_resource->getCommandBufferCounterOffset());
 
 	_resource->transitParticlesToUav(cmdList);
 	_resource->transitAliveIndicesToUav(cmdList);
+}
+
+void ParticlePass::compileShaders()
+{
+	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
+
+	_hlslTranslator->compile(shaderPath);
+
+	_shaderVs = DxUtil::compileShader(
+		shaderPath,
+		nullptr,
+		"ParticleVS",
+		"vs_5_1");
+
+	_shaderGs = DxUtil::compileShader(
+		shaderPath,
+		nullptr,
+		"ParticleGS",
+		"gs_5_1");
+
+	_shaderPs = DxUtil::compileShader(
+		shaderPath,
+		nullptr,
+		"ParticlePS",
+		"ps_5_1");
 }
 
 void ParticlePass::buildRootSignature()
@@ -209,7 +248,7 @@ void ParticlePass::buildRootSignature()
 void ParticlePass::buildCommandSignature()
 {
 	D3D12_INDIRECT_ARGUMENT_DESC argumentDescs[1] = {};
-	argumentDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW;
+	argumentDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
 
 	D3D12_COMMAND_SIGNATURE_DESC commandSignatureDesc = {};
 	commandSignatureDesc.pArgumentDescs = argumentDescs;
@@ -217,7 +256,7 @@ void ParticlePass::buildCommandSignature()
 	commandSignatureDesc.ByteStride = sizeof(ParticleIndirectCommand);
 
 	ThrowIfFailed(_device->getD3dDevice()->CreateCommandSignature(
-		&commandSignatureDesc, _rootSignature.Get(), IID_PPV_ARGS(&_commandSignature)));
+		&commandSignatureDesc, nullptr, IID_PPV_ARGS(&_commandSignature)));
 }
 
 void ParticlePass::buildShaders()
@@ -227,21 +266,16 @@ void ParticlePass::buildShaders()
 		nullptr,
 		"ComputeIndirectCommandsCS",
 		"cs_5_1");
-	_shaderVs = DxUtil::compileShader(
-		L"ParticleApp\\Shaders\\ParticleRender.hlsl",
-		nullptr,
-		"ParticleVS",
-		"vs_5_1");
-	_shaderGs = DxUtil::compileShader(
-		L"ParticleApp\\Shaders\\ParticleRender.hlsl",
-		nullptr,
-		"ParticleGS",
-		"gs_5_1");
-	_shaderPs = DxUtil::compileShader(
-		L"ParticleApp\\Shaders\\ParticleRender.hlsl",
-		nullptr,
-		"ParticlePS",
-		"ps_5_1");
+
+	UINT textureSampleIndex = _hlslTranslator->sampleTexture2d();
+	UINT alphaThresholdIndex = _hlslTranslator->newFloat1(0.5f);
+	UINT textureAlphaIndex = _hlslTranslator->maskX(textureSampleIndex);
+	_hlslTranslator->clip(textureAlphaIndex);
+	UINT outputColorIndex = _hlslTranslator->newFloat4(1.0f, 0.00f, 0.00f, 1.0f);
+	UINT alphaModifiedOutputColorIndex = _hlslTranslator->setAlpha(outputColorIndex, textureAlphaIndex);
+	_hlslTranslator->setOutputColor(alphaModifiedOutputColorIndex);
+
+	compileShaders();
 }
 
 void ParticlePass::buildInputLayout()

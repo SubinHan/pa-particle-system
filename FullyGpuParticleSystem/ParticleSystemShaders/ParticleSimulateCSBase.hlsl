@@ -1,8 +1,9 @@
-#include "Particle.hlsl"
+#include "ParticleApp/Shaders/Particle.hlsl"
+#include "ParticleApp/Shaders/Util.hlsl"
 
 cbuffer cbUpdateConstants : register(b0)
 {
-	float deltaTime;
+	float DeltaTime;
 }
 
 RWStructuredBuffer<Particle> particles		: register(u0);
@@ -27,7 +28,7 @@ void SimulateCS(
 	if (uint(id) < numAlives)
 	{
 		const int particleIndex = aliveIndices[id];
-		particles[particleIndex].Lifetime -= deltaTime;
+		particles[particleIndex].Lifetime -= DeltaTime;
 
 		const bool isExpired = particles[particleIndex].Lifetime <= 0.f;
 
@@ -43,9 +44,11 @@ void SimulateCS(
 		{
 			// TODO: Simulate particles.
 			const float3 velocityBefore = particles[particleIndex].Velocity;
-			particles[particleIndex].Velocity += particles[particleIndex].Acceleration * deltaTime;
+			particles[particleIndex].Velocity += particles[particleIndex].Acceleration * DeltaTime;
 			particles[particleIndex].Position +=
-				(velocityBefore + particles[particleIndex].Velocity) * deltaTime * 0.5f;
+				(velocityBefore + particles[particleIndex].Velocity) * DeltaTime * 0.5f;
+
+			%s
 
 			// move alive particles to ping-pong buffer 
 			uint newIndex;

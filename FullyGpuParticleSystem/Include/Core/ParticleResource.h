@@ -21,7 +21,7 @@ struct ParticleSortData
 
 struct ParticleIndirectCommand
 {
-	D3D12_DRAW_ARGUMENTS DrawArguments;
+	D3D12_DRAW_INDEXED_ARGUMENTS DrawArguments;
 };
 
 class ParticleResource : public ICbvSrvUavDemander
@@ -51,6 +51,8 @@ public:
 	void transitAliveIndicesToSrv(ID3D12GraphicsCommandList* cmdList);
 	void transitParticlesToUav(ID3D12GraphicsCommandList* cmdList);
 	void transitAliveIndicesToUav(ID3D12GraphicsCommandList* cmdList);
+	void transitCommandBufferToIndirectArgument(ID3D12GraphicsCommandList* cmdList);
+	void transitCommandBufferToUav(ID3D12GraphicsCommandList* cmdList);
 
 	int getMaxNumParticles();
 

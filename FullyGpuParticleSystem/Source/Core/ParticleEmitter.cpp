@@ -77,7 +77,7 @@ void ParticleEmitter::emitParticles(
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
 }
 
-void ParticleEmitter::compileShader()
+void ParticleEmitter::compileShaders()
 {
 	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
 
@@ -142,7 +142,7 @@ void ParticleEmitter::buildShaders()
 {
 	UINT positionIndex = _hlslTranslator->newFloat3(0.0f, 0.0f, 0.0f);
 	UINT velocityIndex = _hlslTranslator->randFloat3();
-	UINT accelerationIndex = _hlslTranslator->newFloat3(0.0f, -0.1f, 0.0f);
+	UINT accelerationIndex = _hlslTranslator->newFloat3(0.0f, -1.0f, 0.0f);
 	UINT lifetimeIndex = _hlslTranslator->newFloat1(4.0f);
 	UINT sizeIndex = _hlslTranslator->newFloat1(0.05f);
 	UINT opacityIndex = _hlslTranslator->newFloat1(1.0f);
@@ -154,7 +154,7 @@ void ParticleEmitter::buildShaders()
 	_hlslTranslator->setInitialSize(sizeIndex);
 	_hlslTranslator->setInitialOpacity(opacityIndex);
 
-	compileShader();
+	compileShaders();
 }
 
 void ParticleEmitter::buildPsos()

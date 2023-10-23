@@ -156,6 +156,16 @@
     * 객체 생성 시점을 이용해 hashing 
   * DrawIndexedIndirect(), ExecuteIndirect() 학습
 
+<br>
+
+##### 3주차: 동적 쉐이더 컴파일 구현 및 UI 도입 (2023.10.23. ~ 2023.10.27.)
+* 월요일:
+  + Indirect Drawing 도입 (기존에는 무조건 최대 파티클 수만큼 draw call 생성)
+  + 동적 쉐이더 컴파일 적용
+    + Emit, Simulate, Render 단계에서의 연산을 동적으로 제어 가능
+  + Imgui 학습
+
+
 <hr/>
 
 ### 세부 구현 설명
@@ -193,7 +203,7 @@
 * Base 쉐이더 파일이 입력되며, statements가 삽입될 지점은 "%s"로 표시
 * 클라이언트는 HlslTranslator 객체의 함수를 이용해 원하는 로직 생성
   * 구체적으로는 statement node를 생성 후 그들 간의 관계를 정의
-* in link가 없는 node들을 시작으로 BFS 탐색하여 statements들을 쉐이더 코드에 순차적으로 삽입 후 컴파일
+* 이들을 위상 정렬 후 순차적으로 코드에 삽입
 * 이때 쉐이더의 최종 출력 값은 사전에 정해져 있음.
   * 가령 EmitCS의 경우 InitalPosition, InitialVelocity 따위를 받음.
 * 생성된 Shader 파일들의 이름은 객체 생성 시점을 해싱한 값으로 구분

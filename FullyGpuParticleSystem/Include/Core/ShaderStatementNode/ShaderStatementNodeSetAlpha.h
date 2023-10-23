@@ -8,14 +8,15 @@
 class ShaderStatementNodeSetAlpha : public ShaderStatementNode
 {
 public:
-	ShaderStatementNodeSetAlpha(std::string variableName, float value);
+	ShaderStatementNodeSetAlpha(std::string variableName);
 	virtual ~ShaderStatementNodeSetAlpha() = default;
 
 	virtual std::string generateStatements() const override;
 
-	void setInput(std::shared_ptr<ShaderStatementNode> input);
+	void setInputFloat4(std::shared_ptr<ShaderStatementNode> inputFloat4);
+	void setInputAlpha(std::shared_ptr<ShaderStatementNode> inputAlpha);
 
 private:
-	std::shared_ptr<ShaderStatementNode> _input;
-	float _value;
+	std::shared_ptr<ShaderStatementNode> _inputFloat4;
+	std::shared_ptr<ShaderStatementNode> _inputAlpha;
 };

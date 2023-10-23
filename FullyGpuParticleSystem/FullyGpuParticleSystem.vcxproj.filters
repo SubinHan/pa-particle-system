@@ -141,6 +141,36 @@
     <ClInclude Include="Include\Core\Hashable.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Core\HlslTranslatorSimulate.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeGetFloatByVariableName.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeGetFloat3ByVariableName.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMultiplyFloat3ByScalar.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\HlslTranslatorRender.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMaskW.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSampleTexture2d.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeClip.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMaskX.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -234,6 +264,36 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\Hashable.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HlslTranslatorSimulate.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeGetFloatByVariableName.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeGetFloat3ByVariableName.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMultiplyFloat3ByScalar.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMaskW.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HlslTranslatorRender.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSampleTexture2d.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeClip.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMaskX.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

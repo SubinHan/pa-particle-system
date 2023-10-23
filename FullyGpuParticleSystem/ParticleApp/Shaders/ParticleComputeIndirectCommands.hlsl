@@ -2,7 +2,11 @@
 
 struct IndirectCommand
 {
-	uint4 DrawArguments;
+	uint IndexCountPerInstance;
+	uint InstanceCount;
+	uint StartIndexLocation;
+	int BaseVertexLocation;
+	uint StartInstanceLocation;
 };
 
 RWByteAddressBuffer counters : register(u0);
@@ -20,10 +24,11 @@ void ComputeIndirectCommandsCS(int3 dispatchThreadId : SV_DispatchThreadID)
 	}
 	
 	IndirectCommand command;
-	command.DrawArguments.x = 1;
-	command.DrawArguments.y = 1;
-	command.DrawArguments.z = id;
-	command.DrawArguments.w = 0;
+	command.IndexCountPerInstance = 1;
+	command.InstanceCount = 1;
+	command.StartIndexLocation = id;
+	command.BaseVertexLocation = 0;
+	command.StartInstanceLocation = 0;
 
 	outputCommands.Append(command);
 }
