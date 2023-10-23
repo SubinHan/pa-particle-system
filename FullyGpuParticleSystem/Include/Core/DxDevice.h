@@ -35,7 +35,7 @@ public:
 	ID3D12Resource* getCurrentBackBuffer();
 	D3D12_CPU_DESCRIPTOR_HANDLE getCurrentBackBufferViewHandle();
 	D3D12_CPU_DESCRIPTOR_HANDLE getDepthStencilViewHandle();
-	ComPtr<ID3D12DescriptorHeap> GetCbvSrvUavDescriptorHeap();
+	ComPtr<ID3D12DescriptorHeap> getCbvSrvUavDescriptorHeap();
 	void flushCommandQueue();
 	void resetAllSwapChainBuffers();
 	void resetDepthStencilBuffer();

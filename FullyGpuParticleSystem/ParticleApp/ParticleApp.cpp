@@ -1,5 +1,6 @@
 #include "ParticleApp.h"
 
+#include "Core/ImguiInitializer.h"
 #include "Core/UploadBuffer.h"
 #include "Core/PassConstantBuffer.h"
 #include "Core/ParticleSystem.h"
@@ -8,6 +9,10 @@
 #include "Model/Material.h"
 #include "Model/Texture.h"
 #include "Util/DDSTextureLoader.h"
+
+#include "imgui.h"
+#include "imgui_impl_dx12.h"
+#include "imgui_impl_win32.h"
 
 using namespace DirectX;
 
@@ -18,7 +23,12 @@ ParticleApp::ParticleApp(HINSTANCE hInstance) :
 	// will be initialized through the callback function.
 }
 
-ParticleApp::~ParticleApp() = default;
+ParticleApp::~ParticleApp()
+{
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+}
 
 PCWSTR ParticleApp::getClassName() const
 {
@@ -29,6 +39,8 @@ bool ParticleApp::initialize()
 {
 	if (!MainWindow::initialize())
 		return false;
+
+	_imguiInitializer = std::make_unique<ImguiInitializer>(_device.get(), _hwnd);
 
 	_particleSystems.push_back(std::move(
 		std::make_unique<ParticleSystem>(_device.get())));
@@ -116,7 +128,7 @@ void ParticleApp::draw(const GameTimer& gt)
 {
 	auto commandList = _device->startRecordingCommands();
 
-	auto cbvSrvUavDescriptorHeap = _device->GetCbvSrvUavDescriptorHeap();
+	auto cbvSrvUavDescriptorHeap = _device->getCbvSrvUavDescriptorHeap();
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { cbvSrvUavDescriptorHeap.Get() };
 	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
@@ -166,6 +178,20 @@ void ParticleApp::draw(const GameTimer& gt)
 	//	0);
 
 	fireDrawToParticleSystems(commandList.Get(), gt);
+
+	// render imgui
+
+	// Start the Dear ImGui frame
+	ImGui_ImplDX12_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	bool windowOpen = true;
+	ImGui::ShowDemoWindow(&windowOpen);
+
+	// Rendering
+	ImGui::Render();
+
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
 
 	auto barrierDraw = CD3DX12_RESOURCE_BARRIER::Transition(
 		currentBackBuffer,
@@ -220,6 +246,10 @@ void ParticleApp::buildCbvSrvUavDescriptors()
 
 	_device->registerCbvSrvUavDescriptorDemander(
 		_passConstantBuffer.get());
+
+	// register imgui
+	_device->registerCbvSrvUavDescriptorDemander(
+		_imguiInitializer.get());
 
 	// create descriptor heap
 	_device->buildCbvSrvUavDescriptorHeap();

@@ -343,7 +343,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE DxDevice::getDepthStencilViewHandle()
     return _dsvHeap->GetCPUDescriptorHandleForHeapStart();
 }
 
-ComPtr<ID3D12DescriptorHeap> DxDevice::GetCbvSrvUavDescriptorHeap()
+ComPtr<ID3D12DescriptorHeap> DxDevice::getCbvSrvUavDescriptorHeap()
 {
     return _cbvSrvUavHeap;
 }

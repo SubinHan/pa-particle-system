@@ -10,7 +10,7 @@ public:
 	HlslTranslatorSimulate(std::wstring baseShaderPath);
 	virtual ~HlslTranslatorSimulate();
 
-	UINT getPositionAfterSimulatingVelocity();
+	UINT getPositionAfterSimulation();
 	UINT getVelcotiyAfterSimulateAcceleration();
 
 	void setPosition(UINT float3Index);

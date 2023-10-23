@@ -11,6 +11,7 @@
 class ParticleSystem;
 class PassConstantBuffer;
 class TextureBuffer;
+class ImguiInitializer;
 struct MeshGeometry;
 struct Material;
 
@@ -81,4 +82,5 @@ private:
 	POINT lastMousePos;
 
 	std::vector<std::unique_ptr<ParticleSystem>> _particleSystems;
+	std::unique_ptr<ImguiInitializer> _imguiInitializer;
 };

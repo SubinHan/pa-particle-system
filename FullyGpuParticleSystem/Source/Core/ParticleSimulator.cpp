@@ -175,14 +175,14 @@ void ParticleSimulator::buildRootSignature()
 void ParticleSimulator::buildShaders()
 {
 	UINT deltaTimeIndex = _hlslTranslator->getDeltaTime();
-	UINT positionIndex = _hlslTranslator->getPositionAfterSimulatingVelocity();
+	UINT positionIndex = _hlslTranslator->getPositionAfterSimulation();
 	UINT randFloat3 = _hlslTranslator->randFloat3();
 	UINT minusHalf = _hlslTranslator->newFloat3(-0.5f, -0.5f, -0.5f);
 	UINT minusHalfToPlusHalf = _hlslTranslator->addFloat3(randFloat3, minusHalf);
 	UINT noisedPositionOffset = _hlslTranslator->multiplyFloat3ByScalar(minusHalfToPlusHalf, deltaTimeIndex);
-	UINT multiplier = _hlslTranslator->newFloat1(5.0f);
-	UINT noisedPositionOffsetMultiplied = _hlslTranslator->multiplyFloat3ByScalar(noisedPositionOffset, multiplier);
-	UINT positionResult = _hlslTranslator->addFloat3(positionIndex, noisedPositionOffsetMultiplied);
+	UINT scaler = _hlslTranslator->newFloat1(5.0f);
+	UINT noisedPositionOffsetScaled = _hlslTranslator->multiplyFloat3ByScalar(noisedPositionOffset, scaler);
+	UINT positionResult = _hlslTranslator->addFloat3(positionIndex, noisedPositionOffsetScaled);
 
 	_hlslTranslator->setPosition(positionResult);
 

@@ -3,6 +3,8 @@
 #include <WindowsX.h>
 #include <memory>
 
+#include "imgui_impl_win32.h"
+
 MainWindow::MainWindow(HINSTANCE hInstance) :
 	_hwnd(NULL), 
 	_hInstance(hInstance)
@@ -122,8 +124,12 @@ bool MainWindow::initialize()
     return true;
 }
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    if (ImGui_ImplWin32_WndProcHandler(_hwnd, uMsg, wParam, lParam))
+        return true;
 
     switch (uMsg)
     {

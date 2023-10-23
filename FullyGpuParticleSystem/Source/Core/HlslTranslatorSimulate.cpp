@@ -11,7 +11,7 @@ HlslTranslatorSimulate::HlslTranslatorSimulate(std::wstring baseShaderPath) :
 
 HlslTranslatorSimulate::~HlslTranslatorSimulate() = default;
 
-UINT HlslTranslatorSimulate::getPositionAfterSimulatingVelocity()
+UINT HlslTranslatorSimulate::getPositionAfterSimulation()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	const UINT nodeIndex = _nodes.size();

@@ -72,19 +72,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir);$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <SourcePath>$(SourcePath)</SourcePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir);$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <SourcePath>$(SourcePath)</SourcePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir);$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <SourcePath>$(SourcePath)</SourcePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir);$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <SourcePath>$(SourcePath)</SourcePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -158,6 +166,7 @@
     <ClInclude Include="Include\Core\HlslTranslatorRender.h" />
     <ClInclude Include="Include\Core\HlslTranslatorSimulate.h" />
     <ClInclude Include="Include\Core\ICbvSrvUavDemander.h" />
+    <ClInclude Include="Include\Core\ImguiInitializer.h" />
     <ClInclude Include="Include\Core\MainWindow.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="FullyGpuParticleSystem.h" />
@@ -206,10 +215,18 @@
     <ClInclude Include="Include\Util\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\imgui\backends\imgui_impl_dx12.cpp" />
+    <ClCompile Include="..\include\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\include\imgui\imgui.cpp" />
+    <ClCompile Include="..\include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Source\Core\Hashable.cpp" />
     <ClCompile Include="Source\Core\HlslTranslatorEmit.cpp" />
     <ClCompile Include="Source\Core\HlslTranslatorRender.cpp" />
     <ClCompile Include="Source\Core\HlslTranslatorSimulate.cpp" />
+    <ClCompile Include="Source\Core\ImguiInitializer.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeClip.cpp" />
