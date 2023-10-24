@@ -98,7 +98,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IMGUI_DEFINE_MATH_OPERATORS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Include</AdditionalIncludeDirectories>
     </ClCompile>
@@ -114,7 +114,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IMGUI_DEFINE_MATH_OPERATORS;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Include</AdditionalIncludeDirectories>
     </ClCompile>
@@ -130,7 +130,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IMGUI_DEFINE_MATH_OPERATORS;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -147,7 +147,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IMGUI_DEFINE_MATH_OPERATORS;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Include</AdditionalIncludeDirectories>
     </ClCompile>
@@ -162,15 +162,17 @@
   <ItemGroup>
     <ClInclude Include="Include\Core\DxDevice.h" />
     <ClInclude Include="Include\Core\Hashable.h" />
-    <ClInclude Include="Include\Core\HlslTranslatorEmit.h" />
-    <ClInclude Include="Include\Core\HlslTranslatorRender.h" />
-    <ClInclude Include="Include\Core\HlslTranslatorSimulate.h" />
+    <ClInclude Include="Include\Core\HlslGeneratorEmit.h" />
+    <ClInclude Include="Include\Core\HlslGeneratorRender.h" />
+    <ClInclude Include="Include\Core\HlslGeneratorSimulate.h" />
+    <ClInclude Include="Include\Core\HlslTranslator.h" />
     <ClInclude Include="Include\Core\ICbvSrvUavDemander.h" />
     <ClInclude Include="Include\Core\ImguiInitializer.h" />
     <ClInclude Include="Include\Core\MainWindow.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="FullyGpuParticleSystem.h" />
     <ClInclude Include="Include\Core\ParticleSorter.h" />
+    <ClInclude Include="Include\Core\HlslTranslatorEmit.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeClip.h" />
@@ -198,10 +200,16 @@
     <ClInclude Include="Include\Model\PassConstants.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNode.h" />
     <ClInclude Include="Include\Model\Texture.h" />
+    <ClInclude Include="Include\Ui\NodeEditor.h" />
+    <ClInclude Include="Include\Ui\NodeEditorEmit.h" />
+    <ClInclude Include="Include\Ui\NodeType.h" />
+    <ClInclude Include="Include\Ui\UiLink.h" />
+    <ClInclude Include="Include\Ui\UiNode.h" />
+    <ClInclude Include="Include\Ui\UiNodeFactory.h" />
     <ClInclude Include="Include\Util\DDSTextureLoader.h" />
     <ClInclude Include="Include\Util\GeometryGenerator.h" />
     <ClInclude Include="Include\Core\PassConstantBuffer.h" />
-    <ClInclude Include="Include\Core\HlslTranslator.h" />
+    <ClInclude Include="Include\Core\HlslGenerator.h" />
     <ClInclude Include="ParticleApp\ParticleApp.h" />
     <ClInclude Include="Include\Core\ParticleEmitter.h" />
     <ClInclude Include="Include\Core\ParticlePass.h" />
@@ -222,10 +230,13 @@
     <ClCompile Include="..\include\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\include\imgui\imnodes.cpp" />
     <ClCompile Include="Source\Core\Hashable.cpp" />
+    <ClCompile Include="Source\Core\HlslGeneratorEmit.cpp" />
+    <ClCompile Include="Source\Core\HlslGeneratorRender.cpp" />
+    <ClCompile Include="Source\Core\HlslGeneratorSimulate.cpp" />
+    <ClCompile Include="Source\Core\HlslTranslator.cpp" />
     <ClCompile Include="Source\Core\HlslTranslatorEmit.cpp" />
-    <ClCompile Include="Source\Core\HlslTranslatorRender.cpp" />
-    <ClCompile Include="Source\Core\HlslTranslatorSimulate.cpp" />
     <ClCompile Include="Source\Core\ImguiInitializer.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.cpp" />
@@ -238,7 +249,7 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat1.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat3.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat4.cpp" />
-    <ClCompile Include="Source\Core\HlslTranslator.cpp" />
+    <ClCompile Include="Source\Core\HlslGenerator.cpp" />
     <ClCompile Include="Source\Core\ParticleSorter.cpp" />
     <ClCompile Include="Source\Core\ParticleSystem.cpp" />
     <ClCompile Include="Source\Core\PassConstantBuffer.cpp" />
@@ -258,6 +269,11 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetAlpha.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.cpp" />
     <ClCompile Include="Source\Core\TextureBuffer.cpp" />
+    <ClCompile Include="Source\Ui\NodeEditor.cpp" />
+    <ClCompile Include="Source\Ui\NodeEditorEmit.cpp" />
+    <ClCompile Include="Source\Ui\UiLink.cpp" />
+    <ClCompile Include="Source\Ui\UiNode.cpp" />
+    <ClCompile Include="Source\Ui\UiNodeFactory.cpp" />
     <ClCompile Include="Source\Util\DDSTextureLoader.cpp" />
     <ClCompile Include="Source\Util\DxDebug.cpp" />
     <ClCompile Include="Source\Util\DxUtil.cpp" />

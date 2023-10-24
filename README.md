@@ -164,6 +164,10 @@
   + 동적 쉐이더 컴파일 적용
     + Emit, Simulate, Render 단계에서의 연산을 동적으로 제어 가능
   + Imgui 학습 및 예제 적용
+* 화요일:
+  * imgui 도입 (+node graph 관련 library인 imnodes)
+  * Emitter에 시험적 node editor 적용
+    * node editor 기반으로 쉐이더 수정 가능
 
 
 <hr/>

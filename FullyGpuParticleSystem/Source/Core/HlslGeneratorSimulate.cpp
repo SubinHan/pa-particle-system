@@ -1,17 +1,17 @@
-#include "Core/HlslTranslatorSimulate.h"
+#include "Core/HlslGeneratorSimulate.h"
 
 #include "Core/ShaderStatementNode/ShaderStatementNodeGetFloat3ByVariableName.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeGetFloatByVariableName.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeSetValueByVariableName.h"
 
-HlslTranslatorSimulate::HlslTranslatorSimulate(std::wstring baseShaderPath) :
-	HlslTranslator(baseShaderPath)
+HlslGeneratorSimulate::HlslGeneratorSimulate(std::wstring baseShaderPath) :
+	HlslGenerator(baseShaderPath)
 {
 }
 
-HlslTranslatorSimulate::~HlslTranslatorSimulate() = default;
+HlslGeneratorSimulate::~HlslGeneratorSimulate() = default;
 
-UINT HlslTranslatorSimulate::getPositionAfterSimulation()
+UINT HlslGeneratorSimulate::getPositionAfterSimulation()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	const UINT nodeIndex = _nodes.size();
@@ -22,7 +22,7 @@ UINT HlslTranslatorSimulate::getPositionAfterSimulation()
 	return nodeIndex;
 }
 
-UINT HlslTranslatorSimulate::getVelcotiyAfterSimulateAcceleration()
+UINT HlslGeneratorSimulate::getVelcotiyAfterSimulateAcceleration()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	const UINT nodeIndex = _nodes.size();
@@ -33,7 +33,7 @@ UINT HlslTranslatorSimulate::getVelcotiyAfterSimulateAcceleration()
 	return nodeIndex;
 }
 
-void HlslTranslatorSimulate::setPosition(UINT float3Index)
+void HlslGeneratorSimulate::setPosition(UINT float3Index)
 {
 	const UINT nodeIndex = _nodes.size();
 	auto newNode =
@@ -43,7 +43,7 @@ void HlslTranslatorSimulate::setPosition(UINT float3Index)
 	linkNode(float3Index, nodeIndex);
 }
 
-void HlslTranslatorSimulate::setNextFrameVelocity(UINT float3Index)
+void HlslGeneratorSimulate::setNextFrameVelocity(UINT float3Index)
 {
 	const UINT nodeIndex = _nodes.size();
 	auto newNode =
@@ -53,7 +53,7 @@ void HlslTranslatorSimulate::setNextFrameVelocity(UINT float3Index)
 	linkNode(float3Index, nodeIndex);
 }
 
-void HlslTranslatorSimulate::setNextFrameAcceleration(UINT float3Index)
+void HlslGeneratorSimulate::setNextFrameAcceleration(UINT float3Index)
 {
 	const UINT nodeIndex = _nodes.size();
 	auto newNode =

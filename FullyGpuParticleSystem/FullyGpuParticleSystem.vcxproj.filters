@@ -105,7 +105,7 @@
     <ClInclude Include="Include\Core\ParticleSorter.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Core\HlslTranslator.h">
+    <ClInclude Include="Include\Core\HlslGenerator.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNode.h">
@@ -123,7 +123,7 @@
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Core\HlslTranslatorEmit.h">
+    <ClInclude Include="Include\Core\HlslGeneratorEmit.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.h">
@@ -141,7 +141,7 @@
     <ClInclude Include="Include\Core\Hashable.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Core\HlslTranslatorSimulate.h">
+    <ClInclude Include="Include\Core\HlslGeneratorSimulate.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeGetFloatByVariableName.h">
@@ -156,7 +156,7 @@
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Core\HlslTranslatorRender.h">
+    <ClInclude Include="Include\Core\HlslGeneratorRender.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMaskW.h">
@@ -172,6 +172,30 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Include\Core\ImguiInitializer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Ui\NodeEditor.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Ui\UiNode.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Ui\NodeType.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Ui\UiLink.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Ui\UiNodeFactory.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Ui\NodeEditorEmit.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\HlslTranslator.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\HlslTranslatorEmit.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -236,7 +260,7 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNode.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\HlslTranslator.cpp">
+    <ClCompile Include="Source\Core\HlslGenerator.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat4.cpp">
@@ -251,7 +275,7 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\HlslTranslatorEmit.cpp">
+    <ClCompile Include="Source\Core\HlslGeneratorEmit.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.cpp">
@@ -269,7 +293,7 @@
     <ClCompile Include="Source\Core\Hashable.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\HlslTranslatorSimulate.cpp">
+    <ClCompile Include="Source\Core\HlslGeneratorSimulate.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeGetFloatByVariableName.cpp">
@@ -287,7 +311,7 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMaskW.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\HlslTranslatorRender.cpp">
+    <ClCompile Include="Source\Core\HlslGeneratorRender.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSampleTexture2d.cpp">
@@ -321,6 +345,30 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\ImguiInitializer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\imgui\imnodes.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ui\NodeEditor.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ui\UiNode.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ui\UiLink.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ui\UiNodeFactory.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ui\NodeEditorEmit.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HlslTranslator.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HlslTranslatorEmit.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

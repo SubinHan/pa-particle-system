@@ -12,7 +12,7 @@ struct ID3D12PipelineState;
 struct ID3D12RootSignature;
 
 class ParticleResource;
-class HlslTranslatorSimulate;
+class HlslGeneratorSimulate;
 
 struct ParticleSimulateConstants
 {
@@ -49,7 +49,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 	ParticleResource* _resource;
 
-	std::unique_ptr<HlslTranslatorSimulate> _hlslTranslator;
+	std::unique_ptr<HlslGeneratorSimulate> _hlslGenerator;
 
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shader;

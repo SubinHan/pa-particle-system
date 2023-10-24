@@ -92,7 +92,7 @@ namespace Test
 			HlslTranslator translator(PROJECT_DIR + L"FullyGpuParticleSystem/ParticleSystemShaders/ParticleEmitCSBase.hlsl");
 			UINT float4Index1 = translator.newFloat4(1.0f, 1.0f, 1.0f, 1.0f);
 			UINT float4Index2 = translator.randFloat4();
-			UINT float4Index5 = translator.newFloat1(1.0f);
+			UINT float4Index5 = translator.newFloat(1.0f);
 			UINT float4Index3 = translator.setAlpha(float4Index2, float4Index5);
 			UINT float4Index4 = translator.addFloat4(float4Index1, float4Index3);
 
@@ -161,9 +161,9 @@ namespace Test
 			UINT positionIndex = translator.newFloat3(0.0f, 0.0f, 0.0f);
 			UINT velocityIndex = translator.randFloat3();
 			UINT accelerationIndex = translator.newFloat3(0.0f, -0.1f, 0.0f);
-			UINT lifetimeIndex = translator.newFloat1(4.0f);
-			UINT sizeIndex = translator.newFloat1(0.05f);
-			UINT opacityIndex = translator.newFloat1(1.0f);
+			UINT lifetimeIndex = translator.newFloat(4.0f);
+			UINT sizeIndex = translator.newFloat(0.05f);
+			UINT opacityIndex = translator.newFloat(1.0f);
 
 			translator.setInitialPosition(positionIndex);
 			translator.setInitialVelocity(velocityIndex);

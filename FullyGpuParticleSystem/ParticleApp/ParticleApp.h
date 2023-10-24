@@ -12,6 +12,7 @@ class ParticleSystem;
 class PassConstantBuffer;
 class TextureBuffer;
 class ImguiInitializer;
+class NodeEditorEmit;
 struct MeshGeometry;
 struct Material;
 
@@ -83,4 +84,5 @@ private:
 
 	std::vector<std::unique_ptr<ParticleSystem>> _particleSystems;
 	std::unique_ptr<ImguiInitializer> _imguiInitializer;
+	std::unique_ptr<NodeEditorEmit> _nodeEditorEmit;
 };

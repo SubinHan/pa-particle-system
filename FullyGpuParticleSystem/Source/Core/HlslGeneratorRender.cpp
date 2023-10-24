@@ -1,17 +1,17 @@
-#include "Core/HlslTranslatorRender.h"
+#include "Core/HlslGeneratorRender.h"
 
 #include "Core/ShaderStatementNode/ShaderStatementNodeSampleTexture2d.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeClip.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeSetValueByVariableName.h"
 
-HlslTranslatorRender::HlslTranslatorRender(std::wstring baseShaderPath) :
-	HlslTranslator(baseShaderPath)
+HlslGeneratorRender::HlslGeneratorRender(std::wstring baseShaderPath) :
+	HlslGenerator(baseShaderPath)
 {
 }
 
-HlslTranslatorRender::~HlslTranslatorRender() = default;
+HlslGeneratorRender::~HlslGeneratorRender() = default;
 
-UINT HlslTranslatorRender::sampleTexture2d()
+UINT HlslGeneratorRender::sampleTexture2d()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	const UINT nodeIndex = _nodes.size();
@@ -22,7 +22,7 @@ UINT HlslTranslatorRender::sampleTexture2d()
 	return nodeIndex;
 }
 
-void HlslTranslatorRender::clip(UINT opacityIndex)
+void HlslGeneratorRender::clip(UINT opacityIndex)
 {
 	const UINT nodeIndex = _nodes.size();
 	auto newNode =
@@ -32,7 +32,7 @@ void HlslTranslatorRender::clip(UINT opacityIndex)
 	linkNode(opacityIndex, nodeIndex);
 }
 
-void HlslTranslatorRender::setOutputColor(UINT float4Index)
+void HlslGeneratorRender::setOutputColor(UINT float4Index)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	const UINT nodeIndex = _nodes.size();

@@ -2,6 +2,7 @@
 
 #include "Core/DxDevice.h"
 
+#include "imnodes.h"
 #include "imgui.h"
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
@@ -22,7 +23,17 @@ void ImguiInitializer::buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD3DX1
 	// init imgui
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImNodes::CreateContext();
+	ImNodes::EditorContextCreate();
+
 	ImGuiIO& io = ImGui::GetIO();
+	ImNodesIO& nodesIo = ImNodes::GetIO();
+
+	nodesIo.LinkDetachWithModifierClick.Modifier = &io.KeyCtrl;
+	nodesIo.MultipleSelectModifier.Modifier = &io.KeyCtrl;
+
+	ImNodesStyle& style = ImNodes::GetStyle();
+	style.Flags |= ImNodesStyleFlags_GridLinesPrimary | ImNodesStyleFlags_GridSnapping;
 
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 

@@ -1,57 +1,53 @@
 #pragma once
 
-#include "d3dcommon.h"
+#include "Core/Hashable.h"
+#include "Ui/UiNode.h"
+#include "Ui/UiLink.h"
+#include "Util/DxUtil.h"
 
-#include <string>
 #include <vector>
 #include <deque>
-#include <memory>
-#include <wrl.h>
+#include <unordered_map>
 
-class ShaderStatementNode;
+class HlslGenerator;
 
-class HlslTranslator
+class HlslTranslator : public Hashable
 {
 public:
-	HlslTranslator(std::wstring baseShaderPath);
+	HlslTranslator(std::vector<UiNode> nodes, std::vector<UiLink> links);
 	virtual ~HlslTranslator();
 
-	Microsoft::WRL::ComPtr<ID3DBlob> compile(std::wstring outputPath);
-
-	void generateShaderFile(std::wstring& outputPath);
-
-	UINT newFloat1(float x);
-	UINT newFloat3(float x, float y, float z);
-	UINT newFloat4(float x, float y, float z, float w);
-	UINT randFloat3();
-	UINT randFloat4();
-	UINT setAlpha(UINT float4Index, UINT alphaIndex);
-	UINT addFloat4(UINT float4Index0, UINT float4Index1);
-	UINT addFloat3(UINT float3Index0, UINT float3Index1);
-	UINT multiplyFloat3ByScalar(UINT float3Index, UINT floatIndex);
-	UINT branch(UINT aIndex, UINT bIndex, UINT aLargerThanB, UINT aEqualB, UINT bLargerThanA);
-	UINT maskX(UINT float4Index);
-	UINT maskW(UINT float4Index);
-	UINT getDeltaTime();
+	Microsoft::WRL::ComPtr<ID3DBlob> compileShader();
 
 protected:
-	std::string getNewLocalVariableName();
+	virtual std::unique_ptr<HlslGenerator> createHlslGenerator() = 0;
+	virtual Microsoft::WRL::ComPtr<ID3DBlob> compileShaderImpl(std::wstring shaderPath) = 0;
 
-	void addNode(std::shared_ptr<ShaderStatementNode> node);
-	void linkNode(UINT from, UINT to);
+	virtual bool generateNode(UiNode node);
+
+	std::vector<int> findLinkedNodesWithOutput(const int nodeIndex);
+	int findNodeIdLinkedAsOutput(UiLink link);
+	int findOppositeNodeByInputAttrbuteId(int inputId);
 
 protected:
-	std::vector<std::shared_ptr<ShaderStatementNode>> _nodes;
-	std::vector<std::vector<UINT>> _graph;
+	std::vector<UiNode> _nodes;
+	std::vector<UiLink> _links;
+
+	std::unique_ptr<HlslGenerator> _hlslGenerator;
+
+	// key: ui node index, value: hlsl index
+	std::unordered_map<int, UINT> indexMap;
+
 
 private:
-	void insertCode(std::ofstream& fout);
-	void topologySort(UINT index);
+	void generateNodes();
+	void generateShaderFile(std::wstring shaderPath);
+
+	void topologySort();
+	void topologySort0(const int index);
 
 private:
-	std::wstring _baseShaderPath;
 
-	// for topological sort
 	std::vector<bool> _visited;
-	std::deque<UINT> _topologicalOrder;
+	std::deque<int> _topologicalOrder;
 };

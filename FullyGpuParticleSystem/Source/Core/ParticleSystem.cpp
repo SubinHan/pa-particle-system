@@ -138,6 +138,11 @@ void ParticleSystem::setSpawnRate(float spawnRate)
 	_spawnRateInv = 1.0f / _spawnRate;
 }
 
+ParticleEmitter* ParticleSystem::getEmitter()
+{
+	return _emitter.get();
+}
+
 void ParticleSystem::init()
 {
 	auto commandList = _device->startRecordingCommands();

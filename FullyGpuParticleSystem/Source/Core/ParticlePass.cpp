@@ -1,7 +1,7 @@
 #include "Core/ParticlePass.h"
 
 #include "Core/DxDevice.h"
-#include "Core/HlslTranslatorRender.h"
+#include "Core/HlslGeneratorRender.h"
 #include "Core/ParticleResource.h"
 #include "Core/PassConstantBuffer.h"
 #include "Model/Material.h"
@@ -26,7 +26,7 @@ constexpr int ROOT_SLOT_SRV_UAV_TABLE = 0;
 ParticlePass::ParticlePass(DxDevice* device, ParticleResource* resource) :
 	_device(device),
 	_resource(resource),
-	_hlslTranslator(std::make_unique<HlslTranslatorRender>(BASE_RENDER_SHADER_PATH))
+	_hlslGenerator(std::make_unique<HlslGeneratorRender>(BASE_RENDER_SHADER_PATH))
 {
 	buildRootSignature();
 	buildCommandSignature();
@@ -124,7 +124,7 @@ void ParticlePass::compileShaders()
 {
 	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
 
-	_hlslTranslator->compile(shaderPath);
+	_hlslGenerator->compile(shaderPath);
 
 	_shaderVs = DxUtil::compileShader(
 		shaderPath,
@@ -267,13 +267,13 @@ void ParticlePass::buildShaders()
 		"ComputeIndirectCommandsCS",
 		"cs_5_1");
 
-	UINT textureSampleIndex = _hlslTranslator->sampleTexture2d();
-	UINT alphaThresholdIndex = _hlslTranslator->newFloat1(0.5f);
-	UINT textureAlphaIndex = _hlslTranslator->maskX(textureSampleIndex);
-	_hlslTranslator->clip(textureAlphaIndex);
-	UINT outputColorIndex = _hlslTranslator->newFloat4(1.0f, 0.00f, 0.00f, 1.0f);
-	UINT alphaModifiedOutputColorIndex = _hlslTranslator->setAlpha(outputColorIndex, textureAlphaIndex);
-	_hlslTranslator->setOutputColor(alphaModifiedOutputColorIndex);
+	UINT textureSampleIndex = _hlslGenerator->sampleTexture2d();
+	UINT alphaThresholdIndex = _hlslGenerator->newFloat(0.5f);
+	UINT textureAlphaIndex = _hlslGenerator->maskX(textureSampleIndex);
+	_hlslGenerator->clip(textureAlphaIndex);
+	UINT outputColorIndex = _hlslGenerator->newFloat4(1.0f, 0.00f, 0.00f, 1.0f);
+	UINT alphaModifiedOutputColorIndex = _hlslGenerator->setAlpha(outputColorIndex, textureAlphaIndex);
+	_hlslGenerator->setOutputColor(alphaModifiedOutputColorIndex);
 
 	compileShaders();
 }

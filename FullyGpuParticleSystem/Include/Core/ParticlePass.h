@@ -13,7 +13,7 @@ struct ID3D12RootSignature;
 class DxDevice;
 class ParticleResource;
 class PassConstantBuffer;
-class HlslTranslatorRender;
+class HlslGeneratorRender;
 struct ObjectConstants;
 struct Material;
 
@@ -43,7 +43,7 @@ private:
 	ParticleResource* _resource;
 	Material* _material;
 
-	std::unique_ptr<HlslTranslatorRender> _hlslTranslator;
+	std::unique_ptr<HlslGeneratorRender> _hlslGenerator;
 
 	// for rendering
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature;

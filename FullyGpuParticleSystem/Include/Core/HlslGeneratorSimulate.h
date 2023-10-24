@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Core/HlslTranslator.h"
+#include "Core/HlslGenerator.h"
 
 #include "Core/ShaderStatementNode/ShaderStatementNode.h"
 
-class HlslTranslatorSimulate : public HlslTranslator
+class HlslGeneratorSimulate : public HlslGenerator
 {
 public:
-	HlslTranslatorSimulate(std::wstring baseShaderPath);
-	virtual ~HlslTranslatorSimulate();
+	HlslGeneratorSimulate(std::wstring baseShaderPath);
+	virtual ~HlslGeneratorSimulate();
 
 	UINT getPositionAfterSimulation();
 	UINT getVelcotiyAfterSimulateAcceleration();

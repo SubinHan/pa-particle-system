@@ -10,7 +10,7 @@ struct ID3D12PipelineState;
 struct ID3D12RootSignature;
 
 class ParticleResource;
-class HlslTranslatorEmit;
+class HlslGeneratorEmit;
 struct ObjectConstants;
 
 struct EmitConstants
@@ -39,6 +39,7 @@ public:
 		float deltaTime);
 
 	void compileShaders();
+	void setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
 
 private:
 	void buildRootSignature();
@@ -49,7 +50,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 	ParticleResource* _resource;
 
-	std::unique_ptr<HlslTranslatorEmit> _hlslTranslator;
+	std::unique_ptr<HlslGeneratorEmit> _hlslGenerator;
 
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shader;

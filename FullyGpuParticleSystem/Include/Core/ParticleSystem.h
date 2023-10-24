@@ -41,6 +41,8 @@ public:
 	/// <param name="spawnRate"></param>
 	void setSpawnRate(float spawnRate);
 
+	ParticleEmitter* getEmitter();
+
 private:
 	void init();
 

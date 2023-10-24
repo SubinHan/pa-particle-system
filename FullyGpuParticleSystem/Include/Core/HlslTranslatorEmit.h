@@ -2,20 +2,15 @@
 
 #include "Core/HlslTranslator.h"
 
-#include "Core/ShaderStatementNode/ShaderStatementNode.h"
-
 class HlslTranslatorEmit : public HlslTranslator
 {
 public:
-	HlslTranslatorEmit(std::wstring baseShaderPath);
+	HlslTranslatorEmit(std::vector<UiNode> nodes, std::vector<UiLink> links);
 	virtual ~HlslTranslatorEmit();
 
-	void setInitialPosition(UINT float3Index);
-	void setInitialVelocity(UINT float3Index);
-	void setInitialAcceleration(UINT float3Index);
-	void setInitialLifetime(UINT float1Index);
-	void setInitialSize(UINT float1Index);
-	void setInitialOpacity(UINT float1Index);
+protected:
+	virtual std::unique_ptr<HlslGenerator> createHlslGenerator() override;
+	virtual Microsoft::WRL::ComPtr<ID3DBlob> compileShaderImpl(std::wstring shaderPath) override;
 
-private:
+	virtual bool generateNode(UiNode node) override;
 };

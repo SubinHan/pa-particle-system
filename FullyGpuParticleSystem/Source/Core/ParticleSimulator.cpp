@@ -1,7 +1,7 @@
 #include "Core/ParticleSimulator.h"
 
 #include "Core/ParticleResource.h"
-#include "Core/HlslTranslatorSimulate.h"
+#include "Core/HlslGeneratorSimulate.h"
 #include "Util/DxDebug.h"
 
 #include "d3dx12.h"
@@ -14,7 +14,7 @@ using Microsoft::WRL::ComPtr;
 ParticleSimulator::ParticleSimulator(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource) :
 	_device(device),
 	_resource(resource),
-	_hlslTranslator(std::make_unique<HlslTranslatorSimulate>(BASE_SIMULATOR_SHADER_PATH))
+	_hlslGenerator(std::make_unique<HlslGeneratorSimulate>(BASE_SIMULATOR_SHADER_PATH))
 {
 	buildRootSignature();
 	buildShaders();
@@ -72,7 +72,7 @@ void ParticleSimulator::compileShader()
 {
 	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
 
-	_hlslTranslator->compile(shaderPath);
+	_hlslGenerator->compile(shaderPath);
 
 	_shader = DxUtil::compileShader(
 		shaderPath,
@@ -174,17 +174,17 @@ void ParticleSimulator::buildRootSignature()
 
 void ParticleSimulator::buildShaders()
 {
-	UINT deltaTimeIndex = _hlslTranslator->getDeltaTime();
-	UINT positionIndex = _hlslTranslator->getPositionAfterSimulation();
-	UINT randFloat3 = _hlslTranslator->randFloat3();
-	UINT minusHalf = _hlslTranslator->newFloat3(-0.5f, -0.5f, -0.5f);
-	UINT minusHalfToPlusHalf = _hlslTranslator->addFloat3(randFloat3, minusHalf);
-	UINT noisedPositionOffset = _hlslTranslator->multiplyFloat3ByScalar(minusHalfToPlusHalf, deltaTimeIndex);
-	UINT scaler = _hlslTranslator->newFloat1(5.0f);
-	UINT noisedPositionOffsetScaled = _hlslTranslator->multiplyFloat3ByScalar(noisedPositionOffset, scaler);
-	UINT positionResult = _hlslTranslator->addFloat3(positionIndex, noisedPositionOffsetScaled);
+	UINT deltaTimeIndex = _hlslGenerator->getDeltaTime();
+	UINT positionIndex = _hlslGenerator->getPositionAfterSimulation();
+	UINT randFloat3 = _hlslGenerator->randFloat3();
+	UINT minusHalf = _hlslGenerator->newFloat3(-0.5f, -0.5f, -0.5f);
+	UINT minusHalfToPlusHalf = _hlslGenerator->addFloat3(randFloat3, minusHalf);
+	UINT noisedPositionOffset = _hlslGenerator->multiplyFloat3ByScalar(minusHalfToPlusHalf, deltaTimeIndex);
+	UINT scaler = _hlslGenerator->newFloat(5.0f);
+	UINT noisedPositionOffsetScaled = _hlslGenerator->multiplyFloat3ByScalar(noisedPositionOffset, scaler);
+	UINT positionResult = _hlslGenerator->addFloat3(positionIndex, noisedPositionOffsetScaled);
 
-	_hlslTranslator->setPosition(positionResult);
+	_hlslGenerator->setPosition(positionResult);
 
 	compileShader();
 }

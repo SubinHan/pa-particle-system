@@ -1,7 +1,7 @@
 #include "Core/ParticleEmitter.h"
 
 #include "Core/ParticleResource.h"
-#include "Core/HlslTranslatorEmit.h"
+#include "Core/HlslGeneratorEmit.h"
 #include "Model/ObjectConstants.h"
 #include "Util/DxDebug.h"
 
@@ -23,7 +23,7 @@ ParticleEmitter::ParticleEmitter(Microsoft::WRL::ComPtr<ID3D12Device> device, Pa
 	Hashable(),
 	_device(device),
 	_resource(resource),
-	_hlslTranslator(std::make_unique<HlslTranslatorEmit>(BASE_EMITTER_SHADER_PATH))
+	_hlslGenerator(std::make_unique<HlslGeneratorEmit>(BASE_EMITTER_SHADER_PATH))
 {
 	buildRootSignature();
 	buildShaders();
@@ -81,13 +81,19 @@ void ParticleEmitter::compileShaders()
 {
 	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
 
-	_hlslTranslator->compile(shaderPath);
+	_hlslGenerator->compile(shaderPath);
 
 	_shader = DxUtil::compileShader(
 		shaderPath,
 		nullptr,
 		"EmitCS",
 		"cs_5_1");
+}
+
+void ParticleEmitter::setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
+{
+	_shader = shader;
+	buildPsos();
 }
 
 void ParticleEmitter::buildRootSignature()
@@ -140,19 +146,19 @@ void ParticleEmitter::buildRootSignature()
 
 void ParticleEmitter::buildShaders()
 {
-	UINT positionIndex = _hlslTranslator->newFloat3(0.0f, 0.0f, 0.0f);
-	UINT velocityIndex = _hlslTranslator->randFloat3();
-	UINT accelerationIndex = _hlslTranslator->newFloat3(0.0f, -1.0f, 0.0f);
-	UINT lifetimeIndex = _hlslTranslator->newFloat1(4.0f);
-	UINT sizeIndex = _hlslTranslator->newFloat1(0.05f);
-	UINT opacityIndex = _hlslTranslator->newFloat1(1.0f);
+	UINT positionIndex = _hlslGenerator->newFloat3(0.0f, 0.0f, 0.0f);
+	UINT velocityIndex = _hlslGenerator->randFloat3();
+	UINT accelerationIndex = _hlslGenerator->newFloat3(0.0f, -1.0f, 0.0f);
+	UINT lifetimeIndex = _hlslGenerator->newFloat(4.0f);
+	UINT sizeIndex = _hlslGenerator->newFloat(0.05f);
+	UINT opacityIndex = _hlslGenerator->newFloat(1.0f);
 
-	_hlslTranslator->setInitialPosition(positionIndex);
-	_hlslTranslator->setInitialVelocity(velocityIndex);
-	_hlslTranslator->setInitialAcceleration(accelerationIndex);
-	_hlslTranslator->setInitialLifetime(lifetimeIndex);
-	_hlslTranslator->setInitialSize(sizeIndex);
-	_hlslTranslator->setInitialOpacity(opacityIndex);
+	_hlslGenerator->setInitialPosition(positionIndex);
+	_hlslGenerator->setInitialVelocity(velocityIndex);
+	_hlslGenerator->setInitialAcceleration(accelerationIndex);
+	_hlslGenerator->setInitialLifetime(lifetimeIndex);
+	_hlslGenerator->setInitialSize(sizeIndex);
+	_hlslGenerator->setInitialOpacity(opacityIndex);
 
 	compileShaders();
 }

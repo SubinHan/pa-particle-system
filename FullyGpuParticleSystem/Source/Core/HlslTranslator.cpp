@@ -1,303 +1,184 @@
 #include "Core/HlslTranslator.h"
 
-#include "Core/ShaderStatementNode/ShaderStatementNode.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeNewFloat.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeNewFloat3.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeNewFloat4.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeNewRandFloat3.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeNewRandFloat4.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeSetAlpha.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeAddFloat4.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeAddFloat3.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeMultiplyFloat3ByScalar.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeMaskX.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeMaskW.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeGetFloatByVariableName.h"
-#include "Util/DxUtil.h"
+#include "Core/HlslGenerator.h"
+#include "Ui/NodeType.h"
 
-#include <fstream>
-#include <assert.h>
-#include <queue>
+static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
 
-HlslTranslator::HlslTranslator(std::wstring baseShaderPath)
-	: _baseShaderPath(baseShaderPath)
+HlslTranslator::HlslTranslator(std::vector<UiNode> nodes, std::vector<UiLink> links) :
+	_nodes(nodes),
+	_links(links),
+	_hlslGenerator(nullptr)
 {
 }
 
 HlslTranslator::~HlslTranslator() = default;
 
-Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslator::compile(std::wstring outputPath)
+Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslator::compileShader()
 {
-	generateShaderFile(outputPath);
+	_hlslGenerator = createHlslGenerator();
 
-	return nullptr;
+	topologySort();
+	generateNodes();
+
+	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
+	generateShaderFile(shaderPath);
+
+	return compileShaderImpl(shaderPath);
 }
 
-void HlslTranslator::generateShaderFile(std::wstring& outputPath)
+void HlslTranslator::generateNodes()
 {
-	std::ifstream fin;
-	fin.open(_baseShaderPath);
-	assert(fin.is_open());
-
-	std::ofstream fout;
-	fout.open(outputPath);
-	assert(fout.is_open());
-
-	constexpr UINT BUFFER_SIZE = 512;
-	char buffer[BUFFER_SIZE];
-
-	while (fin.getline(buffer, BUFFER_SIZE))
+	for (int i = 0; i < _nodes.size(); ++i)
 	{
-		std::string line(buffer);
+		generateNode(_nodes[_topologicalOrder[i]]);
+	}
+}
 
-		if (line.find("%s") == std::string::npos)
-		{
-			fout << buffer << std::endl;
-			continue;
-		}
+void HlslTranslator::generateShaderFile(std::wstring shaderPath)
+{
+	_hlslGenerator->generateShaderFile(shaderPath);
+}
 
-		insertCode(fout);
+bool HlslTranslator::generateNode(UiNode node)
+{
+	bool hasGenerated = true;
+	auto nodeType = node.getType();
+	UINT hlslIndex{ 0 };
+
+	switch (nodeType)
+	{
+	case NodeType::NewFloat:
+	{
+		const float r = node.getConstantInput(0);
+		hlslIndex = _hlslGenerator->newFloat(r);
+		break;
+	}
+	case NodeType::NewFloat3:
+	{
+		const float r = node.getConstantInput(0);
+		const float g = node.getConstantInput(1);
+		const float b = node.getConstantInput(2);
+		hlslIndex = _hlslGenerator->newFloat3(r, g, b);
+		break;
+	}
+	case NodeType::NewFloat4:
+	{
+		const float r = node.getConstantInput(0);
+		const float g = node.getConstantInput(1);
+		const float b = node.getConstantInput(2);
+		const float a = node.getConstantInput(3);
+		hlslIndex = _hlslGenerator->newFloat4(r, g, b, a);
+		break;
+	}
+	case NodeType::RandFloat3:
+	{
+		hlslIndex = _hlslGenerator->randFloat3();
+		break;
+	}
+	case NodeType::AddFloat3:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+
+		UINT input0Index = indexMap[inputNodeId0];
+		UINT input1Index = indexMap[inputNodeId1];
+		hlslIndex = _hlslGenerator->addFloat3(input0Index, input1Index);
+		break;
+	}
+	default:
+		hasGenerated = false;
+		break;
 	}
 
-	fin.close();
-	fout.close();
+	if (hasGenerated)
+		indexMap[node.getId()] = hlslIndex;
+	
+	return hasGenerated;
 }
 
-UINT HlslTranslator::newFloat1(float x)
+void HlslTranslator::topologySort()
 {
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode =
-		std::make_shared<ShaderStatementNodeNewFloat>(newLocalVariableName, x);
-	addNode(newNode);
+	_visited.resize(_nodes.size());
 
-	return nodeIndex;
-}
-
-UINT HlslTranslator::newFloat3(float x, float y, float z)
-{
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode =
-		std::make_shared<ShaderStatementNodeNewFloat3>(newLocalVariableName, x, y, z);
-	addNode(newNode);
-
-	return nodeIndex;
-}
-
-UINT HlslTranslator::newFloat4(float x, float y, float z, float w)
-{
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode = 
-		std::make_shared<ShaderStatementNodeNewFloat4>(newLocalVariableName, x, y, z, w);
-	addNode(newNode);
-
-	return nodeIndex;
-}
-
-UINT HlslTranslator::randFloat3()
-{
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode =
-		std::make_shared<ShaderStatementNodeNewRandFloat3>(newLocalVariableName);
-	addNode(newNode);
-
-	return nodeIndex;
-}
-
-UINT HlslTranslator::randFloat4()
-{
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode =
-		std::make_shared<ShaderStatementNodeNewRandFloat4>(newLocalVariableName);
-	addNode(newNode);
-
-	return nodeIndex;
-}
-
-UINT HlslTranslator::setAlpha(UINT float4Index, UINT alphaIndex)
-{
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode =
-		std::make_shared<ShaderStatementNodeSetAlpha>(newLocalVariableName);
-	newNode->setInputFloat4(_nodes[float4Index]);
-	newNode->setInputAlpha(_nodes[alphaIndex]);
-	addNode(newNode);
-	linkNode(float4Index, nodeIndex);
-	linkNode(alphaIndex, nodeIndex);
-
-	return nodeIndex;
-}
-
-UINT HlslTranslator::addFloat4(UINT float4Index0, UINT float4Index1)
-{
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode =
-		std::make_shared<ShaderStatementNodeAddFloat4>(newLocalVariableName);
-	newNode->setInput(_nodes[float4Index0], _nodes[float4Index1]);
-	addNode(newNode);
-	linkNode(float4Index0, nodeIndex);
-	linkNode(float4Index1, nodeIndex);
-
-	return nodeIndex;
-}
-
-UINT HlslTranslator::addFloat3(UINT float3Index0, UINT float3Index1)
-{
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode =
-		std::make_shared<ShaderStatementNodeAddFloat3>(newLocalVariableName);
-	newNode->setInput(_nodes[float3Index0], _nodes[float3Index1]);
-	addNode(newNode);
-	linkNode(float3Index0, nodeIndex);
-	linkNode(float3Index1, nodeIndex);
-
-	return nodeIndex;
-}
-
-UINT HlslTranslator::multiplyFloat3ByScalar(UINT float3Index, UINT floatIndex)
-{
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode =
-		std::make_shared<ShaderStatementNodeMultiplyFloat3ByScalar>(newLocalVariableName);
-	newNode->setInputFloat3(_nodes[float3Index]);
-	newNode->setInputScalar(_nodes[floatIndex]);
-	addNode(newNode);
-	linkNode(float3Index, nodeIndex);
-	linkNode(floatIndex, nodeIndex);
-
-	return nodeIndex;
-}
-
-UINT HlslTranslator::maskX(UINT float4Index)
-{
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode =
-		std::make_shared<ShaderStatementNodeMaskX>(newLocalVariableName);
-	newNode->setInput(_nodes[float4Index]);
-	addNode(newNode);
-	linkNode(float4Index, nodeIndex);
-
-	return nodeIndex;
-}
-
-UINT HlslTranslator::maskW(UINT float4Index)
-{
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode =
-		std::make_shared<ShaderStatementNodeMaskW>(newLocalVariableName);
-	newNode->setInput(_nodes[float4Index]);
-	addNode(newNode);
-	linkNode(float4Index, nodeIndex);
-
-	return nodeIndex;
-}
-
-UINT HlslTranslator::getDeltaTime()
-{
-	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode =
-		std::make_shared<ShaderStatementNodeGetFloatByVariableName>(newLocalVariableName, "DeltaTime");
-	addNode(newNode);
-
-	return nodeIndex;
-}
-
-void HlslTranslator::insertCode(std::ofstream& fout)
-{
-	const UINT numNodes = _graph.size();
-	_visited.resize(numNodes);
-	std::fill(_visited.begin(), _visited.end(), false);
-
-	for (int i = 0; i < numNodes; ++i)
+	for (int i = 0; i < _nodes.size(); ++i)
 	{
 		if (_visited[i])
 			continue;
 
-		topologySort(i);
+		topologySort0(i);
 	}
-
-	for (int i = 0; i < numNodes; ++i)
-	{
-		UINT nodeIndex = _topologicalOrder[i];
-		fout << _nodes[nodeIndex]->generateStatements() << std::endl;
-	}
-
-	//// find root nodes
-	//std::vector<bool> isRoot(numNodes, true);
-
-	//for (int i = 0; i < numNodes; ++i)
-	//{
-	//	for (int j = 0; j < _graph[i].size(); ++j)
-	//	{
-	//		isRoot[_graph[i][j]] = false;
-	//	}
-	//}
-
-	//std::queue<UINT> q;
-
-	//for (int i = 0; i < numNodes; ++i)
-	//{
-	//	if (isRoot[i])
-	//		q.push(i);
-	//}
-
-	//std::vector<bool> visited(numNodes);
-
-	//// bfs
-	//while (!q.empty())
-	//{
-	//	const UINT nodeIndex = q.front();
-	//	q.pop();
-
-	//	for (auto linkIndex : _graph[nodeIndex])
-	//	{
-	//		if (visited[linkIndex])
-	//			continue;
-
-	//		visited[linkIndex] = true;
-	//		q.push(linkIndex);
-	//	}
-
-	//	fout << _nodes[nodeIndex]->generateStatements() << std::endl;
-	//}
 }
 
-void HlslTranslator::topologySort(UINT index)
+void HlslTranslator::topologySort0(const int index)
 {
 	_visited[index] = true;
-	for (auto linkIndex : _graph[index])
-	{
-		if (_visited[linkIndex])
-			continue;
-		topologySort(linkIndex);
-	}
 
+	for (auto linkedNodeIndex : findLinkedNodesWithOutput(index))
+	{
+		if (_visited[linkedNodeIndex])
+			continue;
+		topologySort0(linkedNodeIndex);
+	}
 	_topologicalOrder.push_front(index);
 }
 
-std::string HlslTranslator::getNewLocalVariableName()
+std::vector<int> HlslTranslator::findLinkedNodesWithOutput(const int nodeIndex)
 {
-	return "local" + std::to_string(_nodes.size());
+	std::vector<int> result;
+
+	const int outputId = _nodes[nodeIndex].getOutputId();
+
+	for (auto link : _links)
+	{
+		if (link.getFromId() != outputId && link.getToId() != outputId)
+			continue;
+
+		const int inputId = link.getOther(outputId);
+
+		for (int i = 0; i < _nodes.size(); ++i)
+		{
+			if (!_nodes[i].containsAttributeAsInput(inputId))
+				continue;
+
+			result.push_back(i);
+		}
+	}
+
+	return result;
 }
 
-void HlslTranslator::addNode(std::shared_ptr<ShaderStatementNode> node)
+int HlslTranslator::findNodeIdLinkedAsOutput(UiLink link)
 {
-	_nodes.push_back(node);
-	_graph.emplace_back();
+	for (auto node : _nodes)
+	{
+		if (node.getOutputId() == link.getFromId())
+			return node.getId();
+		if (node.getOutputId() == link.getToId())
+			return node.getId();
+	}
+	// never reach here.
+	assert(0);
+	return -1;
 }
 
-void HlslTranslator::linkNode(UINT from, UINT to)
+int HlslTranslator::findOppositeNodeByInputAttrbuteId(int inputId)
 {
-	_graph[from].push_back(to);
+	for (auto link : _links)
+	{
+		if (link.getFromId() != inputId && link.getToId() != inputId)
+			continue;
+
+		const int outputId = link.getOther(inputId);
+
+		for (auto node : _nodes)
+		{
+			if (node.getOutputId() == outputId)
+				return node.getId();
+		}
+	}
+
+	// never reach here
+	assert(0);
+	return -1;
 }

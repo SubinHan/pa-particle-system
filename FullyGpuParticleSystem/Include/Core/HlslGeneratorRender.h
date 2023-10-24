@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Core/HlslTranslator.h"
+#include "Core/HlslGenerator.h"
 
 #include "Core/ShaderStatementNode/ShaderStatementNode.h"
 
-class HlslTranslatorRender : public HlslTranslator
+class HlslGeneratorRender : public HlslGenerator
 {
 public:
-	HlslTranslatorRender(std::wstring baseShaderPath);
-	virtual ~HlslTranslatorRender();
+	HlslGeneratorRender(std::wstring baseShaderPath);
+	virtual ~HlslGeneratorRender();
 
 	UINT sampleTexture2d();
 	void clip(UINT opacityIndex);
