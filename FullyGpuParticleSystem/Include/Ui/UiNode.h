@@ -7,7 +7,10 @@ enum class NodeType;
 
 class UiNode
 {
+    friend class NodeEditorIo;
+
 public:
+    UiNode() = default;
     UiNode(
         const int id,
         std::string nodeName,
@@ -32,7 +35,7 @@ public:
     int getOutputId();
 
     float* getConstantInputAddress(const int index);
-    float getConstantInput(const int index);
+    float getConstantInputValue(const int index) const;
 
 private:
     int _id;

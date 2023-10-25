@@ -25,8 +25,10 @@ struct EmitConstants
 class ParticleEmitter : public Hashable
 {
 public:
-	ParticleEmitter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource);
+	ParticleEmitter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource, std::string name);
 	virtual ~ParticleEmitter();
+
+	std::string getName();
 
 	ID3D12RootSignature* getRootSignature();
 	ID3DBlob* getShader();
@@ -39,7 +41,7 @@ public:
 		float deltaTime);
 
 	void compileShaders();
-	void setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
+	void setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader);
 
 private:
 	void buildRootSignature();
@@ -49,6 +51,8 @@ private:
 private:
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 	ParticleResource* _resource;
+
+	std::string _name;
 
 	std::unique_ptr<HlslGeneratorEmit> _hlslGenerator;
 

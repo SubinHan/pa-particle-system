@@ -20,8 +20,18 @@ UiNode UiNodeFactory::createNode(const int id, NodeType nodeType)
 		return createRandFloat3(id);
 	case NodeType::AddFloat3:
 		return createAddFloat3(id);
+	case NodeType::GetParticlePosition:
+		return createGetParticlePosition(id);
+	case NodeType::GetParticleVelocity:
+		return createGetParticleVelocity(id);
+	case NodeType::GetParticleAcceleration:
+		return createGetParticleAcceleration(id);
 	case NodeType::EmitterOutput:
 		return createEmitterOutput(id);
+	case NodeType::SimulatorOutput:
+		return createSimulatorOutput(id);
+	case NodeType::RendererOutput:
+		return createRendererOutput(id);
 	default:
 		// should never reach here.
 		assert(0);
@@ -130,6 +140,45 @@ UiNode UiNodeFactory::createAddFloat3(const int id)
 	return UiNode(id, nodeName, inputNames, emptyVector, outputNames, nodeType);
 }
 
+UiNode UiNodeFactory::createGetParticlePosition(const int id)
+{
+	constexpr auto nodeType = NodeType::GetParticlePosition;
+	std::vector<std::string> emptyVector;
+	std::vector<std::string> outputNames =
+	{
+		"float3"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, emptyVector, emptyVector, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createGetParticleVelocity(const int id)
+{
+	constexpr auto nodeType = NodeType::GetParticleVelocity;
+	std::vector<std::string> emptyVector;
+	std::vector<std::string> outputNames =
+	{
+		"float3"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, emptyVector, emptyVector, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createGetParticleAcceleration(const int id)
+{
+	constexpr auto nodeType = NodeType::GetParticleAcceleration;
+	std::vector<std::string> emptyVector;
+	std::vector<std::string> outputNames =
+	{
+		"float3"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, emptyVector, emptyVector, outputNames, nodeType);
+}
+
 UiNode UiNodeFactory::createEmitterOutput(const int id)
 {
 	constexpr auto nodeType = NodeType::EmitterOutput;
@@ -141,6 +190,34 @@ UiNode UiNodeFactory::createEmitterOutput(const int id)
 		"initialLifetime",
 		"initialSize",
 		"initialOpacity",
+	};
+	std::vector<std::string> emptyVector;
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyVector, nodeType);
+}
+
+UiNode UiNodeFactory::createSimulatorOutput(const int id)
+{
+	constexpr auto nodeType = NodeType::SimulatorOutput;
+	std::vector<std::string> inputNames =
+	{
+		"newPosition",
+		"newVelocity",
+		"newAcceleration",
+	};
+	std::vector<std::string> emptyVector;
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyVector, nodeType);
+}
+
+UiNode UiNodeFactory::createRendererOutput(const int id)
+{
+	constexpr auto nodeType = NodeType::RendererOutput;
+	std::vector<std::string> inputNames =
+	{
+		"outputColor"
 	};
 	std::vector<std::string> emptyVector;
 

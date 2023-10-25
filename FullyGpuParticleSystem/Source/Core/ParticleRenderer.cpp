@@ -1,4 +1,4 @@
-#include "Core/ParticlePass.h"
+#include "Core/ParticleRenderer.h"
 
 #include "Core/DxDevice.h"
 #include "Core/HlslGeneratorRender.h"
@@ -10,7 +10,7 @@
 
 #include "d3dx12.h"
 
-static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
+static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/Generated/";
 static const std::wstring BASE_RENDER_SHADER_PATH = L"ParticleSystemShaders/ParticleRenderBase.hlsl";
 
 using Microsoft::WRL::ComPtr;
@@ -23,9 +23,10 @@ constexpr int ROOT_SLOT_DIFFUSE_MAP_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER + 1
 
 constexpr int ROOT_SLOT_SRV_UAV_TABLE = 0;
 
-ParticlePass::ParticlePass(DxDevice* device, ParticleResource* resource) :
+ParticleRenderer::ParticleRenderer(DxDevice* device, ParticleResource* resource, std::string name) :
 	_device(device),
 	_resource(resource),
+	_name(name),
 	_hlslGenerator(std::make_unique<HlslGeneratorRender>(BASE_RENDER_SHADER_PATH))
 {
 	buildRootSignature();
@@ -36,12 +37,17 @@ ParticlePass::ParticlePass(DxDevice* device, ParticleResource* resource) :
 	generateEmptyGeometry();
 }
 
-void ParticlePass::setMaterial(Material* material)
+std::string ParticleRenderer::getName()
+{
+	return _name;
+}
+
+void ParticleRenderer::setMaterial(Material* material)
 {
 	_material = material;
 }
 
-void ParticlePass::render(
+void ParticleRenderer::render(
 	ID3D12GraphicsCommandList* cmdList,
 	const ObjectConstants& objectConstants,
 	const PassConstantBuffer& passCb)
@@ -120,7 +126,7 @@ void ParticlePass::render(
 	_resource->transitAliveIndicesToUav(cmdList);
 }
 
-void ParticlePass::compileShaders()
+void ParticleRenderer::compileShaders()
 {
 	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
 
@@ -145,7 +151,13 @@ void ParticlePass::compileShaders()
 		"ps_5_1");
 }
 
-void ParticlePass::buildRootSignature()
+void ParticleRenderer::setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader)
+{
+	_shaderPs = shader;
+	buildPsos();
+}
+
+void ParticleRenderer::buildRootSignature()
 {
 	// build graphics root signature
 	{
@@ -245,7 +257,7 @@ void ParticlePass::buildRootSignature()
 	}
 }
 
-void ParticlePass::buildCommandSignature()
+void ParticleRenderer::buildCommandSignature()
 {
 	D3D12_INDIRECT_ARGUMENT_DESC argumentDescs[1] = {};
 	argumentDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
@@ -259,7 +271,7 @@ void ParticlePass::buildCommandSignature()
 		&commandSignatureDesc, nullptr, IID_PPV_ARGS(&_commandSignature)));
 }
 
-void ParticlePass::buildShaders()
+void ParticleRenderer::buildShaders()
 {
 	_shaderIndirectCommand = DxUtil::compileShader(
 		L"ParticleApp\\Shaders\\ParticleComputeIndirectCommands.hlsl",
@@ -278,14 +290,14 @@ void ParticlePass::buildShaders()
 	compileShaders();
 }
 
-void ParticlePass::buildInputLayout()
+void ParticleRenderer::buildInputLayout()
 {
 	_inputLayout =
 	{
 	};
 }
 
-void ParticlePass::buildPsos()
+void ParticleRenderer::buildPsos()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
 	ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -328,7 +340,7 @@ void ParticlePass::buildPsos()
 	transparencyBlendDesc.BlendEnable = true;
 	transparencyBlendDesc.LogicOpEnable = false;
 	transparencyBlendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	transparencyBlendDesc.DestBlend = D3D12_BLEND_DEST_ALPHA;
+	transparencyBlendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 	transparencyBlendDesc.BlendOp = D3D12_BLEND_OP_ADD;
 	transparencyBlendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
 	transparencyBlendDesc.DestBlendAlpha = D3D12_BLEND_ONE;
@@ -355,7 +367,7 @@ void ParticlePass::buildPsos()
 			&psoDesc, IID_PPV_ARGS(&_psoCompute)));
 }
 
-void ParticlePass::generateEmptyGeometry()
+void ParticleRenderer::generateEmptyGeometry()
 {
 	using VertexType = DirectX::XMFLOAT3;
 	using IndexType = std::uint32_t;

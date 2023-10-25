@@ -1,5 +1,5 @@
-#include "ParticleApp/Shaders/Particle.hlsl"
-#include "ParticleApp/Shaders/ParticleSystem.hlsl"
+#include "Particle.hlsl"
+#include "ParticleSystem.hlsl"
 
 cbuffer cbPass : register(b1)
 {
@@ -46,21 +46,6 @@ SamplerState gsamLinearClamp  : register(s3);
 SamplerState gsamAnisotropicWrap  : register(s4);
 SamplerState gsamAnisotropicClamp  : register(s5);
 
-VertexOut ParticleVS(
-	uint vid : SV_VertexID)
-{
-	const uint particleIndex = aliveIndices[vid];
-	Particle particle = particles[particleIndex];
-
-	VertexOut vertexOut;
-
-	const float4 posW = mul(float4(particle.Position, 1.0f), gWorld);
-	vertexOut.CenterW = posW;
-	vertexOut.Size = particle.Size;
-
-	return vertexOut;
-}
-
 [maxvertexcount(4)]
 void ParticleGS(
 	point VertexOut gin[1],
@@ -102,13 +87,4 @@ void ParticleGS(
 
 		triStream.Append(geoOut);
 	}
-}
-
-float4 ParticlePS(GeoOut pin) : SV_Target
-{
-	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-
-	%s
-
-	return color;
 }

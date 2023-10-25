@@ -11,7 +11,7 @@ class ParticleResource;
 class ParticleEmitter;
 class ParticleSorter;
 class ParticleSimulator;
-class ParticlePass;
+class ParticleRenderer;
 class PassConstantBuffer;
 
 struct ID3D12GraphicsCommandList;
@@ -20,7 +20,7 @@ struct Material;
 class ParticleSystem : public ICbvSrvUavDemander
 {
 public:
-	ParticleSystem(DxDevice* device);
+	ParticleSystem(DxDevice* device, std::string name);
 	~ParticleSystem();
 
 	virtual int getNumDescriptorsToDemand() const override;
@@ -30,7 +30,6 @@ public:
 		ID3D12GraphicsCommandList* commandList, 
 		const PassConstantBuffer& passCb, 
 		const GameTimer& gt);
-	void updateShaders();
 
 	void setWorldTransform(const DirectX::XMFLOAT4X4& newWorldTransform);
 	void setMaterial(Material* material);
@@ -42,6 +41,10 @@ public:
 	void setSpawnRate(float spawnRate);
 
 	ParticleEmitter* getEmitter();
+	ParticleSimulator* getSimulator();
+	ParticleRenderer* getRenderer();
+
+	std::string getName();
 
 private:
 	void init();
@@ -49,11 +52,13 @@ private:
 private:
 	DxDevice* _device;
 
+	std::string _name;
+
 	std::unique_ptr<ParticleResource> _resource;
 	std::unique_ptr<ParticleEmitter> _emitter;
 	std::unique_ptr<ParticleSorter> _sorter;
 	std::unique_ptr<ParticleSimulator> _simulator;
-	std::unique_ptr<ParticlePass> _pass;
+	std::unique_ptr<ParticleRenderer> _renderer;
 
 	DirectX::XMFLOAT4X4 _world = MathHelper::identity4x4();
 	float _spawnRate;

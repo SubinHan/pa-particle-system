@@ -6,14 +6,15 @@
 
 #include "d3dx12.h"
 
-static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
+static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/Generated/";
 static const std::wstring BASE_SIMULATOR_SHADER_PATH = L"ParticleSystemShaders/ParticleSimulateCSBase.hlsl";
 
 using Microsoft::WRL::ComPtr;
 
-ParticleSimulator::ParticleSimulator(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource) :
+ParticleSimulator::ParticleSimulator(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource, std::string name) :
 	_device(device),
 	_resource(resource),
+	_name(name),
 	_hlslGenerator(std::make_unique<HlslGeneratorSimulate>(BASE_SIMULATOR_SHADER_PATH))
 {
 	buildRootSignature();
@@ -22,6 +23,11 @@ ParticleSimulator::ParticleSimulator(Microsoft::WRL::ComPtr<ID3D12Device> device
 }
 
 ParticleSimulator::~ParticleSimulator() = default;
+
+std::string ParticleSimulator::getName()
+{
+	return _name;
+}
 
 ID3D12RootSignature* ParticleSimulator::getRootSignature()
 {
@@ -85,6 +91,12 @@ void ParticleSimulator::compileShader()
 		nullptr,
 		"PostSimulateCS",
 		"cs_5_1");
+}
+
+void ParticleSimulator::setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader)
+{
+	_shader = shader;
+	buildPsos();
 }
 
 void ParticleSimulator::buildRootSignature()
@@ -175,7 +187,7 @@ void ParticleSimulator::buildRootSignature()
 void ParticleSimulator::buildShaders()
 {
 	UINT deltaTimeIndex = _hlslGenerator->getDeltaTime();
-	UINT positionIndex = _hlslGenerator->getPositionAfterSimulation();
+	UINT positionIndex = _hlslGenerator->getPosition();
 	UINT randFloat3 = _hlslGenerator->randFloat3();
 	UINT minusHalf = _hlslGenerator->newFloat3(-0.5f, -0.5f, -0.5f);
 	UINT minusHalfToPlusHalf = _hlslGenerator->addFloat3(randFloat3, minusHalf);

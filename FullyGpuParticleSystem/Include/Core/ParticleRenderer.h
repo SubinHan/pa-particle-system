@@ -17,11 +17,12 @@ class HlslGeneratorRender;
 struct ObjectConstants;
 struct Material;
 
-class ParticlePass : public Hashable
+class ParticleRenderer : public Hashable
 {
 public:
-	ParticlePass(DxDevice* device, ParticleResource* resource);
+	ParticleRenderer(DxDevice* device, ParticleResource* resource, std::string name);
 
+	std::string getName();
 	void setMaterial(Material* material);
 
 	void render(
@@ -30,6 +31,7 @@ public:
 		const PassConstantBuffer& passCb);
 
 	void compileShaders();
+	void setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader);
 
 private:
 	void buildRootSignature();
@@ -42,6 +44,8 @@ private:
 	DxDevice* _device;
 	ParticleResource* _resource;
 	Material* _material;
+
+	std::string _name;
 
 	std::unique_ptr<HlslGeneratorRender> _hlslGenerator;
 

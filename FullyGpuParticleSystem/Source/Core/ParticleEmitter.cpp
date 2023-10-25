@@ -7,7 +7,7 @@
 
 #include "d3dx12.h"
 
-static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
+static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/Generated/";
 static const std::wstring BASE_EMITTER_SHADER_PATH = L"ParticleSystemShaders/ParticleEmitCSBase.hlsl";
 
 using Microsoft::WRL::ComPtr;
@@ -19,10 +19,11 @@ constexpr int ROOT_SLOT_ALIVES_INDICES_BUFFER = ROOT_SLOT_PARTICLES_BUFFER + 1;
 constexpr int ROOT_SLOT_DEADS_INDICES_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER + 1;
 constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_DEADS_INDICES_BUFFER + 1;
 
-ParticleEmitter::ParticleEmitter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource) :
+ParticleEmitter::ParticleEmitter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource, std::string name) :
 	Hashable(),
 	_device(device),
 	_resource(resource),
+	_name(name),
 	_hlslGenerator(std::make_unique<HlslGeneratorEmit>(BASE_EMITTER_SHADER_PATH))
 {
 	buildRootSignature();
@@ -31,6 +32,11 @@ ParticleEmitter::ParticleEmitter(Microsoft::WRL::ComPtr<ID3D12Device> device, Pa
 }
 
 ParticleEmitter::~ParticleEmitter() = default;
+
+std::string ParticleEmitter::getName()
+{
+	return _name;
+}
 
 ID3D12RootSignature* ParticleEmitter::getRootSignature()
 {
@@ -90,7 +96,7 @@ void ParticleEmitter::compileShaders()
 		"cs_5_1");
 }
 
-void ParticleEmitter::setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
+void ParticleEmitter::setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 {
 	_shader = shader;
 	buildPsos();

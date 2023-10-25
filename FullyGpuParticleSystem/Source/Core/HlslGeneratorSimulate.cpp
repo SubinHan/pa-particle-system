@@ -11,7 +11,7 @@ HlslGeneratorSimulate::HlslGeneratorSimulate(std::wstring baseShaderPath) :
 
 HlslGeneratorSimulate::~HlslGeneratorSimulate() = default;
 
-UINT HlslGeneratorSimulate::getPositionAfterSimulation()
+UINT HlslGeneratorSimulate::getPosition()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	const UINT nodeIndex = _nodes.size();
@@ -22,12 +22,23 @@ UINT HlslGeneratorSimulate::getPositionAfterSimulation()
 	return nodeIndex;
 }
 
-UINT HlslGeneratorSimulate::getVelcotiyAfterSimulateAcceleration()
+UINT HlslGeneratorSimulate::getVelocity()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeGetFloat3ByVariableName>(newLocalVariableName, "particles[particleIndex].Velocity");
+	addNode(newNode);
+
+	return nodeIndex;
+}
+
+UINT HlslGeneratorSimulate::getAcceleration()
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeGetFloat3ByVariableName>(newLocalVariableName, "particles[particleIndex].Acceleration");
 	addNode(newNode);
 
 	return nodeIndex;
@@ -43,7 +54,7 @@ void HlslGeneratorSimulate::setPosition(UINT float3Index)
 	linkNode(float3Index, nodeIndex);
 }
 
-void HlslGeneratorSimulate::setNextFrameVelocity(UINT float3Index)
+void HlslGeneratorSimulate::setVelocity(UINT float3Index)
 {
 	const UINT nodeIndex = _nodes.size();
 	auto newNode =
@@ -53,7 +64,7 @@ void HlslGeneratorSimulate::setNextFrameVelocity(UINT float3Index)
 	linkNode(float3Index, nodeIndex);
 }
 
-void HlslGeneratorSimulate::setNextFrameAcceleration(UINT float3Index)
+void HlslGeneratorSimulate::setAcceleration(UINT float3Index)
 {
 	const UINT nodeIndex = _nodes.size();
 	auto newNode =

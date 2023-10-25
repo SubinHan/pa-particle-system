@@ -2,24 +2,28 @@
 
 #include "Ui/NodeType.h"
 #include "Ui/UiNodeFactory.h"
+#include "Ui/NodeEditorIo.h"
 
 #include "imgui.h"
 #include "imnodes.h"
+
+static const std::wstring SAVE_LOAD_ROOT_PATH = L"Saved/";
 
 NodeEditor::NodeEditor() :
     _currentId(0),
     _nodes(),
     _links(),
-    _name("HelloNodeEditor")
+    _isAlive(true)
 {
 }
 
 void NodeEditor::show()
 {
-    ImGui::Begin(_name.c_str());
+    ImGui::Begin(getName().c_str(), &_isAlive);
     if (ImGui::Button("Compile"))
     {
         onCompileButtonClicked();
+        save();
     }
     ImGui::TextUnformatted("Text");
 
@@ -135,6 +139,33 @@ void NodeEditor::show()
 
     ImGui::End();
 }
+
+bool NodeEditor::isAlive()
+{
+    return _isAlive;
+}
+
+void NodeEditor::save()
+{
+    std::wstring nameWstring;
+    std::string name = getName();
+    nameWstring.assign(name.begin(), name.end());
+    NodeEditorIo::save(_nodes, _links, _currentId, SAVE_LOAD_ROOT_PATH + nameWstring);
+}
+
+void NodeEditor::load()
+{
+    std::wstring nameWstring;
+    std::string name = getName();
+    nameWstring.assign(name.begin(), name.end());
+    auto [nodes, links, currentId] = 
+        NodeEditorIo::load(SAVE_LOAD_ROOT_PATH + nameWstring);
+
+    _nodes = nodes;
+    _links = links;
+    _currentId = currentId;
+}
+
 
 void NodeEditor::nextCurrentId(UiNode createdNode)
 {

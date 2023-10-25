@@ -1,5 +1,5 @@
-#include "Particle.hlsl"
-#include "ParticleSystem.hlsl"
+#include "ParticleApp/Shaders/Particle.hlsl"
+#include "ParticleApp/Shaders/ParticleSystem.hlsl"
 
 cbuffer cbPass : register(b1)
 {

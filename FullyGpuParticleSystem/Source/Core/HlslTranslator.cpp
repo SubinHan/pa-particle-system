@@ -3,7 +3,7 @@
 #include "Core/HlslGenerator.h"
 #include "Ui/NodeType.h"
 
-static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
+static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/Generated/";
 
 HlslTranslator::HlslTranslator(std::vector<UiNode> nodes, std::vector<UiLink> links) :
 	_nodes(nodes),
@@ -24,14 +24,16 @@ Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslator::compileShader()
 	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
 	generateShaderFile(shaderPath);
 
-	return compileShaderImpl(shaderPath);
+	auto shaderBlob = compileShaderImpl(shaderPath);
+
+	return shaderBlob;
 }
 
 void HlslTranslator::generateNodes()
 {
 	for (int i = 0; i < _nodes.size(); ++i)
 	{
-		generateNode(_nodes[_topologicalOrder[i]]);
+		translateNode(_nodes[_topologicalOrder[i]]);
 	}
 }
 
@@ -40,7 +42,7 @@ void HlslTranslator::generateShaderFile(std::wstring shaderPath)
 	_hlslGenerator->generateShaderFile(shaderPath);
 }
 
-bool HlslTranslator::generateNode(UiNode node)
+bool HlslTranslator::translateNode(UiNode node)
 {
 	bool hasGenerated = true;
 	auto nodeType = node.getType();
@@ -50,24 +52,24 @@ bool HlslTranslator::generateNode(UiNode node)
 	{
 	case NodeType::NewFloat:
 	{
-		const float r = node.getConstantInput(0);
+		const float r = node.getConstantInputValue(0);
 		hlslIndex = _hlslGenerator->newFloat(r);
 		break;
 	}
 	case NodeType::NewFloat3:
 	{
-		const float r = node.getConstantInput(0);
-		const float g = node.getConstantInput(1);
-		const float b = node.getConstantInput(2);
+		const float r = node.getConstantInputValue(0);
+		const float g = node.getConstantInputValue(1);
+		const float b = node.getConstantInputValue(2);
 		hlslIndex = _hlslGenerator->newFloat3(r, g, b);
 		break;
 	}
 	case NodeType::NewFloat4:
 	{
-		const float r = node.getConstantInput(0);
-		const float g = node.getConstantInput(1);
-		const float b = node.getConstantInput(2);
-		const float a = node.getConstantInput(3);
+		const float r = node.getConstantInputValue(0);
+		const float g = node.getConstantInputValue(1);
+		const float b = node.getConstantInputValue(2);
+		const float a = node.getConstantInputValue(3);
 		hlslIndex = _hlslGenerator->newFloat4(r, g, b, a);
 		break;
 	}

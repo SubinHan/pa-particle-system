@@ -3,6 +3,7 @@
 class UiLink
 {
 public:
+    UiLink() = default;
     UiLink(int id, int from, int to);
 
     int getId() const;

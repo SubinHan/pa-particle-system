@@ -87,7 +87,7 @@ float* UiNode::getConstantInputAddress(const int index)
 	return &_constantInputValues[index];
 }
 
-float UiNode::getConstantInput(const int index)
+float UiNode::getConstantInputValue(const int index) const
 {
 	return _constantInputValues[index];
 }

@@ -42,13 +42,12 @@ void SimulateCS(
 		}
 		else
 		{
-			// TODO: Simulate particles.
+			%s
+
 			const float3 velocityBefore = particles[particleIndex].Velocity;
 			particles[particleIndex].Velocity += particles[particleIndex].Acceleration * DeltaTime;
 			particles[particleIndex].Position +=
 				(velocityBefore + particles[particleIndex].Velocity) * DeltaTime * 0.5f;
-
-			%s
 
 			// move alive particles to ping-pong buffer 
 			uint newIndex;

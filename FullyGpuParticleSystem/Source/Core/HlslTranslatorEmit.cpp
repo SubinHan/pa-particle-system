@@ -26,9 +26,9 @@ Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslatorEmit::compileShaderImpl(std::wstr
 		"cs_5_1");
 }
 
-bool HlslTranslatorEmit::generateNode(UiNode node)
+bool HlslTranslatorEmit::translateNode(UiNode node)
 {
-	if (HlslTranslator::generateNode(node))
+	if (HlslTranslator::translateNode(node))
 		return true;
 
 	bool hasGenerated = true;

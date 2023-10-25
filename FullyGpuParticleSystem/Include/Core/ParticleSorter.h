@@ -20,7 +20,7 @@ struct SortConstants
 class ParticleSorter
 {
 public:
-	ParticleSorter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource);
+	ParticleSorter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource, std::string name);
 
 	ID3D12RootSignature* getRootSignature();
 	ID3DBlob* getShader();
@@ -38,6 +38,8 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 	ParticleResource* _resource;
+
+	std::string _name;
 
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shader;

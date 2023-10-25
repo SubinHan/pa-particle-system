@@ -13,6 +13,7 @@ class PassConstantBuffer;
 class TextureBuffer;
 class ImguiInitializer;
 class NodeEditorEmit;
+class ParticleSystemController;
 struct MeshGeometry;
 struct Material;
 
@@ -28,7 +29,7 @@ class ParticleApp : public MainWindow
 {
 public:
 	ParticleApp(HINSTANCE hInstance);
-	~ParticleApp();
+	virtual ~ParticleApp();
 
 	virtual PCWSTR getClassName() const override;
 
@@ -84,5 +85,5 @@ private:
 
 	std::vector<std::unique_ptr<ParticleSystem>> _particleSystems;
 	std::unique_ptr<ImguiInitializer> _imguiInitializer;
-	std::unique_ptr<NodeEditorEmit> _nodeEditorEmit;
+	std::unique_ptr<ParticleSystemController> _particleSystemController;
 };

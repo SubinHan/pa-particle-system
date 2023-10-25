@@ -2,13 +2,13 @@
 
 #include "Ui/NodeEditor.h"
 
-class ParticleEmitter;
+class ParticleRenderer;
 
-class NodeEditorEmit : public NodeEditor
+class NodeEditorRender : public NodeEditor
 {
 public:
-	NodeEditorEmit(ParticleEmitter* emitter);
-	virtual ~NodeEditorEmit();
+	NodeEditorRender(ParticleRenderer* renderer);
+	virtual ~NodeEditorRender();
 
 	virtual void load() override;
 
@@ -20,5 +20,5 @@ private:
 	void createOutputNode();
 
 private:
-	ParticleEmitter* _emitter;
+	ParticleRenderer* _renderer;
 };

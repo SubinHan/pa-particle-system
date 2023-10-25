@@ -6,13 +6,14 @@
 #include "Core/ParticleEmitter.h"
 #include "Core/ParticleSorter.h"
 #include "Core/ParticleSimulator.h"
-#include "Core/ParticlePass.h"
+#include "Core/ParticleRenderer.h"
 #include "Model/ObjectConstants.h"
 
 #include <iostream>
 
-ParticleSystem::ParticleSystem(DxDevice* device) :
+ParticleSystem::ParticleSystem(DxDevice* device, std::string name) :
 	_device(device),
+	_name(name),
 	_spawnRate(0.0f),
 	_deltaTimeAfterSpawn(0.0f)
 {
@@ -72,7 +73,7 @@ void ParticleSystem::onDraw(
 	//_sorter->sortParticles(commandList);
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 2);
-	_pass->render(commandList, objConstants, passCb);
+	_renderer->render(commandList, objConstants, passCb);
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 3);
 
@@ -129,7 +130,7 @@ void ParticleSystem::setWorldTransform(const DirectX::XMFLOAT4X4& newWorldTransf
 
 void ParticleSystem::setMaterial(Material* material)
 {
-	_pass->setMaterial(material);
+	_renderer->setMaterial(material);
 }
 
 void ParticleSystem::setSpawnRate(float spawnRate)
@@ -143,6 +144,21 @@ ParticleEmitter* ParticleSystem::getEmitter()
 	return _emitter.get();
 }
 
+ParticleSimulator* ParticleSystem::getSimulator()
+{
+	return _simulator.get();
+}
+
+ParticleRenderer* ParticleSystem::getRenderer()
+{
+	return _renderer.get();
+}
+
+std::string ParticleSystem::getName()
+{
+	return _name;
+}
+
 void ParticleSystem::init()
 {
 	auto commandList = _device->startRecordingCommands();
@@ -152,16 +168,20 @@ void ParticleSystem::init()
 		commandList.Get());
 	_emitter = std::make_unique<ParticleEmitter>(
 		_device->getD3dDevice(),
-		_resource.get());
+		_resource.get(),
+		_name + "Emitter");
 	_sorter = std::make_unique<ParticleSorter>(
 		_device->getD3dDevice(),
-		_resource.get());
+		_resource.get(),
+		_name + "Sorter");
 	_simulator = std::make_unique<ParticleSimulator>(
 		_device->getD3dDevice(),
-		_resource.get());
-	_pass = std::make_unique<ParticlePass>(
+		_resource.get(),
+		_name + "Simulator");
+	_renderer = std::make_unique<ParticleRenderer>(
 		_device,
-		_resource.get());
+		_resource.get(),
+		_name + "Renderer");
 
 	_device->submitCommands(commandList);
 }

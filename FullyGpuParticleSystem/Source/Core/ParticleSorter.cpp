@@ -7,9 +7,10 @@ using namespace Microsoft::WRL;
 constexpr int ROOT_SLOT_CONSTANTS_BUFFER = 0;
 constexpr int ROOT_SLOT_ALIVE_INDICES_BUFFER = ROOT_SLOT_CONSTANTS_BUFFER + 1;
 
-ParticleSorter::ParticleSorter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource) :
+ParticleSorter::ParticleSorter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource, std::string name) :
 	_device(device),
-	_resource(resource)
+	_resource(resource),
+	_name(name)
 {
 	buildRootSignature();
 	buildShaders();

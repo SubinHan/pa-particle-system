@@ -78,7 +78,7 @@
     <ClInclude Include="Include\Core\ParticleSimulator.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Core\ParticlePass.h">
+    <ClInclude Include="Include\Core\ParticleRenderer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Include\Core\ParticleSystem.h">
@@ -198,6 +198,30 @@
     <ClInclude Include="Include\Core\HlslTranslatorEmit.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Ui\ParticleSystemController.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Ui\IWindow.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\HlslTranslatorSimulate.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Ui\NodeEditorSimulate.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\HlslTranslatorRender.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Ui\NodeEditorRender.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Ui\NodeEditorIo.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ParticleSystemManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -242,7 +266,7 @@
     <ClCompile Include="Source\Core\ParticleSimulator.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\ParticlePass.cpp">
+    <ClCompile Include="Source\Core\ParticleRenderer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\ParticleSystem.cpp">
@@ -371,6 +395,27 @@
     <ClCompile Include="Source\Core\HlslTranslatorEmit.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Ui\ParticleSystemController.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HlslTranslatorSimulate.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ui\NodeEditorSimulate.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HlslTranslatorRender.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ui\NodeEditorRender.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ui\NodeEditorIo.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ParticleSystemManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FullyGpuParticleSystem.rc">
@@ -397,6 +442,9 @@
     <FxCompile Include="ParticleApp\Shaders\ParticleSystem.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticleSortCS.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticleComputeIndirectCommands.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleRenderVSBase.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleRenderGSBase.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleRenderBase.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -22,8 +22,10 @@ struct ParticleSimulateConstants
 class ParticleSimulator : public Hashable
 {
 public:
-	ParticleSimulator(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource);
+	ParticleSimulator(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource, std::string name);
 	~ParticleSimulator();
+
+	std::string getName();
 
 	ID3D12RootSignature* getRootSignature();
 	ID3DBlob* getShader();
@@ -32,6 +34,7 @@ public:
 	void simulateParticles(ID3D12GraphicsCommandList* cmdList, float deltaTime);
 
 	void compileShader();
+	void setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader);
 
 private:
 	void buildRootSignature();
@@ -48,6 +51,8 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 	ParticleResource* _resource;
+
+	std::string _name;
 
 	std::unique_ptr<HlslGeneratorSimulate> _hlslGenerator;
 

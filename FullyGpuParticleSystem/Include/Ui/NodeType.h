@@ -10,7 +10,12 @@ enum class NodeType
 	NewFloat4,
 	RandFloat3,
 	AddFloat3,
+	GetParticlePosition,
+	GetParticleVelocity,
+	GetParticleAcceleration,
 	EmitterOutput,
+	SimulatorOutput,
+	RendererOutput,
 	Size
 };
 
@@ -22,7 +27,12 @@ const std::array<NodeType, static_cast<size_t>(NodeType::Size)> nodeTypes =
 	NodeType::NewFloat4,
 	NodeType::RandFloat3,
 	NodeType::AddFloat3,
+	NodeType::GetParticlePosition,
+	NodeType::GetParticleVelocity,
+	NodeType::GetParticleAcceleration,
 	NodeType::EmitterOutput,
+	NodeType::SimulatorOutput,
+	NodeType::RendererOutput,
 };
 
 const std::array<std::string, static_cast<size_t>(NodeType::Size)> nodeNames =
@@ -33,5 +43,10 @@ const std::array<std::string, static_cast<size_t>(NodeType::Size)> nodeNames =
 	"NewFloat4",
 	"RandFloat3",
 	"AddFloat3",
+	"GetParticlePosition",
+	"GetParticleVelocity",
+	"GetParticleAcceleration",
 	"EmitterOutput",
+	"SimulatorOutput",
+	"RendererOutput",
 };

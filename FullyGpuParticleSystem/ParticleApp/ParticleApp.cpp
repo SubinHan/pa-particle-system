@@ -10,6 +10,7 @@
 #include "Model/Texture.h"
 #include "Util/DDSTextureLoader.h"
 #include "Ui/NodeEditorEmit.h"
+#include "Ui/ParticleSystemController.h"
 
 #include "imgui.h"
 #include "imgui_impl_dx12.h"
@@ -44,12 +45,13 @@ bool ParticleApp::initialize()
 	_imguiInitializer = std::make_unique<ImguiInitializer>(_device.get(), _hwnd);
 
 	_particleSystems.push_back(std::move(
-		std::make_unique<ParticleSystem>(_device.get())));
+		std::make_unique<ParticleSystem>(_device.get(), "ParticleSystem0")));
 
 	_particleSystems.push_back(std::move(
-		std::make_unique<ParticleSystem>(_device.get())));
+		std::make_unique<ParticleSystem>(_device.get(), "ParticleSystem1")));
 
-	_nodeEditorEmit = std::make_unique<NodeEditorEmit>(_particleSystems[0]->getEmitter());
+	_particleSystemController =
+		std::make_unique<ParticleSystemController>(&_particleSystems);
 
 	auto commandList = _device->startRecordingCommands();
 
@@ -190,7 +192,7 @@ void ParticleApp::draw(const GameTimer& gt)
 	ImGui::NewFrame();
 	bool windowOpen = true;
 	ImGui::ShowDemoWindow(&windowOpen);
-	_nodeEditorEmit->show();
+	_particleSystemController->show();
 
 	// Rendering
 	ImGui::Render();

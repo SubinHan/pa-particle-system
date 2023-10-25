@@ -10,12 +10,13 @@ public:
 	HlslGeneratorSimulate(std::wstring baseShaderPath);
 	virtual ~HlslGeneratorSimulate();
 
-	UINT getPositionAfterSimulation();
-	UINT getVelcotiyAfterSimulateAcceleration();
+	UINT getPosition();
+	UINT getVelocity();
+	UINT getAcceleration();
 
 	void setPosition(UINT float3Index);
-	void setNextFrameVelocity(UINT float3Index);
-	void setNextFrameAcceleration(UINT float3Index);
+	void setVelocity(UINT float3Index);
+	void setAcceleration(UINT float3Index);
 
 private:
 };
