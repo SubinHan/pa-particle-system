@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <DirectXMath.h>
 #include <cstdint>
+#include <algorithm>
 
 class MathHelper
 {
@@ -69,6 +70,13 @@ public:
 			0.0f, 0.0f, 0.0f, 1.0f);
 
 		return I;
+	}
+
+	static bool nearlyZero(float a)
+	{
+		constexpr float EPSILON = 1e-5;
+
+		return std::abs(a) < EPSILON;
 	}
 
 	static DirectX::XMVECTOR randUnitVec3();

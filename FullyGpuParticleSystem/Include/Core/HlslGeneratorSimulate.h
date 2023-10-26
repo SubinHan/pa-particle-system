@@ -14,6 +14,12 @@ public:
 	UINT getVelocity();
 	UINT getAcceleration();
 
+	UINT windForce();
+	UINT gravity();
+	UINT drag();
+	UINT pointAttraction();
+	UINT vortex();
+
 	void setPosition(UINT float3Index);
 	void setVelocity(UINT float3Index);
 	void setAcceleration(UINT float3Index);

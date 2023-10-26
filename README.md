@@ -78,14 +78,15 @@
 * Motion blur 구현
 * Geometry와의 collision
 * imgui 도입
-* Ribbon mesh 지원
+* Ribbon trail
+* Lighting
 * Shader generation에서 node dependency 무결성 확인
   * i.e.) float3에 float4를 대입하지는 않는지?
   * 각 node들이 type 정보를 유지하여 적절한 input임을 검증해야 함
 
 ##### 진행 중인 Task
 * Particle System 학습
-* DrawIndexedIndirect(), ExecuteIndirect() 학습 및 적용
+* UI 적용
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -103,6 +104,7 @@
   * 추상화된 작업들을 HLSL 코드로 변환시켜주는 클래스
   * 가령 float4 변수를 초기화하고, 두 개의 float4 변수를 더하는 것 등
   * 이를 기반으로 유연한 Emit, Simulate process 구현의 기반 마련
+* DrawIndexedIndirect(), ExecuteIndirect() 학습 및 적용
 
 <hr/>
 
@@ -168,7 +170,15 @@
   * imgui 도입 (+node graph 관련 library인 imnodes)
   * Emitter에 시험적 node editor 적용
     * node editor 기반으로 쉐이더 수정 가능
-
+* 수요일:
+  * UI 적용
+    * Particle Emission, Simulation, Rendering 변경 가능
+    * 노드 에디터의 정보들은 저장됨
+      <img src="./img/20231025_ui.png">
+* 목요일:
+  * UI 적용
+    * Particle System들의 상태를 저장할 수 있음
+      * 다시 프로그램 시작 시 자동적으로 load
 
 <hr/>
 
@@ -203,12 +213,113 @@
   * data access 패턴이 규칙적이라 cache hit가 잘 이루어질 수 있음.
 
 #### 쉐이더 동적 생성
-* Graph 자료구조를 기반으로 statements의 dependency를 관리
+* 예시:
+``` c++
+EmitCSBase.hlsl
+
+// each thread emits a particle.
+[numthreads(256, 1, 1)]
+void EmitCS(
+	int3 groupThreadId : SV_GroupThreadID,
+	int3 dispatchThreadId : SV_DispatchThreadID)
+{
+	...
+	%s
+
+	newParticle.Color = float3(1.0f, 0.0f, 0.0f);
+
+	// add particle into buffer
+	// TODO: remove either numDeads or numAlives and derive it with max num of particles.
+	uint numDeads;
+	counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMDEADS, -1, numDeads);
+
+	uint newParticleIndex = deadIndices[numDeads - 1];
+
+	uint numAlives;
+	counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMALIVES, 1, numAlives);
+	
+	aliveIndices[numAlives] = newParticleIndex;
+
+	particles[newParticleIndex] = newParticle;
+}
+```
+
+<img src="img/emitter_editor_ui_example.png">
+
+
+``` c++
+7765567160042113517.hlsl
+
+// each thread emits a particle.
+[numthreads(256, 1, 1)]
+void EmitCS(
+	int3 groupThreadId : SV_GroupThreadID,
+	int3 dispatchThreadId : SV_DispatchThreadID)
+{
+    ...
+
+float3 local6 = float3(0.000000, 0.000000, 0.000000);
+newParticle.Position = local6;
+float3 local4 = float3(random(0.293304 + DeltaTime + float(dispatchThreadId.x)), random(0.393304 + DeltaTime + float(dispatchThreadId.x)), random(0.493304 + DeltaTime + float(dispatchThreadId.x)));
+float3 local3 = float3(0.000000, -1.000000, 0.000000);
+newParticle.Acceleration = local3;
+float local2 = float(3.000000);
+newParticle.Lifetime = local2;
+float local1 = float(0.050000);
+newParticle.Opacity = local1;
+newParticle.Size = local1;
+float3 local0 = float3(-0.500000, -0.500000, -0.500000);
+float3 local5 = local4 + local0;
+newParticle.Velocity = local5;
+
+	// add particle into buffer
+	// TODO: remove either numDeads or numAlives and derive it with max num of particles.
+	uint numDeads;
+	counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMDEADS, -1, numDeads);
+
+	uint newParticleIndex = deadIndices[numDeads - 1];
+
+	uint numAlives;
+	counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMALIVES, 1, numAlives);
+	
+	aliveIndices[numAlives] = newParticleIndex;
+
+	particles[newParticleIndex] = newParticle;
+}
+```
+
 * Base 쉐이더 파일이 입력되며, statements가 삽입될 지점은 "%s"로 표시
-* 클라이언트는 HlslTranslator 객체의 함수를 이용해 원하는 로직 생성
+* Graph 자료구조를 기반으로 statements의 dependency를 관리
+* 이들을 위상 정렬 후 순차적으로 코드에 삽입
+  * 깊이 우선 탐색의 후위 순서를 거꾸로 순회
+* 클라이언트는 HlslGenerator 객체의 함수를 이용해 원하는 로직 생성
   * 구체적으로는 statement node를 생성 후 그들 간의 관계를 정의
   * 각 statement node는 고유한 번호가 존재
-* 이들을 위상 정렬 후 순차적으로 코드에 삽입
+  * 예시:
+``` c++
+UINT positionIndex = _hlslGenerator->newFloat3(0.0f, 0.0f, 0.0f);
+
+UINT randFloat3 = _hlslGenerator->randFloat3();
+UINT minusHalfFloat3 = _hlslGenerator->newFloat3(-0.5f, -0.5f, -0.5f);
+UINT velocityIndex = _hlslGenerator->addFloat3(randFloat3, minusHalfFloat3);
+
+UINT accelerationIndex = _hlslGenerator->newFloat3(0.0f, -1.0f, 0.0f);
+
+UINT lifetimeIndex = _hlslGenerator->newFloat(4.0f);
+
+UINT sizeIndex = _hlslGenerator->newFloat(0.05f);
+
+UINT opacityIndex = _hlslGenerator->newFloat(1.0f);
+
+_hlslGenerator->setInitialPosition(positionIndex);
+_hlslGenerator->setInitialVelocity(velocityIndex);
+_hlslGenerator->setInitialAcceleration(accelerationIndex);
+_hlslGenerator->setInitialLifetime(lifetimeIndex);
+_hlslGenerator->setInitialSize(sizeIndex);
+_hlslGenerator->setInitialOpacity(opacityIndex);
+
+compileShaders();
+```
 * 이때 쉐이더의 최종 출력 값은 사전에 정해져 있음.
   * 가령 EmitCS의 경우 InitalPosition, InitialVelocity 따위를 최종 출력으로 받음.
 * 생성된 Shader 파일들의 이름은 객체 생성 시점을 해싱한 값으로 구분

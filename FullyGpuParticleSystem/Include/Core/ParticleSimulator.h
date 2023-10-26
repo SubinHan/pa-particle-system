@@ -34,7 +34,7 @@ public:
 	void simulateParticles(ID3D12GraphicsCommandList* cmdList, float deltaTime);
 
 	void compileShader();
-	void setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader);
+	void setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
 
 private:
 	void buildRootSignature();

@@ -9,6 +9,7 @@
 #include <unordered_map>
 
 class ParticleSystem;
+class ParticleSystemManager;
 class PassConstantBuffer;
 class TextureBuffer;
 class ImguiInitializer;
@@ -44,8 +45,11 @@ private:
 	virtual void update(const GameTimer& gt) override;
 	virtual void draw(const GameTimer& gt) override;
 
+	void drawObjects(ID3D12GraphicsCommandList* commandList, const GameTimer& gt);
+	void drawUi(ID3D12GraphicsCommandList* commandList);
+
 	void loadTextures(ID3D12GraphicsCommandList* commandList);
-	void buildCbvSrvUavDescriptors();
+	void registerCbvSrvUavDescriptors();
 	void buildMaterials();
 	void buildRootSignature();
 	void buildShadersAndInputLayout();
@@ -83,7 +87,7 @@ private:
 
 	POINT lastMousePos;
 
-	std::vector<std::unique_ptr<ParticleSystem>> _particleSystems;
+	std::unique_ptr<ParticleSystemManager> _particleSystemManager;
 	std::unique_ptr<ImguiInitializer> _imguiInitializer;
 	std::unique_ptr<ParticleSystemController> _particleSystemController;
 };

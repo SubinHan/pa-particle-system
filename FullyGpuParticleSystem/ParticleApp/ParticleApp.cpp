@@ -4,7 +4,10 @@
 #include "Core/UploadBuffer.h"
 #include "Core/PassConstantBuffer.h"
 #include "Core/ParticleSystem.h"
+#include "Core/ParticleSystemManager.h"
 #include "Core/TextureBuffer.h"
+#include "Core/TextureManager.h"
+#include "Core/MaterialManager.h"
 #include "Model/Geometry.h"
 #include "Model/Material.h"
 #include "Model/Texture.h"
@@ -42,18 +45,14 @@ bool ParticleApp::initialize()
 	if (!MainWindow::initialize())
 		return false;
 
+	auto commandList = _device->startRecordingCommands();
+
 	_imguiInitializer = std::make_unique<ImguiInitializer>(_device.get(), _hwnd);
 
-	_particleSystems.push_back(std::move(
-		std::make_unique<ParticleSystem>(_device.get(), "ParticleSystem0")));
-
-	_particleSystems.push_back(std::move(
-		std::make_unique<ParticleSystem>(_device.get(), "ParticleSystem1")));
+	_particleSystemManager = std::make_unique<ParticleSystemManager>(_device.get());
 
 	_particleSystemController =
-		std::make_unique<ParticleSystemController>(&_particleSystems);
-
-	auto commandList = _device->startRecordingCommands();
+		std::make_unique<ParticleSystemController>(_particleSystemManager.get());
 
 	_passConstantBuffer =
 		std::make_shared<PassConstantBuffer>(
@@ -61,7 +60,7 @@ bool ParticleApp::initialize()
 
 	// be careful about order!! load texture - buildDescriptors - buildMaterials
 	loadTextures(commandList.Get());
-	buildCbvSrvUavDescriptors();
+	registerCbvSrvUavDescriptors();
 	buildMaterials();
 	buildRootSignature();
 	buildShadersAndInputLayout();
@@ -70,17 +69,17 @@ bool ParticleApp::initialize()
 
 	_device->submitCommands(commandList);
 
-	// init Particle Systems
-	auto newWorld = DirectX::XMMatrixRotationY(MathHelper::Pi);
-	DirectX::XMFLOAT4X4 newWorldFloat4x4;
-	DirectX::XMStoreFloat4x4(&newWorldFloat4x4, newWorld);
-	_particleSystems[0]->setWorldTransform(newWorldFloat4x4);
+	//// init Particle Systems
+	//auto newWorld = DirectX::XMMatrixRotationY(MathHelper::Pi);
+	//DirectX::XMFLOAT4X4 newWorldFloat4x4;
+	//DirectX::XMStoreFloat4x4(&newWorldFloat4x4, newWorld);
+	//_particleSystems[0]->setWorldTransform(newWorldFloat4x4);
 
-	_particleSystems[0]->setMaterial(_materials["particle"].get());
-	_particleSystems[1]->setMaterial(_materials["particle"].get());
+	//_particleSystems[0]->setMaterial(_materials["particle"].get());
+	//_particleSystems[1]->setMaterial(_materials["particle"].get());
 
-	_particleSystems[0]->setSpawnRate(10000.0f);
-	_particleSystems[1]->setSpawnRate(10000.0f);
+	//_particleSystems[0]->setSpawnRate(10000.0f);
+	//_particleSystems[1]->setSpawnRate(10000.0f);
 
 	return true;
 }
@@ -131,8 +130,31 @@ void ParticleApp::update(const GameTimer& gt)
 
 void ParticleApp::draw(const GameTimer& gt)
 {
-	auto commandList = _device->startRecordingCommands();
+	auto currentBackBuffer = _device->getCurrentBackBuffer();
 
+	auto commandList = _device->startRecordingCommands();
+	drawObjects(commandList.Get(), gt);
+	_device->submitCommands(commandList);
+
+	commandList = _device->startRecordingCommands();
+	drawUi(commandList.Get());
+	_device->submitCommands(commandList);
+
+	commandList = _device->startRecordingCommands();
+	auto barrierDraw = CD3DX12_RESOURCE_BARRIER::Transition(
+		currentBackBuffer,
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_PRESENT
+	);
+
+	commandList->ResourceBarrier(1, &barrierDraw);
+
+	_device->submitCommands(commandList);
+	_device->swapBuffers();
+}
+
+void ParticleApp::drawObjects(ID3D12GraphicsCommandList* commandList, const GameTimer& gt)
+{
 	auto cbvSrvUavDescriptorHeap = _device->getCbvSrvUavDescriptorHeap();
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { cbvSrvUavDescriptorHeap.Get() };
@@ -182,8 +204,25 @@ void ParticleApp::draw(const GameTimer& gt)
 	//	0, 
 	//	0);
 
-	fireDrawToParticleSystems(commandList.Get(), gt);
+	fireDrawToParticleSystems(commandList, gt);
+}
 
+void ParticleApp::drawUi(ID3D12GraphicsCommandList* commandList)
+{
+	auto cbvSrvUavDescriptorHeap = _device->getCbvSrvUavDescriptorHeap();
+
+	ID3D12DescriptorHeap* descriptorHeaps[] = { cbvSrvUavDescriptorHeap.Get() };
+	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+	auto currentBackBuffer = _device->getCurrentBackBuffer();
+	auto currentBackBufferView = _device->getCurrentBackBufferViewHandle();
+	auto depthStencilView = _device->getDepthStencilViewHandle();
+
+	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+	commandList->RSSetViewports(1, &_device->getScreenViewport());
+	commandList->RSSetScissorRects(1, &_device->getScissorRect());
+	commandList->OMSetRenderTargets(1, &currentBackBufferView,
+		true, &depthStencilView);
 	// render imgui
 
 	// Start the Dear ImGui frame
@@ -197,25 +236,14 @@ void ParticleApp::draw(const GameTimer& gt)
 	// Rendering
 	ImGui::Render();
 
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
-
-	auto barrierDraw = CD3DX12_RESOURCE_BARRIER::Transition(
-		currentBackBuffer,
-		D3D12_RESOURCE_STATE_RENDER_TARGET,
-		D3D12_RESOURCE_STATE_PRESENT
-	);
-
-	commandList->ResourceBarrier(1, &barrierDraw);
-
-	_device->submitCommands(commandList);
-	_device->swapBuffers();
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 }
 
 void ParticleApp::loadTextures(ID3D12GraphicsCommandList* commandList)
 {
 	// parallel vectors:
 	const std::vector<std::string> texturesName = {
-		"circle"
+		"default"
 	};
 
 	const std::vector<std::wstring> texturesPath = {
@@ -226,27 +254,21 @@ void ParticleApp::loadTextures(ID3D12GraphicsCommandList* commandList)
 
 	for (int i = 0; i < texturesName.size(); ++i)
 	{
-		_textures[texturesName[i]] =
-			std::move(std::make_unique<TextureBuffer>(
-				texturesPath[i],
-				_device.get(), 
-				commandList));
+		TextureManager* textureManager = TextureManager::getInstance();
+		textureManager->loadTexture(
+			commandList,
+			_device.get(),
+			texturesName[i],
+			texturesPath[i]);
 	}
 }
-void ParticleApp::buildCbvSrvUavDescriptors()
+void ParticleApp::registerCbvSrvUavDescriptors()
 {
-	// register particle systems
-	for (auto& particleSystem : _particleSystems)
-	{
-		_device->registerCbvSrvUavDescriptorDemander(
-			particleSystem.get());
-	}
-
-	// register textures
-	for (auto& [_, texture] : _textures)
-	{
-		_device->registerCbvSrvUavDescriptorDemander(texture.get());
-	}
+	//// register textures
+	//for (auto& [_, texture] : _textures)
+	//{
+	//	_device->registerCbvSrvUavDescriptorDemander(texture.get());
+	//}
 
 	// register cbv demander
 
@@ -256,23 +278,24 @@ void ParticleApp::buildCbvSrvUavDescriptors()
 	// register imgui
 	_device->registerCbvSrvUavDescriptorDemander(
 		_imguiInitializer.get());
-
-	// create descriptor heap
-	_device->buildCbvSrvUavDescriptorHeap();
 }
 
 void ParticleApp::buildMaterials()
 {
-	auto particleMat = std::make_unique<Material>();
+	MaterialManager* materialManager = MaterialManager::getInstance();
 
-	particleMat->Name = "particle";
-	particleMat->MatCBIndex = 0;
-	particleMat->DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
-	particleMat->FresnelR0 = { 0.3f, 0.3f, 0.3f };
-	particleMat->DiffuseSrvHandle = _textures["circle"]->getSrvGpuHandle();
-	particleMat->Roughness = 0.01f;
+	Material defaultMat{};
 
-	_materials[particleMat->Name] = std::move(particleMat);
+	defaultMat.Name = "default";
+	defaultMat.MatCBIndex = 0;
+	defaultMat.DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+	defaultMat.FresnelR0 = { 0.3f, 0.3f, 0.3f };
+	defaultMat.DiffuseTextureName = "default";
+	defaultMat.Roughness = 0.01f;
+
+	//_materials[particleMat->Name] = std::move(particleMat);
+
+	materialManager->addMaterial(defaultMat);
 }
 
 
@@ -457,9 +480,9 @@ void ParticleApp::updateCamera(const GameTimer& gt)
 
 void ParticleApp::fireDrawToParticleSystems(ID3D12GraphicsCommandList* cmdList, const GameTimer& gt)
 {
-	for (auto& particleSystem : _particleSystems)
+	for (int i = 0; i < _particleSystemManager->getNumParticleSystems(); ++i)
 	{
-		particleSystem->onDraw(cmdList, *_passConstantBuffer, gt);
+		_particleSystemManager->getParticleSystemByIndex(i)->onDraw(cmdList, *_passConstantBuffer, gt);
 	}
 }
 

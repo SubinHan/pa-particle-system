@@ -218,25 +218,58 @@ void DxDevice::updateScissorRect()
 
 ComPtr<ID3D12GraphicsCommandList> DxDevice::startRecordingCommands(void)
 {
+    if (_bRecordingCommands)
+    {
+        return _commandList;;
+    }
+
     ThrowIfFailed(_commandListAllocator->Reset());
     _commandList->Reset(_commandListAllocator.Get(), nullptr);
+    _bRecordingCommands = true;
 
     return _commandList;
 }
 
 void DxDevice::submitCommands(ComPtr<ID3D12GraphicsCommandList> commandList)
 {
+    if (!_bRecordingCommands)
+        return;
+
     ThrowIfFailed(commandList->Close());
+    _bRecordingCommands = false;
 
     ID3D12CommandList* cmdsLists[] = { commandList.Get() };
     _commandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
     flushCommandQueue();
+
+
+    if (_needsUpdateDescriptorHeap)
+    {
+        buildCbvSrvUavDescriptorHeap();
+        _needsUpdateDescriptorHeap = false;
+    }
 }
 
 void DxDevice::registerCbvSrvUavDescriptorDemander(ICbvSrvUavDemander* demander)
 {
     _cbvSrvUavDescriptorDemanders.push_back(demander);
+
+    _needsUpdateDescriptorHeap = true;
+}
+
+void DxDevice::unregisterCbvSrvUavDescriptorDemander(ICbvSrvUavDemander* demander)
+{
+    for (int i = 0; i < _cbvSrvUavDescriptorDemanders.size(); ++i)
+    {
+        if (_cbvSrvUavDescriptorDemanders[i] == demander)
+        {
+            _cbvSrvUavDescriptorDemanders.erase(_cbvSrvUavDescriptorDemanders.begin() + i);
+            return;
+        }
+    }
+
+    return;
 }
 
 void DxDevice::buildCbvSrvUavDescriptorHeap()

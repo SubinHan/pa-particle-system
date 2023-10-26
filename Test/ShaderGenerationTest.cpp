@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "CppUnitTest.h"
-#include "../FullyGpuParticleSystem/Include/Core/HlslTranslator.h"
-#include "../FullyGpuParticleSystem/Include/Core/HlslTranslatorEmit.h"
+#include "../FullyGpuParticleSystem/Include/Core/HlslGeneratorEmit.h"
 
 #include <fstream>
 #include <Windows.h>
@@ -22,8 +21,8 @@ namespace Test
 			
 			remove(outputPathString.c_str());
 
-			HlslTranslator translator(PROJECT_DIR + L"FullyGpuParticleSystem/ParticleSystemShaders/ParticleEmitCSBase.hlsl");
-			translator.compile(OUTPUT_PATH);
+			HlslGeneratorEmit generator(PROJECT_DIR + L"FullyGpuParticleSystem/ParticleSystemShaders/ParticleEmitCSBase.hlsl");
+			generator.compile(OUTPUT_PATH);
 
 			std::ifstream fin;
 			fin.open(OUTPUT_PATH);
@@ -47,10 +46,10 @@ namespace Test
 
 			remove(outputPathString.c_str());
 
-			HlslTranslator translator(PROJECT_DIR + L"FullyGpuParticleSystem/ParticleSystemShaders/ParticleEmitCSBase.hlsl");
-			UINT float4Index = translator.newFloat4(1.0f, 1.0f, 1.0f, 1.0f);
+			HlslGeneratorEmit generator(PROJECT_DIR + L"FullyGpuParticleSystem/ParticleSystemShaders/ParticleEmitCSBase.hlsl");
+			UINT float4Index = generator.newFloat4(1.0f, 1.0f, 1.0f, 1.0f);
 
-			translator.compile(OUTPUT_PATH);
+			generator.compile(OUTPUT_PATH);
 
 			// assert
 			std::ifstream fin;
@@ -89,14 +88,14 @@ namespace Test
 
 			remove(outputPathString.c_str());
 
-			HlslTranslator translator(PROJECT_DIR + L"FullyGpuParticleSystem/ParticleSystemShaders/ParticleEmitCSBase.hlsl");
-			UINT float4Index1 = translator.newFloat4(1.0f, 1.0f, 1.0f, 1.0f);
-			UINT float4Index2 = translator.randFloat4();
-			UINT float4Index5 = translator.newFloat(1.0f);
-			UINT float4Index3 = translator.setAlpha(float4Index2, float4Index5);
-			UINT float4Index4 = translator.addFloat4(float4Index1, float4Index3);
+			HlslGeneratorEmit generator(PROJECT_DIR + L"FullyGpuParticleSystem/ParticleSystemShaders/ParticleEmitCSBase.hlsl");
+			UINT float4Index1 = generator.newFloat4(1.0f, 1.0f, 1.0f, 1.0f);
+			UINT float4Index2 = generator.randFloat4();
+			UINT float4Index5 = generator.newFloat(1.0f);
+			UINT float4Index3 = generator.setAlpha(float4Index2, float4Index5);
+			UINT float4Index4 = generator.addFloat4(float4Index1, float4Index3);
 
-			translator.compile(OUTPUT_PATH);
+			generator.compile(OUTPUT_PATH);
 
 			// assert
 			std::ifstream fin;
@@ -130,7 +129,7 @@ namespace Test
 					didGenerateLocal1 = true;
 				}
 
-				if (line.find("float4 local2") != std::string::npos)
+				if (line.find("float local2") != std::string::npos)
 				{
 					didGenerateLocal2 = true;
 				}
@@ -157,22 +156,22 @@ namespace Test
 
 			remove(outputPathString.c_str());
 
-			HlslTranslatorEmit translator(PROJECT_DIR + L"FullyGpuParticleSystem/ParticleSystemShaders/ParticleEmitCSBase.hlsl");
-			UINT positionIndex = translator.newFloat3(0.0f, 0.0f, 0.0f);
-			UINT velocityIndex = translator.randFloat3();
-			UINT accelerationIndex = translator.newFloat3(0.0f, -0.1f, 0.0f);
-			UINT lifetimeIndex = translator.newFloat(4.0f);
-			UINT sizeIndex = translator.newFloat(0.05f);
-			UINT opacityIndex = translator.newFloat(1.0f);
+			HlslGeneratorEmit generator(PROJECT_DIR + L"FullyGpuParticleSystem/ParticleSystemShaders/ParticleEmitCSBase.hlsl");
+			UINT positionIndex = generator.newFloat3(0.0f, 0.0f, 0.0f);
+			UINT velocityIndex = generator.randFloat3();
+			UINT accelerationIndex = generator.newFloat3(0.0f, -0.1f, 0.0f);
+			UINT lifetimeIndex = generator.newFloat(4.0f);
+			UINT sizeIndex = generator.newFloat(0.05f);
+			UINT opacityIndex = generator.newFloat(1.0f);
 
-			translator.setInitialPosition(positionIndex);
-			translator.setInitialVelocity(velocityIndex);
-			translator.setInitialAcceleration(accelerationIndex);
-			translator.setInitialLifetime(lifetimeIndex);
-			translator.setInitialSize(sizeIndex);
-			translator.setInitialOpacity(opacityIndex);
+			generator.setInitialPosition(positionIndex);
+			generator.setInitialVelocity(velocityIndex);
+			generator.setInitialAcceleration(accelerationIndex);
+			generator.setInitialLifetime(lifetimeIndex);
+			generator.setInitialSize(sizeIndex);
+			generator.setInitialOpacity(opacityIndex);
 
-			translator.compile(OUTPUT_PATH);
+			generator.compile(OUTPUT_PATH);
 
 			// assert
 			std::ifstream fin;

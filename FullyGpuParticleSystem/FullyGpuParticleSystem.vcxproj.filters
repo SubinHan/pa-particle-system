@@ -216,10 +216,22 @@
     <ClInclude Include="Include\Ui\NodeEditorRender.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Ui\NodeEditorIo.h">
+    <ClInclude Include="Include\Io\NodeEditorIo.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Include\Core\ParticleSystemManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\MaterialManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\TextureManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Io\ParticleSystemIo.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Model\RendererType.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -410,10 +422,19 @@
     <ClCompile Include="Source\Ui\NodeEditorRender.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Ui\NodeEditorIo.cpp">
+    <ClCompile Include="Source\Io\NodeEditorIo.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\ParticleSystemManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\MaterialManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\TextureManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Io\ParticleSystemIo.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

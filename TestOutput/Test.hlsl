@@ -1,6 +1,6 @@
-#include "Util.hlsl"
+#include "ParticleApp/Shaders/Util.hlsl"
 #include "ParticleApp/Shaders/Particle.hlsl"
-#include "ParticleSystem.hlsl"
+#include "ParticleApp/Shaders/ParticleSystem.hlsl"
 
 cbuffer cbEmitConstants : register(b1)
 {

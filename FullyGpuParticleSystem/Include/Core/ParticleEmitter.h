@@ -41,7 +41,7 @@ public:
 		float deltaTime);
 
 	void compileShaders();
-	void setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader);
+	void setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
 
 private:
 	void buildRootSignature();

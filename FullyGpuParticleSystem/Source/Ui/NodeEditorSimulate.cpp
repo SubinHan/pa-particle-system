@@ -22,7 +22,7 @@ void NodeEditorSimulate::onCompileButtonClicked()
 {
 	HlslTranslatorSimulate translator(_nodes, _links);
 
-	_simulator->setShaderPs(translator.compileShader());
+	_simulator->setShader(translator.compileShader());
 }
 
 void NodeEditorSimulate::load()

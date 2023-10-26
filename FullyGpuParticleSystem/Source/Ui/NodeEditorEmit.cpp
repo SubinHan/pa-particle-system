@@ -4,7 +4,6 @@
 #include "Core/HlslTranslatorEmit.h"
 #include "Ui/UiNodeFactory.h"
 #include "Ui/NodeType.h"
-#include "Ui/NodeEditorIo.h"
 
 NodeEditorEmit::NodeEditorEmit(ParticleEmitter* emitter) :
     NodeEditor(),
@@ -23,7 +22,7 @@ void NodeEditorEmit::onCompileButtonClicked()
 {
     HlslTranslatorEmit translator(_nodes, _links);
 
-    _emitter->setShaderPs(translator.compileShader());
+    _emitter->setShader(translator.compileShader());
 }
 
 void NodeEditorEmit::load()

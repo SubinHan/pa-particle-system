@@ -26,8 +26,9 @@ public:
 	void submitCommands(ComPtr<ID3D12GraphicsCommandList> commandList);
 
 	void registerCbvSrvUavDescriptorDemander(
-		ICbvSrvUavDemander* demander
-	);
+		ICbvSrvUavDemander* demander);
+	void unregisterCbvSrvUavDescriptorDemander(
+		ICbvSrvUavDemander* demander);
 	// build descriptor heap sized by registered descriptor demanders.
 	void buildCbvSrvUavDescriptorHeap();
 
@@ -126,4 +127,6 @@ private:
 	tagRECT			_scissorRect;
 
 	std::vector<ICbvSrvUavDemander*> _cbvSrvUavDescriptorDemanders;
+	bool _needsUpdateDescriptorHeap;
+	bool _bRecordingCommands;
 };

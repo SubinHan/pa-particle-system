@@ -11,15 +11,6 @@ ImguiInitializer::ImguiInitializer(DxDevice* device, HWND hwnd) :
 	_device(device),
 	_hwnd(hwnd)
 {
-}
-
-int ImguiInitializer::getNumDescriptorsToDemand() const
-{
-	return 1;
-}
-
-void ImguiInitializer::buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD3DX12_GPU_DESCRIPTOR_HANDLE hGpu)
-{
 	// init imgui
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -38,6 +29,20 @@ void ImguiInitializer::buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD3DX1
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
 	ImGui::StyleColorsDark();
+}
+
+int ImguiInitializer::getNumDescriptorsToDemand() const
+{
+	return 1;
+}
+
+void ImguiInitializer::buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD3DX12_GPU_DESCRIPTOR_HANDLE hGpu)
+{
+	if (_isInit)
+	{
+		ImGui_ImplWin32_Shutdown();
+		ImGui_ImplDX12_Shutdown();
+	}
 
 	ImGui_ImplWin32_Init(_hwnd);
 	ImGui_ImplDX12_Init(
@@ -47,4 +52,6 @@ void ImguiInitializer::buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD3DX1
 		_device->getCbvSrvUavDescriptorHeap().Get(),
 		hCpu,
 		hGpu);
+
+	_isInit = true;
 }

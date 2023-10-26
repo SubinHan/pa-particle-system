@@ -15,12 +15,15 @@ struct Material
 
 	// gpu handle for diffuse map texture.
 	CD3DX12_GPU_DESCRIPTOR_HANDLE DiffuseSrvHandle;
+	std::string DiffuseTextureName;
 
 	// gpu handle for normal map texture.
 	CD3DX12_GPU_DESCRIPTOR_HANDLE NormalSrvHandle;
+	std::string NormalTextureName;
 
 	// gpu handle for displacement map texture.
 	CD3DX12_GPU_DESCRIPTOR_HANDLE DisplacementSrvHandle;
+	std::string DisplacementTextureName;
 
 	// Material constant buffer data used for shading.
 	DirectX::XMFLOAT4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };

@@ -8,13 +8,15 @@
 #include "Core/ParticleSimulator.h"
 #include "Core/ParticleRenderer.h"
 #include "Model/ObjectConstants.h"
+#include "Model/Material.h"
 
 #include <iostream>
 
 ParticleSystem::ParticleSystem(DxDevice* device, std::string name) :
 	_device(device),
 	_name(name),
-	_spawnRate(0.0f),
+	_spawnRate(100.0f),
+	_spawnRateInv(1.0f / _spawnRate),
 	_deltaTimeAfterSpawn(0.0f)
 {
 	init();
@@ -30,6 +32,8 @@ int ParticleSystem::getNumDescriptorsToDemand() const
 void ParticleSystem::buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD3DX12_GPU_DESCRIPTOR_HANDLE hGpu)
 {
 	_resource->buildCbvSrvUav(hCpu, hGpu);
+
+	_canDraw = true;
 }
 
 void ParticleSystem::onDraw(
@@ -37,6 +41,9 @@ void ParticleSystem::onDraw(
 	const PassConstantBuffer& passCb, 
 	const GameTimer& gt)
 {
+	if (!_canDraw)
+		return;
+
 	ObjectConstants objConstants = {};
 	
 	DirectX::XMMATRIX world = XMLoadFloat4x4(&_world);
@@ -56,10 +63,12 @@ void ParticleSystem::onDraw(
 	unsigned int numSpawn = 0;
 
 	numSpawn = _deltaTimeAfterSpawn * _spawnRate;
-	_deltaTimeAfterSpawn -= _spawnRateInv * static_cast<float>(numSpawn);
 
 	if (numSpawn > 0)
 	{
+		_deltaTimeAfterSpawn -= _spawnRateInv * static_cast<float>(numSpawn);
+		_deltaTimeAfterSpawn = max(0.0f, _deltaTimeAfterSpawn);
+
 		_emitter->emitParticles(
 			commandList,
 			objConstants,
@@ -128,14 +137,15 @@ void ParticleSystem::setWorldTransform(const DirectX::XMFLOAT4X4& newWorldTransf
 	_world = newWorldTransform;
 }
 
-void ParticleSystem::setMaterial(Material* material)
+void ParticleSystem::setRenderMaterialName(std::string materialName)
 {
-	_renderer->setMaterial(material);
+	_renderer->setMaterialName(materialName);
 }
 
 void ParticleSystem::setSpawnRate(float spawnRate)
 {
 	_spawnRate = spawnRate;
+
 	_spawnRateInv = 1.0f / _spawnRate;
 }
 
@@ -159,9 +169,14 @@ std::string ParticleSystem::getName()
 	return _name;
 }
 
+float ParticleSystem::getSpawnRate()
+{
+	return _spawnRate;
+}
+
 void ParticleSystem::init()
 {
-	auto commandList = _device->startRecordingCommands();
+	auto commandList = _device->getCommandList();
 
 	_resource = std::make_unique<ParticleResource>(
 		_device->getD3dDevice(), 
@@ -169,19 +184,19 @@ void ParticleSystem::init()
 	_emitter = std::make_unique<ParticleEmitter>(
 		_device->getD3dDevice(),
 		_resource.get(),
-		_name + "Emitter");
+		_name + "_Emitter");
 	_sorter = std::make_unique<ParticleSorter>(
 		_device->getD3dDevice(),
 		_resource.get(),
-		_name + "Sorter");
+		_name + "_Sorter");
 	_simulator = std::make_unique<ParticleSimulator>(
 		_device->getD3dDevice(),
 		_resource.get(),
-		_name + "Simulator");
+		_name + "_Simulator");
 	_renderer = std::make_unique<ParticleRenderer>(
 		_device,
 		_resource.get(),
-		_name + "Renderer");
+		_name + "_Renderer");
 
-	_device->submitCommands(commandList);
+	//_device->submitCommands(commandList);
 }

@@ -96,7 +96,7 @@ void ParticleEmitter::compileShaders()
 		"cs_5_1");
 }
 
-void ParticleEmitter::setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader)
+void ParticleEmitter::setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 {
 	_shader = shader;
 	buildPsos();
@@ -153,10 +153,17 @@ void ParticleEmitter::buildRootSignature()
 void ParticleEmitter::buildShaders()
 {
 	UINT positionIndex = _hlslGenerator->newFloat3(0.0f, 0.0f, 0.0f);
-	UINT velocityIndex = _hlslGenerator->randFloat3();
+
+	UINT randFloat3 = _hlslGenerator->randFloat3();
+	UINT minusHalfFloat3 = _hlslGenerator->newFloat3(-0.5f, -0.5f, -0.5f);
+	UINT velocityIndex = _hlslGenerator->addFloat3(randFloat3, minusHalfFloat3);
+
 	UINT accelerationIndex = _hlslGenerator->newFloat3(0.0f, -1.0f, 0.0f);
+
 	UINT lifetimeIndex = _hlslGenerator->newFloat(4.0f);
+
 	UINT sizeIndex = _hlslGenerator->newFloat(0.05f);
+
 	UINT opacityIndex = _hlslGenerator->newFloat(1.0f);
 
 	_hlslGenerator->setInitialPosition(positionIndex);

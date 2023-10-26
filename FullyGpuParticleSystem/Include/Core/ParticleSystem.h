@@ -32,8 +32,8 @@ public:
 		const GameTimer& gt);
 
 	void setWorldTransform(const DirectX::XMFLOAT4X4& newWorldTransform);
-	void setMaterial(Material* material);
-	
+	void setRenderMaterialName(std::string materialName);	
+
 	/// <summary>
 	/// Set number of particles to spawn per a second.
 	/// </summary>
@@ -45,6 +45,7 @@ public:
 	ParticleRenderer* getRenderer();
 
 	std::string getName();
+	float getSpawnRate();
 
 private:
 	void init();
@@ -64,4 +65,6 @@ private:
 	float _spawnRate;
 	float _spawnRateInv;
 	float _deltaTimeAfterSpawn;
+
+	bool _canDraw;
 };

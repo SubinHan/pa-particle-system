@@ -15,4 +15,6 @@ public:
 private:
 	DxDevice* _device;
 	HWND _hwnd;
+
+	bool _isInit;
 };

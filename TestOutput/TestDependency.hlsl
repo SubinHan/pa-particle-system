@@ -1,6 +1,6 @@
-#include "Util.hlsl"
+#include "ParticleApp/Shaders/Util.hlsl"
 #include "ParticleApp/Shaders/Particle.hlsl"
-#include "ParticleSystem.hlsl"
+#include "ParticleApp/Shaders/ParticleSystem.hlsl"
 
 cbuffer cbEmitConstants : register(b1)
 {
@@ -45,10 +45,11 @@ void EmitCS(
 
 	Particle newParticle;
 
+float local2 = float(1.000000);
+float4 local1 = float4(random(0.101251 + DeltaTime + float(dispatchThreadId.x)), random(0.201251 + DeltaTime + float(dispatchThreadId.x)), random(0.301251 + DeltaTime + float(dispatchThreadId.x)), random(0.401251 + DeltaTime + float(dispatchThreadId.x)));
+float4 local3 = float4(local1.xyz, local2);
 float4 local0 = float4(1.000000, 1.000000, 1.000000, 1.000000);
-float4 local1 = float4(random(0.101251 + DeltaTime), random(0.201251 + DeltaTime), random(0.301251 + DeltaTime), random(0.401251 + DeltaTime));
-float4 local3 = local0 + local2;
-float4 local2 = float4(local1.xyz, 1.000000);
+float4 local4 = local0 + local3;
 
 	newParticle.Color = float3(1.0f, 0.0f, 0.0f);
 

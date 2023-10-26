@@ -4,6 +4,8 @@
 #include "Core/HlslGeneratorRender.h"
 #include "Core/ParticleResource.h"
 #include "Core/PassConstantBuffer.h"
+#include "Core/MaterialManager.h"
+#include "Core/TextureManager.h"
 #include "Model/Material.h"
 #include "Model/ObjectConstants.h"
 #include "Util/DxDebug.h"
@@ -27,6 +29,7 @@ ParticleRenderer::ParticleRenderer(DxDevice* device, ParticleResource* resource,
 	_device(device),
 	_resource(resource),
 	_name(name),
+	_materialName("default"),
 	_hlslGenerator(std::make_unique<HlslGeneratorRender>(BASE_RENDER_SHADER_PATH))
 {
 	buildRootSignature();
@@ -42,9 +45,9 @@ std::string ParticleRenderer::getName()
 	return _name;
 }
 
-void ParticleRenderer::setMaterial(Material* material)
+void ParticleRenderer::setMaterialName(std::string materialName)
 {
-	_material = material;
+	_materialName = materialName;
 }
 
 void ParticleRenderer::render(
@@ -100,7 +103,7 @@ void ParticleRenderer::render(
 
 	cmdList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_POINTLIST);
 
-	cmdList->SetPipelineState(_psoTransparency.Get());
+	cmdList->SetPipelineState(_isOpaque ? _psoOpaque.Get() : _psoTransparency.Get());
 	cmdList->SetGraphicsRoot32BitConstants(ROOT_SLOT_OBJECT_CONSTANTS_BUFFER, sizeof(ObjectConstants) / 4, &objectConstants, 0);
 	cmdList->SetGraphicsRootDescriptorTable(
 		ROOT_SLOT_PASS_CONSTANTS_BUFFER, passCb.getGpuHandle());
@@ -108,8 +111,14 @@ void ParticleRenderer::render(
 		ROOT_SLOT_PARTICLES_BUFFER, _resource->getParticlesResource()->GetGPUVirtualAddress());
 	cmdList->SetGraphicsRootShaderResourceView(
 		ROOT_SLOT_ALIVES_INDICES_BUFFER, _resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
+
+	TextureManager* textureManager = TextureManager::getInstance();
+	MaterialManager* materialManager = MaterialManager::getInstance();
+
+	auto diffuseSrvHandle = textureManager->getSrvGpuHandle(
+		materialManager->getMaterial(_materialName).DiffuseTextureName);
 	cmdList->SetGraphicsRootDescriptorTable(
-		ROOT_SLOT_DIFFUSE_MAP_BUFFER, _material->DiffuseSrvHandle);
+		ROOT_SLOT_DIFFUSE_MAP_BUFFER, diffuseSrvHandle);
 
 	_resource->transitCommandBufferToIndirectArgument(cmdList);
 
@@ -155,6 +164,16 @@ void ParticleRenderer::setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 {
 	_shaderPs = shader;
 	buildPsos();
+}
+
+bool ParticleRenderer::isOpaque()
+{
+	return _isOpaque;
+}
+
+void ParticleRenderer::setOpaque(bool newIsOpaque)
+{
+	_isOpaque = newIsOpaque;
 }
 
 void ParticleRenderer::buildRootSignature()

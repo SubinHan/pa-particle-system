@@ -3,6 +3,7 @@
 #include "Core/Hashable.h"
 #include "Util/DxUtil.h"
 #include "Model/Geometry.h"
+#include "Model/Material.h"
 
 #include <wrl.h>
 
@@ -23,7 +24,7 @@ public:
 	ParticleRenderer(DxDevice* device, ParticleResource* resource, std::string name);
 
 	std::string getName();
-	void setMaterial(Material* material);
+	void setMaterialName(std::string material);
 
 	void render(
 		ID3D12GraphicsCommandList* cmdList,
@@ -32,6 +33,9 @@ public:
 
 	void compileShaders();
 	void setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader);
+
+	bool isOpaque();
+	void setOpaque(bool newIsOpaque);
 
 private:
 	void buildRootSignature();
@@ -43,7 +47,7 @@ private:
 
 	DxDevice* _device;
 	ParticleResource* _resource;
-	Material* _material;
+	std::string _materialName;
 
 	std::string _name;
 
@@ -65,4 +69,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoCompute;
 
 	std::unique_ptr<MeshGeometry> _emptyGeometry = nullptr;
+
+	bool _isOpaque;
 };

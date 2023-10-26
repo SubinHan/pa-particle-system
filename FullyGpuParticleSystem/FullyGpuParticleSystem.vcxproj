@@ -173,6 +173,7 @@
     <ClInclude Include="Include\Core\MainWindow.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="FullyGpuParticleSystem.h" />
+    <ClInclude Include="Include\Core\MaterialManager.h" />
     <ClInclude Include="Include\Core\ParticleSorter.h" />
     <ClInclude Include="Include\Core\HlslTranslatorEmit.h" />
     <ClInclude Include="Include\Core\ParticleSystemManager.h" />
@@ -193,7 +194,9 @@
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetAlpha.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.h" />
     <ClInclude Include="Include\Core\TextureBuffer.h" />
+    <ClInclude Include="Include\Core\TextureManager.h" />
     <ClInclude Include="Include\Core\UploadBuffer.h" />
+    <ClInclude Include="Include\Io\ParticleSystemIo.h" />
     <ClInclude Include="Include\Model\Emitter.h" />
     <ClInclude Include="Include\Model\Geometry.h" />
     <ClInclude Include="Include\Model\Material.h" />
@@ -202,11 +205,12 @@
     <ClInclude Include="Include\Core\ParticleSystem.h" />
     <ClInclude Include="Include\Model\PassConstants.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNode.h" />
+    <ClInclude Include="Include\Model\RendererType.h" />
     <ClInclude Include="Include\Model\Texture.h" />
     <ClInclude Include="Include\Ui\IWindow.h" />
     <ClInclude Include="Include\Ui\NodeEditor.h" />
     <ClInclude Include="Include\Ui\NodeEditorEmit.h" />
-    <ClInclude Include="Include\Ui\NodeEditorIo.h" />
+    <ClInclude Include="Include\Io\NodeEditorIo.h" />
     <ClInclude Include="Include\Ui\NodeEditorRender.h" />
     <ClInclude Include="Include\Ui\NodeEditorSimulate.h" />
     <ClInclude Include="Include\Ui\NodeType.h" />
@@ -247,6 +251,7 @@
     <ClCompile Include="Source\Core\HlslTranslatorEmit.cpp" />
     <ClCompile Include="Source\Core\HlslTranslatorRender.cpp" />
     <ClCompile Include="Source\Core\ImguiInitializer.cpp" />
+    <ClCompile Include="Source\Core\MaterialManager.cpp" />
     <ClCompile Include="Source\Core\ParticleSystemManager.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.cpp" />
@@ -280,9 +285,11 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.cpp" />
     <ClCompile Include="Source\Core\TextureBuffer.cpp" />
     <ClCompile Include="Source\Core\HlslTranslatorSimulate.cpp" />
+    <ClCompile Include="Source\Core\TextureManager.cpp" />
+    <ClCompile Include="Source\Io\ParticleSystemIo.cpp" />
     <ClCompile Include="Source\Ui\NodeEditor.cpp" />
     <ClCompile Include="Source\Ui\NodeEditorEmit.cpp" />
-    <ClCompile Include="Source\Ui\NodeEditorIo.cpp" />
+    <ClCompile Include="Source\Io\NodeEditorIo.cpp" />
     <ClCompile Include="Source\Ui\NodeEditorRender.cpp" />
     <ClCompile Include="Source\Ui\NodeEditorSimulate.cpp" />
     <ClCompile Include="Source\Ui\ParticleSystemController.cpp" />

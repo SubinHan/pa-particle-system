@@ -93,7 +93,7 @@ void ParticleSimulator::compileShader()
 		"cs_5_1");
 }
 
-void ParticleSimulator::setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader)
+void ParticleSimulator::setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 {
 	_shader = shader;
 	buildPsos();
