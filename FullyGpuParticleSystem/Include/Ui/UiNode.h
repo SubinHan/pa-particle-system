@@ -30,6 +30,7 @@ public:
     std::string getOutputName(const int index) const;
 
     bool containsAttributeAsInput(const int attributeId) const;
+    bool containsAttributeAsOutput(const int attributeId) const;
     int getInputIndexByAttributeId(const int attributeId) const;
     int getInputId(const int index) const;
     int getOutputId();

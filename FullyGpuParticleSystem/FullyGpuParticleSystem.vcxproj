@@ -180,6 +180,8 @@
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeClip.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeDragForce.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeEmpty.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeGetFloat3ByVariableName.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeGetFloatByVariableName.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMaskW.h" />
@@ -190,9 +192,12 @@
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewFloat4.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat3.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat4.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodePointAttractionForce.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSampleTexture2d.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetAlpha.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeVortexForce.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeWindForce.h" />
     <ClInclude Include="Include\Core\TextureBuffer.h" />
     <ClInclude Include="Include\Core\TextureManager.h" />
     <ClInclude Include="Include\Core\UploadBuffer.h" />
@@ -256,6 +261,8 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeClip.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeDragForce.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeEmpty.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeGetFloat3ByVariableName.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeGetFloatByVariableName.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMaskW.cpp" />
@@ -280,9 +287,12 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNode.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat3.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat4.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodePointAttractionForce.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSampleTexture2d.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetAlpha.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeVortexForce.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeWindForce.cpp" />
     <ClCompile Include="Source\Core\TextureBuffer.cpp" />
     <ClCompile Include="Source\Core\HlslTranslatorSimulate.cpp" />
     <ClCompile Include="Source\Core\TextureManager.cpp" />
@@ -366,6 +376,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleSystemShaders\ParticleRenderVSBase.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleSystemShaders\ParticleSimulateUtil.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

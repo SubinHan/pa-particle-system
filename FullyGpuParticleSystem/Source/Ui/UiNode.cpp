@@ -67,6 +67,11 @@ bool UiNode::containsAttributeAsInput(const int attributeId) const
 	return _id < attributeId && attributeId <= _id + getNumInputs();
 }
 
+bool UiNode::containsAttributeAsOutput(const int attributeId) const
+{
+	return _id + getNumInputs() + getNumConstantInputs() < attributeId && attributeId <= _id + getNumInputs() + getNumConstantInputs() + getNumOutputs();
+}
+
 int UiNode::getInputIndexByAttributeId(const int attributeId) const
 {
 	return attributeId - _id - 1;

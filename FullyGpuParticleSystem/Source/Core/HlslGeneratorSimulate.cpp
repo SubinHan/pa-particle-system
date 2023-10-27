@@ -3,6 +3,9 @@
 #include "Core/ShaderStatementNode/ShaderStatementNodeGetFloat3ByVariableName.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeGetFloatByVariableName.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeSetValueByVariableName.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodePointAttractionForce.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeDragForce.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeVortexForce.h"
 
 HlslGeneratorSimulate::HlslGeneratorSimulate(std::wstring baseShaderPath) :
 	HlslGenerator(baseShaderPath)
@@ -40,6 +43,47 @@ UINT HlslGeneratorSimulate::getAcceleration()
 	auto newNode =
 		std::make_shared<ShaderStatementNodeGetFloat3ByVariableName>(newLocalVariableName, "particles[particleIndex].Acceleration");
 	addNode(newNode);
+
+	return nodeIndex;
+}
+
+UINT HlslGeneratorSimulate::pointAttraction(UINT prerequisite, float x, float y, float z, float radius, float strength)
+{
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodePointAttractionForce>(x, y, z, radius, strength);
+	addNode(newNode);
+	linkNode(prerequisite, nodeIndex);
+
+	return nodeIndex;
+}
+
+UINT HlslGeneratorSimulate::vortex(UINT prerequisite, float vortexCenterX, float vortexCenterY, float vortexCenterZ, float vortexAxisX, float vortexAxisY, float vortexAxisZ, float magnitude, float tightness)
+{
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeVortexForce>(
+			vortexCenterX,
+			vortexCenterY,
+			vortexCenterZ,
+			vortexAxisX,
+			vortexAxisY,
+			vortexAxisZ,
+			magnitude,
+			tightness);
+	addNode(newNode);
+	linkNode(prerequisite, nodeIndex);
+
+	return nodeIndex;
+}
+
+UINT HlslGeneratorSimulate::drag(UINT prerequisite, float dragCoefficient)
+{
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeDragForce>(dragCoefficient);
+	addNode(newNode);
+	linkNode(prerequisite, nodeIndex);
 
 	return nodeIndex;
 }

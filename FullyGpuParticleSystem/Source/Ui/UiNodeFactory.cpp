@@ -32,6 +32,14 @@ UiNode UiNodeFactory::createNode(const int id, NodeType nodeType)
 		return createSimulatorOutput(id);
 	case NodeType::RendererOutput:
 		return createRendererOutput(id);
+	case NodeType::StartParticleSimulation:
+		return createStartParticleSimulation(id);
+	case NodeType::PointAttractionForce:
+		return createPointAttractionForce(id);
+	case NodeType::DragForce:
+		return createDragForce(id);
+	case NodeType::VortexForce:
+		return createVortexForce(id);
 	default:
 		// should never reach here.
 		assert(0);
@@ -202,9 +210,7 @@ UiNode UiNodeFactory::createSimulatorOutput(const int id)
 	constexpr auto nodeType = NodeType::SimulatorOutput;
 	std::vector<std::string> inputNames =
 	{
-		"newPosition",
-		"newVelocity",
-		"newAcceleration",
+		"finalParticleResult"
 	};
 	std::vector<std::string> emptyVector;
 
@@ -223,4 +229,76 @@ UiNode UiNodeFactory::createRendererOutput(const int id)
 
 	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
 	return UiNode(id, nodeName, inputNames, emptyVector, emptyVector, nodeType);
+}
+
+UiNode UiNodeFactory::createStartParticleSimulation(const int id)
+{
+	constexpr auto nodeType = NodeType::StartParticleSimulation;
+	std::vector<std::string> emptyVector;
+	std::vector<std::string> outputNames =
+	{
+		"particleState"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, emptyVector, emptyVector, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createPointAttractionForce(const int id)
+{
+	constexpr auto nodeType = NodeType::PointAttractionForce;
+	std::vector<std::string> inputOutputNames =
+	{
+		"particleState"
+	};
+	std::vector<std::string> constantsNames = 
+	{
+		"pointX",
+		"pointY",
+		"pointZ",
+		"radius",
+		"strength",
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputOutputNames, constantsNames, inputOutputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createDragForce(const int id)
+{
+	constexpr auto nodeType = NodeType::DragForce;
+	std::vector<std::string> inputOutputNames =
+	{
+		"particleState"
+	};
+	std::vector<std::string> constantsNames =
+	{
+		"dragCoefficient"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputOutputNames, constantsNames, inputOutputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createVortexForce(const int id)
+{
+	constexpr auto nodeType = NodeType::VortexForce;
+	std::vector<std::string> inputOutputNames =
+	{
+		"particleState"
+	};
+	std::vector<std::string> constantsNames =
+	{
+		"vortexCenterX",
+		"vortexCenterY",
+		"vortexCenterZ",
+		"vortexAxisX",
+		"vortexAxisY",
+		"vortexAxisZ",
+		"magnitude",
+		"tightness",
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputOutputNames, constantsNames, inputOutputNames, nodeType);
 }

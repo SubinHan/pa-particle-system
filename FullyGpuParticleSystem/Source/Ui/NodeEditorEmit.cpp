@@ -13,7 +13,7 @@ NodeEditorEmit::NodeEditorEmit(ParticleEmitter* emitter) :
 
 NodeEditorEmit::~NodeEditorEmit() = default;
 
-std::string NodeEditorEmit::getName()
+std::string NodeEditorEmit::getName() const
 {
     return _emitter->getName();
 }
@@ -23,6 +23,29 @@ void NodeEditorEmit::onCompileButtonClicked()
     HlslTranslatorEmit translator(_nodes, _links);
 
     _emitter->setShader(translator.compileShader());
+}
+
+std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorEmit::getCreatableNodes() const
+{
+    static const std::vector<std::string> creatableNodeNames =
+    {
+        "NewFloat",
+        "NewFloat3",
+        "NewFloat4",
+        "RandFloat3",
+        "AddFloat3",
+    };
+
+    static const std::vector<NodeType> creatableNodeTypes=
+    {
+        NodeType::NewFloat,
+        NodeType::NewFloat3,
+        NodeType::NewFloat4,
+        NodeType::RandFloat3,
+        NodeType::AddFloat3,
+    };
+
+    return std::make_pair<>(creatableNodeNames, creatableNodeTypes);
 }
 
 void NodeEditorEmit::load()

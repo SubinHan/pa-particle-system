@@ -179,6 +179,16 @@
   * UI 적용
     * Particle System들의 상태를 저장할 수 있음
       * 다시 프로그램 시작 시 자동적으로 load
+* 금요일:
+  * Simulation Node 추가
+    * Drag Force
+    * Point Attraction Force
+  * Simulation 방식 변경
+    * Velocity, Acceleration, Position을 누적해 변경하고 마지막에 Solving 됨
+  * UI 적용
+    * Node를 삭제할 수 있음
+    * 각 Emitter, Simulator, Renderer Editor에서 사용할 수 있는 node들만 생성할 수 있음
+  * <img src="./img/20231027_particles.webp">
 
 <hr/>
 

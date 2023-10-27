@@ -52,19 +52,67 @@ bool HlslTranslatorSimulate::translateNode(UiNode node)
 		hlslIndex = hlslGeneratorSimulate->getAcceleration();
 		break;
 
+	case NodeType::PointAttractionForce:
+	{
+		const float x = node.getConstantInputValue(0);
+		const float y = node.getConstantInputValue(1);
+		const float z = node.getConstantInputValue(2);
+		const float radius = node.getConstantInputValue(3);
+		const float strength = node.getConstantInputValue(4);
+
+		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		
+		UINT inputIndex = indexMap[inputNodeId];
+		hlslIndex = hlslGeneratorSimulate->pointAttraction(inputIndex, x, y, z, radius, strength);
+		break;
+	}
+
+	case NodeType::DragForce:
+	{
+		const float dragCoefficient = node.getConstantInputValue(0);
+
+		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+
+		UINT inputIndex = indexMap[inputNodeId];
+		hlslIndex = hlslGeneratorSimulate->drag(inputIndex, dragCoefficient);
+		break;
+	}
+	
+	case NodeType::VortexForce:
+	{
+		const float vortexCenterX = node.getConstantInputValue(0);
+		const float vortexCenterY = node.getConstantInputValue(1);
+		const float vortexCenterZ = node.getConstantInputValue(2);
+		const float vortexAxisX = node.getConstantInputValue(3);
+		const float vortexAxisY = node.getConstantInputValue(4);
+		const float vortexAxisZ = node.getConstantInputValue(5);
+		const float magnitude = node.getConstantInputValue(6);
+		const float tightness = node.getConstantInputValue(7);
+
+		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+
+		UINT inputIndex = indexMap[inputNodeId];
+		hlslIndex = hlslGeneratorSimulate->vortex(
+			inputIndex, 
+			vortexCenterX,
+			vortexCenterY,
+			vortexCenterZ,
+			vortexAxisX,
+			vortexAxisY,
+			vortexAxisZ,
+			magnitude,
+			tightness);
+		break;
+	}
+
+	case NodeType::StartParticleSimulation:
+	{
+		hlslIndex = hlslGeneratorSimulate->empty();
+		break;
+	}
+
 	case NodeType::SimulatorOutput:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
-		const int inputNodeId2 = findOppositeNodeByInputAttrbuteId(node.getInputId(2));
-
-		UINT input0Index = indexMap[inputNodeId0];
-		UINT input1Index = indexMap[inputNodeId1];
-		UINT input2Index = indexMap[inputNodeId2];
-
-		hlslGeneratorSimulate->setPosition(input0Index);
-		hlslGeneratorSimulate->setVelocity(input1Index);
-		hlslGeneratorSimulate->setAcceleration(input2Index);
 		break;
 	}
 	default:

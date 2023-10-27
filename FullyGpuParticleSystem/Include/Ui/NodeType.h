@@ -16,6 +16,10 @@ enum class NodeType
 	EmitterOutput,
 	SimulatorOutput,
 	RendererOutput,
+	StartParticleSimulation,
+	PointAttractionForce,
+	DragForce,
+	VortexForce,
 	Size
 };
 
@@ -33,6 +37,10 @@ const std::array<NodeType, static_cast<size_t>(NodeType::Size)> nodeTypes =
 	NodeType::EmitterOutput,
 	NodeType::SimulatorOutput,
 	NodeType::RendererOutput,
+	NodeType::StartParticleSimulation,
+	NodeType::PointAttractionForce,
+	NodeType::DragForce,
+	NodeType::VortexForce,
 };
 
 const std::array<std::string, static_cast<size_t>(NodeType::Size)> nodeNames =
@@ -49,4 +57,8 @@ const std::array<std::string, static_cast<size_t>(NodeType::Size)> nodeNames =
 	"EmitterOutput",
 	"SimulatorOutput",
 	"RendererOutput",
+	"StartParticleSimulation",
+	"PointAttractionForce",
+	"DragForce",
+	"VortexForce",
 };

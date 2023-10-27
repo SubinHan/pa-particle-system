@@ -234,6 +234,21 @@
     <ClInclude Include="Include\Model\RendererType.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeWindForce.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodePointAttractionForce.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeEmpty.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeDragForce.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeVortexForce.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -437,6 +452,21 @@
     <ClCompile Include="Source\Io\ParticleSystemIo.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeWindForce.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodePointAttractionForce.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeEmpty.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeDragForce.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeVortexForce.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FullyGpuParticleSystem.rc">
@@ -466,6 +496,7 @@
     <FxCompile Include="ParticleSystemShaders\ParticleRenderVSBase.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleRenderGSBase.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleRenderBase.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleSimulateUtil.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

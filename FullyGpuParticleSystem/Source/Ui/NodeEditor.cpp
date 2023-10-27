@@ -36,7 +36,10 @@ void NodeEditor::show()
         {
             ImGui::Text("Create a new node");
 
-            const int numNodes = static_cast<int>(NodeType::Size);
+            auto [nodeNames, nodeTypes] = getCreatableNodes();
+            assert(nodeNames.size() == nodeTypes.size() && "getCreatableNodeS() didn't return parallel vectors");
+
+            const int numNodes = nodeNames.size();
             for (int i = 0; i < numNodes; ++i)
             {
                 if (ImGui::Selectable(nodeNames[i].c_str()))
@@ -114,6 +117,23 @@ void NodeEditor::show()
 
     ImNodes::EndNodeEditor();
 
+    // delete node
+    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
+        ImGui::IsKeyReleased(ImGuiKey_Delete))
+    {
+        int numNodesToDelete = ImNodes::NumSelectedNodes();
+        if (numNodesToDelete > 0)
+        {
+            std::vector<int> nodesToDelete(numNodesToDelete);
+            ImNodes::GetSelectedNodes(nodesToDelete.data());
+
+            for (int i = 0; i < numNodesToDelete; ++i)
+            {
+                deleteNode(nodesToDelete[i]);
+            }
+        }
+    }
+
     {
         int from;
         int to;
@@ -166,11 +186,38 @@ void NodeEditor::load()
     _currentId = currentId;
 }
 
-
 void NodeEditor::nextCurrentId(UiNode createdNode)
 {
     _currentId +=
         createdNode.getNumInputs() +
         createdNode.getNumConstantInputs() +
         createdNode.getNumOutputs() + 1;
+}
+
+void NodeEditor::deleteNode(int nodeId)
+{
+    // find node
+    for (int i = 0; i < _nodes.size(); ++i)
+    {
+        auto& node = _nodes[i];
+        if (node.getId() != nodeId)
+            continue;
+
+        // delete all related links.
+        for (int j = 0; j < _links.size(); ++j)
+        {
+            auto& link = _links[j];
+            if (node.containsAttributeAsInput(link.getFromId()) ||
+                node.containsAttributeAsInput(link.getToId()) ||
+                node.containsAttributeAsOutput(link.getFromId()) ||
+                node.containsAttributeAsOutput(link.getToId()))
+            {
+                _links.erase(_links.begin() + j);
+                j--;
+            }
+        }
+
+        _nodes.erase(_nodes.begin() + i);
+        return;
+    }
 }

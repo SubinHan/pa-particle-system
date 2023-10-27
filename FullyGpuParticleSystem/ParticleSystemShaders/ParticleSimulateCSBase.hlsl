@@ -1,5 +1,6 @@
 #include "ParticleApp/Shaders/Particle.hlsl"
 #include "ParticleApp/Shaders/Util.hlsl"
+#include "ParticleSystemShaders/ParticleSimulateUtil.hlsl"
 
 cbuffer cbUpdateConstants : register(b0)
 {
@@ -48,9 +49,10 @@ void SimulateCS(
 
 			%s
 
-			particles[particleIndex].Velocity += currentAcceleration * DeltaTime;
+			currentVelocity += currentAcceleration * DeltaTime;
 			particles[particleIndex].Position +=
 				(currentVelocity + particles[particleIndex].Velocity) * DeltaTime * 0.5f;
+			particles[particleIndex].Velocity = currentVelocity;
 
 			// move alive particles to ping-pong buffer 
 			uint newIndex;

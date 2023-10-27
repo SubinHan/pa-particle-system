@@ -20,10 +20,12 @@ public:
     virtual void load();
 
 protected:
-    virtual std::string getName() = 0;
+    virtual std::string getName() const = 0;
     virtual void onCompileButtonClicked() = 0;
+    virtual std::pair<std::vector<std::string>, std::vector<NodeType>> getCreatableNodes() const = 0;
 
     void nextCurrentId(UiNode createdNode);
+    void deleteNode(int nodeId);
 
 protected:
     int _currentId;

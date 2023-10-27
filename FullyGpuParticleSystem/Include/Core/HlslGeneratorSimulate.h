@@ -14,11 +14,20 @@ public:
 	UINT getVelocity();
 	UINT getAcceleration();
 
-	UINT windForce();
-	UINT gravity();
-	UINT drag();
-	UINT pointAttraction();
-	UINT vortex();
+	UINT windForce(UINT prerequisite);
+	UINT gravity(UINT prerequisite);
+	UINT drag(UINT prerequisite, float dragCoefficient);
+	UINT pointAttraction(UINT prerequisite, float x, float y, float z, float radius, float strength);
+	UINT vortex(
+		UINT prerequisite,
+		float vortexCenterX,
+		float vortexCenterY,
+		float vortexCenterZ,
+		float vortexAxisX,
+		float vortexAxisY,
+		float vortexAxisZ,
+		float magnitude,
+		float tightness);
 
 	void setPosition(UINT float3Index);
 	void setVelocity(UINT float3Index);

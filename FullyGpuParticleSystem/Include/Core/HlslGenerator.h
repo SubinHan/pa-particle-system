@@ -20,6 +20,7 @@ public:
 
 	void generateShaderFile(std::wstring& outputPath);
 
+	UINT empty();
 	UINT newFloat(float x);
 	UINT newFloat3(float x, float y, float z);
 	UINT newFloat4(float x, float y, float z, float w);

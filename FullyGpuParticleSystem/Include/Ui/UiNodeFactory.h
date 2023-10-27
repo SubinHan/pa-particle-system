@@ -20,4 +20,8 @@ public:
 	static UiNode createEmitterOutput(const int id);
 	static UiNode createSimulatorOutput(const int id);
 	static UiNode createRendererOutput(const int id);
+	static UiNode createStartParticleSimulation(const int id);
+	static UiNode createPointAttractionForce(const int id);
+	static UiNode createDragForce(const int id);
+	static UiNode createVortexForce(const int id);
 };

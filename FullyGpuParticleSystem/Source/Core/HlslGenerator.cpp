@@ -1,6 +1,7 @@
 #include "Core/HlslGenerator.h"
 
 #include "Core/ShaderStatementNode/ShaderStatementNode.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeEmpty.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewFloat.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewFloat3.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewFloat4.h"
@@ -61,6 +62,15 @@ void HlslGenerator::generateShaderFile(std::wstring& outputPath)
 
 	fin.close();
 	fout.close();
+}
+
+UINT HlslGenerator::empty()
+{
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeEmpty>();
+	addNode(newNode);
+	return nodeIndex;
 }
 
 UINT HlslGenerator::newFloat(float x)
