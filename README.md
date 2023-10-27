@@ -73,12 +73,14 @@
 ### Tasks
 
 ##### Backlogs
-* ParticlePass, ParticleSimulator에도 HlslTranslator 적용 및 관련한 Control 추상화
-* 프레임 통계 모듈 구현
-* Motion blur 구현
-* Geometry와의 collision
-* imgui 도입
-* Ribbon trail
+* Ribbon trail renderer
+* Mesh(i.e. cube) render
+* Curl Noise simulation
+* Particle에 Orientation 속성 추가
+* Opaque particles를 먼저 draw해야 함
+* 프레임 통계 모듈
+* Motion blur
+* Collision
 * Lighting
 * Shader generation에서 node dependency 무결성 확인
   * i.e.) float3에 float4를 대입하지는 않는지?
@@ -100,11 +102,24 @@
   + Batcher's odd-even merge sort 학습
   + Bitonic sort 학습
   + 간단한 구현 수행 및 결과 확인
-* HLSL Translator 구현
+* HLSL Generator 구현
   * 추상화된 작업들을 HLSL 코드로 변환시켜주는 클래스
   * 가령 float4 변수를 초기화하고, 두 개의 float4 변수를 더하는 것 등
   * 이를 기반으로 유연한 Emit, Simulate process 구현의 기반 마련
 * DrawIndexedIndirect(), ExecuteIndirect() 학습 및 적용
+* UI:
+  * Spawn rate 조절 가능
+  * Emitter Shader 작성 가능
+  * Simulator Shader 작성 가능
+  * Renderer Shader 작성 가능
+  * 새로운 Particle System 추가 가능
+  * Particle System의 상태를 저장 및 로드
+  * Opaque/Translucent 변환 가능
+* Simulation Node:
+  * Vortex Force
+  * Point Attraction Force
+  * Drag Force
+* 
 
 <hr/>
 
@@ -182,6 +197,7 @@
 * 금요일:
   * Simulation Node 추가
     * Drag Force
+    * Vortex Force
     * Point Attraction Force
   * Simulation 방식 변경
     * Velocity, Acceleration, Position을 누적해 변경하고 마지막에 Solving 됨
