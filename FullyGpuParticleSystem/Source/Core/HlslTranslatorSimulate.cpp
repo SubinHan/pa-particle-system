@@ -105,6 +105,21 @@ bool HlslTranslatorSimulate::translateNode(UiNode node)
 		break;
 	}
 
+	case NodeType::CurlNoiseForce:
+	{
+		const float amplitude = node.getConstantInputValue(0);
+		const float frequency = node.getConstantInputValue(1);
+
+		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+
+		UINT inputIndex = indexMap[inputNodeId];
+		hlslIndex = hlslGeneratorSimulate->curlNoise(
+			inputIndex,
+			amplitude,
+			frequency);
+		break;
+	}
+
 	case NodeType::StartParticleSimulation:
 	{
 		hlslIndex = hlslGeneratorSimulate->empty();

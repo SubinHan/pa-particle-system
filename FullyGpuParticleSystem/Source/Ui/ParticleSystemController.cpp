@@ -39,7 +39,8 @@ void ParticleSystemController::show()
 		auto particleSystem = _particleSystemManager->getParticleSystemByIndex(i);
 
 		std::string particleSystemName = particleSystem->getName();
-		if (ImGui::TreeNode(particleSystemName.c_str()))
+		bool isAlive = true;
+		if (ImGui::CollapsingHeader(particleSystemName.c_str(), &isAlive))
 		{
 			if (ImGui::TreeNode("Particle Emitter"))
 			{
@@ -54,7 +55,7 @@ void ParticleSystemController::show()
 					auto editor =
 						std::make_unique<NodeEditorEmit>(particleSystem->getEmitter());
 					editor->load();
-					_showingWindow.push_back(std::move(editor));
+					_showingWindow = std::move(editor);
 				}
 
 				ImGui::TreePop();
@@ -69,7 +70,7 @@ void ParticleSystemController::show()
 					auto editor =
 						std::make_unique<NodeEditorSimulate>(particleSystem->getSimulator());
 					editor->load();
-					_showingWindow.push_back(std::move(editor));
+					_showingWindow = std::move(editor);
 				}
 
 				ImGui::TreePop();
@@ -77,7 +78,7 @@ void ParticleSystemController::show()
 
 			if (ImGui::TreeNode("Particle Renderer"))
 			{
-				static bool isOpaque = particleSystem->getRenderer()->isOpaque();
+				bool isOpaque = particleSystem->getRenderer()->isOpaque();
 				ImGui::Checkbox("isOpaque", &isOpaque);
 				particleSystem->getRenderer()->setOpaque(isOpaque);
 
@@ -110,25 +111,51 @@ void ParticleSystemController::show()
 					auto editor =
 						std::make_unique<NodeEditorRender>(particleSystem->getRenderer());
 					editor->load();
-					_showingWindow.push_back(std::move(editor));
+					_showingWindow = std::move(editor);
 				}
 				ImGui::TreePop();
 			}
-			ImGui::TreePop();
+		}
+
+		// TODO: not works. should fix logic.
+		// store isAlive per particle system and save the state about popup is opened or not.
+		if (!isAlive)
+		{
+			ImGui::OpenPopup("confirmDeleteParticleSystem");
+			if (ImGui::BeginPopup("confirmDeleteParticleSystem"))
+			{
+				ImGui::Text("Are you sure to delete the particle system?");
+				if (ImGui::Button("Yes"))
+				{
+					// delete particle system.
+					deleteParticleSystemAndSaveFiles(i);
+					i--;
+					ImGui::EndPopup();
+				}
+				else if (ImGui::Button("No"))
+				{
+					ImGui::EndPopup();
+				}
+				else
+				{
+					ImGui::EndPopup();
+				}
+			}
+
 		}
 	}
 	ImGui::End();
 
-	for (int i = 0; i < _showingWindow.size(); ++i)
+	if (_showingWindow)
 	{
-		if (!_showingWindow[i]->isAlive())
+		if (!_showingWindow->isAlive())
 		{
-			_showingWindow.erase(_showingWindow.begin() + i);
-
-			continue;
+			_showingWindow = nullptr;
 		}
-
-		_showingWindow[i]->show();
+		else
+		{
+			_showingWindow->show();
+		}
 	}
 }
 
@@ -166,4 +193,11 @@ ParticleSystem* ParticleSystemController::createNewParticleSystem(std::string na
 	_spawnRate.push_back(particleSystem->getSpawnRate());
 
 	return particleSystem;
+}
+
+void ParticleSystemController::deleteParticleSystemAndSaveFiles(int index)
+{
+
+
+	// TODO
 }

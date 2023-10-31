@@ -89,19 +89,24 @@ void ParticleSystemIo::loadInto(std::string filePath, ParticleSystem* particleSy
 			if (!foundEmitterEditorSaveFile && endsWith(filenameWithoutExtension, "Emitter"))
 			{
 				HlslTranslatorEmit translator(nodes, links);
-				particleSystem->getEmitter()->setShader(translator.compileShader());
+				translator.translateTo(particleSystem->getEmitter());
 				foundEmitterEditorSaveFile = true;
 			}
 			else if (!foundSimulatorEditorSaveFile && endsWith(filenameWithoutExtension, "Simulator"))
 			{
 				HlslTranslatorSimulate translator(nodes, links);
-				particleSystem->getSimulator()->setShader(translator.compileShader());
+				translator.translateTo(particleSystem->getSimulator());
 				foundSimulatorEditorSaveFile = true;
 			}
 			else if (!foundRendererEditorSaveFile && endsWith(filenameWithoutExtension, "Renderer"))
 			{
 				HlslTranslatorRender translator(nodes, links);
-				particleSystem->getRenderer()->setShaderPs(translator.compileShader());
+				// TODO: change to translateTo()
+				auto renderer = particleSystem->getRenderer();
+				renderer->clearRegisteredShaderStatementNodes();
+				auto blob = translator.compileShader();
+				translator.registerTranslatedShaderNodesInto(renderer);
+				renderer->setShaderPs(blob);
 				foundRendererEditorSaveFile = true;
 			}
 		}
@@ -109,17 +114,17 @@ void ParticleSystemIo::loadInto(std::string filePath, ParticleSystem* particleSy
 
 	if (!foundEmitterEditorSaveFile)
 	{
-
+		// TODO
 	}
 
 	if (!foundSimulatorEditorSaveFile)
 	{
-
+		// TODO
 	}
 
 	if (!foundRendererEditorSaveFile)
 	{
-
+		// TODO
 	}
 }
 

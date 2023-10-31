@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/ParticlePass.h"
 #include "Core/Hashable.h"
 #include "Ui/UiNode.h"
 #include "Ui/UiLink.h"
@@ -18,6 +19,8 @@ public:
 	virtual ~HlslTranslator();
 
 	Microsoft::WRL::ComPtr<ID3DBlob> compileShader();
+	void translateTo(ParticlePass* pass);
+	void registerTranslatedShaderNodesInto(ParticlePass* pass);
 
 protected:
 	virtual std::unique_ptr<HlslGenerator> createHlslGenerator() = 0;

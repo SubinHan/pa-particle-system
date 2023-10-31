@@ -11,12 +11,12 @@ HlslGeneratorRender::HlslGeneratorRender(std::wstring baseShaderPath) :
 
 HlslGeneratorRender::~HlslGeneratorRender() = default;
 
-UINT HlslGeneratorRender::sampleTexture2d()
+UINT HlslGeneratorRender::sampleTexture2d(std::string textureName)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	const UINT nodeIndex = _nodes.size();
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSampleTexture2d>(newLocalVariableName);
+		std::make_shared<ShaderStatementNodeSampleTexture2d>(newLocalVariableName, textureName);
 	addNode(newNode);
 
 	return nodeIndex;

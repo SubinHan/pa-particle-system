@@ -6,6 +6,7 @@
 #include "Core/ShaderStatementNode/ShaderStatementNodePointAttractionForce.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeDragForce.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeVortexForce.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeCurlNoiseForce.h"
 
 HlslGeneratorSimulate::HlslGeneratorSimulate(std::wstring baseShaderPath) :
 	HlslGenerator(baseShaderPath)
@@ -71,6 +72,21 @@ UINT HlslGeneratorSimulate::vortex(UINT prerequisite, float vortexCenterX, float
 			vortexAxisZ,
 			magnitude,
 			tightness);
+	addNode(newNode);
+	linkNode(prerequisite, nodeIndex);
+
+	return nodeIndex;
+}
+
+UINT HlslGeneratorSimulate::curlNoise(UINT prerequisite, float amplitude, float frequency)
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeCurlNoiseForce>(
+			newLocalVariableName,
+			amplitude,
+			frequency);
 	addNode(newNode);
 	linkNode(prerequisite, nodeIndex);
 

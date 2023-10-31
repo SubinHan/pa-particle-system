@@ -1,20 +1,39 @@
 #include "Ui/UiNode.h"
 
+#include "Ui/ValueType.h"
+
+#include <assert.h>
+
 UiNode::UiNode(
 	const int id,
 	std::string nodeName,
 	std::vector<std::string> inputNames,
 	std::vector<std::string> constantInputNames,
+	std::vector<ValueType> constantValueTypes,
 	std::vector<std::string> outputNames,
 	NodeType nodeType) :
 	_id(id),
 	_nodeName(nodeName),
 	_inputNames(inputNames),
 	_constantInputNames(constantInputNames),
+	_constantInputValueTypes(constantValueTypes),
 	_constantInputValues(constantInputNames.size()),
+	_constantInputStrings(constantInputNames.size()),
+	_constantInputStringsCstr(constantInputNames.size()),
 	_outputNames(outputNames),
 	_nodeType(nodeType)
 {
+	assert(constantInputNames.size() == constantValueTypes.size() && "constantInputNames's size is not same with constantValueTypes' size");
+
+	for (int i = 0; i < constantInputNames.size(); ++i)
+	{
+		_constantInputStrings[i].reserve(64);
+	}
+
+	for (int i = 0; i < constantInputNames.size(); ++i)
+	{
+		_constantInputStringsCstr[i].resize(64);
+	}
 }
 
 NodeType UiNode::getType() const
@@ -57,6 +76,11 @@ std::string UiNode::getConstantInputName(const int index) const
 	return _constantInputNames[index];
 }
 
+ValueType UiNode::getConstantInputValueType(const int index) const
+{
+	return _constantInputValueTypes[index];
+}
+
 std::string UiNode::getOutputName(const int index) const
 {
 	return _outputNames[index];
@@ -92,7 +116,27 @@ float* UiNode::getConstantInputAddress(const int index)
 	return &_constantInputValues[index];
 }
 
+char* UiNode::getConstantInputStringAddress(const int index)
+{
+	return _constantInputStringsCstr[index].data();
+}
+
 float UiNode::getConstantInputValue(const int index) const
 {
 	return _constantInputValues[index];
+}
+
+std::string UiNode::getConstantInputValueAsString(const int index) const
+{
+	return _constantInputStrings[index];
+}
+
+// little hack code, I should input by using char pointer,
+// but modifying inner data of std::string by passing char pointer through
+// string.data() function is undefined behavior.
+// so I use vector<char> represents string data, and update actual
+// std::string data by using this function.
+void UiNode::updateConstantInputStringFromCstr(int index)
+{
+	_constantInputStrings[index] = std::string(_constantInputStringsCstr[index].data());
 }

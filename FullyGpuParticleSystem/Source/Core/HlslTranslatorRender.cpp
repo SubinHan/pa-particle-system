@@ -49,6 +49,12 @@ bool HlslTranslatorRender::translateNode(UiNode node)
 		hlslGeneratorRender->setOutputColor(input0Index);
 		break;
 	}
+	case NodeType::SampleTexture2D:
+	{
+		const std::string textureName = node.getConstantInputValueAsString(0);
+		hlslIndex = hlslGeneratorRender->sampleTexture2d(textureName);
+		break;
+	}
 	default:
 		hasGenerated = false;
 		break;

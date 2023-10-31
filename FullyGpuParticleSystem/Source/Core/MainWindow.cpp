@@ -112,7 +112,6 @@ LRESULT MainWindow::windowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 float MainWindow::aspectRatio() const
 {
-
     return static_cast<float>(_device->getClientWidth()) /
         static_cast<float>(_device->getClientHeight());
 }
@@ -344,7 +343,8 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void MainWindow::createDevice()
 {
-    _device = std::make_unique<DxDevice>(_hwnd);
+    _device = &(DxDevice::getInstance());
+    _device->initDevice(_hwnd);
     onResize();
 }
 

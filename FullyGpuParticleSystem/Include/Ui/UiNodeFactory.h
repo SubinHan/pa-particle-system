@@ -14,6 +14,7 @@ public:
 	static UiNode createNewFloat4(const int id);
 	static UiNode createRandFloat3(const int id);
 	static UiNode createAddFloat3(const int id);
+	static UiNode createMultiplyFloat3ByScalar(const int id);
 	static UiNode createGetParticlePosition(const int id);
 	static UiNode createGetParticleVelocity(const int id);
 	static UiNode createGetParticleAcceleration(const int id);
@@ -24,4 +25,6 @@ public:
 	static UiNode createPointAttractionForce(const int id);
 	static UiNode createDragForce(const int id);
 	static UiNode createVortexForce(const int id);
+	static UiNode createCurlNoiseForce(const int id);
+	static UiNode createSampleTexture2d(const int id);
 };

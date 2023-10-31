@@ -25,24 +25,15 @@ constexpr int ROOT_SLOT_DIFFUSE_MAP_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER + 1
 
 constexpr int ROOT_SLOT_SRV_UAV_TABLE = 0;
 
-ParticleRenderer::ParticleRenderer(DxDevice* device, ParticleResource* resource, std::string name) :
-	_device(device),
-	_resource(resource),
-	_name(name),
+ParticleRenderer::ParticleRenderer(ParticleResource* resource, std::string name) :
+	ParticlePass(resource, name),
 	_materialName("default"),
 	_hlslGenerator(std::make_unique<HlslGeneratorRender>(BASE_RENDER_SHADER_PATH))
 {
-	buildRootSignature();
 	buildCommandSignature();
-	buildShaders();
 	buildInputLayout();
-	buildPsos();
 	generateEmptyGeometry();
-}
-
-std::string ParticleRenderer::getName()
-{
-	return _name;
+	buildDefaultShader();
 }
 
 void ParticleRenderer::setMaterialName(std::string materialName)
@@ -112,17 +103,10 @@ void ParticleRenderer::render(
 	cmdList->SetGraphicsRootShaderResourceView(
 		ROOT_SLOT_ALIVES_INDICES_BUFFER, _resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
 
-	TextureManager* textureManager = TextureManager::getInstance();
-	MaterialManager* materialManager = MaterialManager::getInstance();
-
-	auto diffuseSrvHandle = textureManager->getSrvGpuHandle(
-		materialManager->getMaterial(_materialName).DiffuseTextureName);
-	cmdList->SetGraphicsRootDescriptorTable(
-		ROOT_SLOT_DIFFUSE_MAP_BUFFER, diffuseSrvHandle);
+	bindGraphicsResourcesOfRegisteredNodes(cmdList, 4);
 
 	_resource->transitCommandBufferToIndirectArgument(cmdList);
 
-	// TODO: change to executeindirect
 	cmdList->ExecuteIndirect(
 		_commandSignature.Get(),
 		_resource->getMaxNumParticles(),
@@ -139,7 +123,7 @@ void ParticleRenderer::compileShaders()
 {
 	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
 
-	_hlslGenerator->compile(shaderPath);
+	_hlslGenerator->generateShaderFile(shaderPath);
 
 	_shaderVs = DxUtil::compileShader(
 		shaderPath,
@@ -158,11 +142,18 @@ void ParticleRenderer::compileShaders()
 		nullptr,
 		"ParticlePS",
 		"ps_5_1");
+
+	_shaderIndirectCommand = DxUtil::compileShader(
+		L"ParticleApp\\Shaders\\ParticleComputeIndirectCommands.hlsl",
+		nullptr,
+		"ComputeIndirectCommandsCS",
+		"cs_5_1");
 }
 
 void ParticleRenderer::setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 {
 	_shaderPs = shader;
+	buildRootSignature();
 	buildPsos();
 }
 
@@ -176,56 +167,16 @@ void ParticleRenderer::setOpaque(bool newIsOpaque)
 	_isOpaque = newIsOpaque;
 }
 
-void ParticleRenderer::buildRootSignature()
+std::vector<CD3DX12_ROOT_PARAMETER> ParticleRenderer::buildRootParameter()
 {
-	// build graphics root signature
-	{
-		CD3DX12_ROOT_PARAMETER slotRootParameter[5];
-		slotRootParameter[ROOT_SLOT_OBJECT_CONSTANTS_BUFFER].InitAsConstants(sizeof(ObjectConstants) / 4, 0);
+	std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter(4);
+	slotRootParameter[ROOT_SLOT_OBJECT_CONSTANTS_BUFFER].InitAsConstants(sizeof(ObjectConstants) / 4, 0);
 
-		CD3DX12_DESCRIPTOR_RANGE passCbvTable;
-		passCbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-		slotRootParameter[ROOT_SLOT_PASS_CONSTANTS_BUFFER].InitAsDescriptorTable(1, &passCbvTable);
+	_passCbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+	slotRootParameter[ROOT_SLOT_PASS_CONSTANTS_BUFFER].InitAsDescriptorTable(1, &_passCbvTable);
 
-		slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER].InitAsShaderResourceView(0); // particles
-		slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER].InitAsShaderResourceView(1); // aliveIndices
-
-		CD3DX12_DESCRIPTOR_RANGE texSrvTable;
-		texSrvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
-		slotRootParameter[ROOT_SLOT_DIFFUSE_MAP_BUFFER].InitAsDescriptorTable(1, &texSrvTable);
-
-		auto staticSamplers = DxUtil::getStaticSamplers();
-
-		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
-			_countof(slotRootParameter),
-			slotRootParameter,
-			staticSamplers.size(),
-			staticSamplers.data(),
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
-		);
-
-		ComPtr<ID3DBlob> serializedRootSig = nullptr;
-		ComPtr<ID3DBlob> errorBlob = nullptr;
-		HRESULT hr = D3D12SerializeRootSignature(
-			&rootSigDesc,
-			D3D_ROOT_SIGNATURE_VERSION_1,
-			serializedRootSig.GetAddressOf(),
-			errorBlob.GetAddressOf()
-		);
-
-		if (errorBlob != nullptr)
-		{
-			::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-		}
-		ThrowIfFailed(hr);
-
-		ThrowIfFailed(_device->getD3dDevice()->CreateRootSignature(
-			0,
-			serializedRootSig->GetBufferPointer(),
-			serializedRootSig->GetBufferSize(),
-			IID_PPV_ARGS(&_rootSignature))
-		);
-	}
+	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER].InitAsShaderResourceView(0); // particles
+	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER].InitAsShaderResourceView(1); // aliveIndices
 
 	// build compute root signature
 	{
@@ -268,12 +219,31 @@ void ParticleRenderer::buildRootSignature()
 		}
 		ThrowIfFailed(hr);
 
-		ThrowIfFailed(_device->getD3dDevice()->CreateRootSignature(
+		auto device = DxDevice::getInstance().getD3dDevice();
+
+		ThrowIfFailed(device->CreateRootSignature(
 			0,
 			serializedRootSig->GetBufferPointer(),
 			serializedRootSig->GetBufferSize(),
 			IID_PPV_ARGS(&_computeRootSignature)));
 	}
+	
+	return slotRootParameter;
+}
+
+int ParticleRenderer::getNumSrvUsing()
+{
+	return 2;
+}
+
+int ParticleRenderer::getNumUavUsing()
+{
+	return 0;
+}
+
+bool ParticleRenderer::needsStaticSampler()
+{
+	return true;
 }
 
 void ParticleRenderer::buildCommandSignature()
@@ -286,27 +256,19 @@ void ParticleRenderer::buildCommandSignature()
 	commandSignatureDesc.NumArgumentDescs = _countof(argumentDescs);
 	commandSignatureDesc.ByteStride = sizeof(ParticleIndirectCommand);
 
-	ThrowIfFailed(_device->getD3dDevice()->CreateCommandSignature(
+	auto device = DxDevice::getInstance().getD3dDevice();
+
+	ThrowIfFailed(device->CreateCommandSignature(
 		&commandSignatureDesc, nullptr, IID_PPV_ARGS(&_commandSignature)));
 }
 
-void ParticleRenderer::buildShaders()
+void ParticleRenderer::buildDefaultShader()
 {
-	_shaderIndirectCommand = DxUtil::compileShader(
-		L"ParticleApp\\Shaders\\ParticleComputeIndirectCommands.hlsl",
-		nullptr,
-		"ComputeIndirectCommandsCS",
-		"cs_5_1");
-
-	UINT textureSampleIndex = _hlslGenerator->sampleTexture2d();
-	UINT alphaThresholdIndex = _hlslGenerator->newFloat(0.5f);
-	UINT textureAlphaIndex = _hlslGenerator->maskX(textureSampleIndex);
-	_hlslGenerator->clip(textureAlphaIndex);
-	UINT outputColorIndex = _hlslGenerator->newFloat4(1.0f, 0.00f, 0.00f, 1.0f);
-	UINT alphaModifiedOutputColorIndex = _hlslGenerator->setAlpha(outputColorIndex, textureAlphaIndex);
-	_hlslGenerator->setOutputColor(alphaModifiedOutputColorIndex);
+	UINT outputColorIndex = _hlslGenerator->newFloat4(1.0f, 1.00f, 1.00f, 0.04f);
+	_hlslGenerator->setOutputColor(outputColorIndex);
 
 	compileShaders();
+	setShaderPs(_shaderPs);
 }
 
 void ParticleRenderer::buildInputLayout()
@@ -318,6 +280,8 @@ void ParticleRenderer::buildInputLayout()
 
 void ParticleRenderer::buildPsos()
 {
+	auto device = DxDevice::getInstance();
+
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
 	ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	opaquePsoDesc.InputLayout = { _inputLayout.data(), static_cast<UINT>(_inputLayout.size()) };
@@ -343,12 +307,12 @@ void ParticleRenderer::buildPsos()
 	opaquePsoDesc.SampleMask = UINT_MAX;
 	opaquePsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 	opaquePsoDesc.NumRenderTargets = 1;
-	opaquePsoDesc.RTVFormats[0] = _device->getBackBufferFormat();
-	bool msaaState = _device->getMsaaState();
+	opaquePsoDesc.RTVFormats[0] = device.getBackBufferFormat();
+	bool msaaState = device.getMsaaState();
 	opaquePsoDesc.SampleDesc.Count = msaaState ? 4 : 1;
-	opaquePsoDesc.SampleDesc.Quality = msaaState ? _device->getMsaaQuality() - 1 : 0;
-	opaquePsoDesc.DSVFormat = _device->getDepthStencilFormat();
-	ThrowIfFailed(_device->getD3dDevice()->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&_psoOpaque)));
+	opaquePsoDesc.SampleDesc.Quality = msaaState ? device.getMsaaQuality() - 1 : 0;
+	opaquePsoDesc.DSVFormat = device.getDepthStencilFormat();
+	ThrowIfFailed(device.getD3dDevice()->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&_psoOpaque)));
 
 
 	auto transparentPsoDesc = opaquePsoDesc;
@@ -369,7 +333,7 @@ void ParticleRenderer::buildPsos()
 
 	transparentPsoDesc.BlendState.RenderTarget[0] = transparencyBlendDesc;
 	ThrowIfFailed(
-		_device->getD3dDevice()->CreateGraphicsPipelineState(
+		device.getD3dDevice()->CreateGraphicsPipelineState(
 			&transparentPsoDesc, IID_PPV_ARGS(&_psoTransparency)
 		)
 	);
@@ -382,12 +346,14 @@ void ParticleRenderer::buildPsos()
 		_shaderIndirectCommand->GetBufferSize()
 	};
 	ThrowIfFailed(
-		_device->getD3dDevice()->CreateComputePipelineState(
+		device.getD3dDevice()->CreateComputePipelineState(
 			&psoDesc, IID_PPV_ARGS(&_psoCompute)));
 }
 
 void ParticleRenderer::generateEmptyGeometry()
 {
+	auto device = DxDevice::getInstance();
+
 	using VertexType = DirectX::XMFLOAT3;
 	using IndexType = std::uint32_t;
 
@@ -413,16 +379,16 @@ void ParticleRenderer::generateEmptyGeometry()
 	CopyMemory(_emptyGeometry->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
 	_emptyGeometry->VertexBufferGPU = DxUtil::createDefaultBuffer(
-		_device->getD3dDevice().Get(),
-		_device->getCommandList().Get(),
+		device.getD3dDevice().Get(),
+		device.getCommandList().Get(),
 		vertices.data(),
 		vbByteSize,
 		_emptyGeometry->VertexBufferUploader
 	);
 
 	_emptyGeometry->IndexBufferGPU = DxUtil::createDefaultBuffer(
-		_device->getD3dDevice().Get(),
-		_device->getCommandList().Get(),
+		device.getD3dDevice().Get(),
+		device.getCommandList().Get(),
 		indices.data(),
 		ibByteSize,
 		_emptyGeometry->IndexBufferUploader

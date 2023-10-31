@@ -182,7 +182,6 @@ void ParticleSystem::init()
 		_device->getD3dDevice(), 
 		commandList.Get());
 	_emitter = std::make_unique<ParticleEmitter>(
-		_device->getD3dDevice(),
 		_resource.get(),
 		_name + "_Emitter");
 	_sorter = std::make_unique<ParticleSorter>(
@@ -190,11 +189,9 @@ void ParticleSystem::init()
 		_resource.get(),
 		_name + "_Sorter");
 	_simulator = std::make_unique<ParticleSimulator>(
-		_device->getD3dDevice(),
 		_resource.get(),
 		_name + "_Simulator");
 	_renderer = std::make_unique<ParticleRenderer>(
-		_device,
 		_resource.get(),
 		_name + "_Renderer");
 

@@ -1,8 +1,55 @@
 #include "Io/NodeEditorIo.h"
 
+#include "Ui/ValueType.h"
+
 #include <imnodes.h>
 
 #include <fstream>
+
+decltype(auto) readString(std::fstream& fin, int stringSize)
+{
+    char buffer[256];
+
+    fin.read(
+        reinterpret_cast<char*>(buffer),
+        static_cast<std::streamsize>(stringSize));
+
+    return std::string(buffer, buffer + stringSize);
+}
+
+decltype(auto) readSizeType(std::fstream& fin)
+{
+    size_t variable;
+
+    fin.read(
+        reinterpret_cast<char*>(&variable),
+        static_cast<std::streamsize>(sizeof(decltype(variable))));
+
+    return variable;
+}
+
+
+decltype(auto) readInt(std::fstream& fin)
+{
+    int variable;
+
+    fin.read(
+        reinterpret_cast<char*>(&variable),
+        static_cast<std::streamsize>(sizeof(decltype(variable))));
+
+    return variable;
+}
+
+decltype(auto) readFloat(std::fstream& fin)
+{
+    float variable;
+
+    fin.read(
+        reinterpret_cast<char*>(&variable),
+        static_cast<std::streamsize>(sizeof(decltype(variable))));
+
+    return variable;
+}
 
 void NodeEditorIo::save(
     const std::vector<UiNode> nodes,
@@ -79,6 +126,11 @@ void NodeEditorIo::save(
             fout.write(
                 reinterpret_cast<const char*>(constnatInputName.data()),
                 static_cast<std::streamsize>(constnatInputName.size()));
+
+            auto constnatInputType = nodes[i].getConstantInputValueType(j);
+            fout.write(
+                reinterpret_cast<const char*>(&constnatInputType),
+                static_cast<std::streamsize>(sizeof(decltype(constnatInputType))));
         }
 
         auto numOutputs = nodes[i].getNumOutputs();
@@ -106,10 +158,34 @@ void NodeEditorIo::save(
 
         for (int j = 0; j < numConstantInputs; ++j)
         {
-            auto constantInputValue = nodes[i].getConstantInputValue(j);
-            fout.write(
-                reinterpret_cast<const char*>(&constantInputValue),
-                static_cast<std::streamsize>(sizeof(decltype(constantInputValue))));
+            switch (nodes[i].getConstantInputValueType(j))
+            {
+            case ValueType::Float:
+            {
+                auto constantInputValue = nodes[i].getConstantInputValue(j);
+                fout.write(
+                    reinterpret_cast<const char*>(&constantInputValue),
+                    static_cast<std::streamsize>(sizeof(decltype(constantInputValue))));
+                break;
+            }
+
+            case ValueType::String:
+            {
+                auto constantInputStringSize = nodes[i].getConstantInputValueAsString(j).size();
+                fout.write(
+                    reinterpret_cast<const char*>(&constantInputStringSize),
+                    static_cast<std::streamsize>(sizeof(decltype(constantInputStringSize))));
+
+                auto constantInputString = nodes[i].getConstantInputValueAsString(j);
+                fout.write(
+                    reinterpret_cast<const char*>(constantInputString.data()),
+                    static_cast<std::streamsize>(constantInputString.size()));
+                break;
+            }
+            default:
+                assert(0 && "unknown value type");
+                break;
+            }
         }
     }
 
@@ -160,80 +236,49 @@ NodeEditorIo::Snapshot NodeEditorIo::load(std::wstring filePathWithoutExtension)
     {
         UiNode node;
 
-        int id;
-        fin.read(
-            reinterpret_cast<char*>(&id),
-            static_cast<std::streamsize>(sizeof(int)));
-        node._id = id;
+        node._id = readInt(fin);
 
-        size_t nodeNameSize;
-        fin.read(
-            reinterpret_cast<char*>(&nodeNameSize),
-            static_cast<std::streamsize>(sizeof(size_t)));
+        size_t nodeNameSize = readSizeType(fin);
 
-        std::string nodeName;
-        nodeName.resize(nodeNameSize);
-        fin.read(
-            reinterpret_cast<char*>(nodeName.data()),
-            static_cast<std::streamsize>(nodeNameSize));
-        node._nodeName = nodeName;
+        node._nodeName = readString(fin, nodeNameSize);
 
-        int numInputs;
-        fin.read(
-            reinterpret_cast<char*>(&numInputs),
-            static_cast<std::streamsize>(sizeof(decltype(numInputs))));
+        int numInputs = readInt(fin);
         node._inputNames.resize(numInputs);
 
         for (int j = 0; j < numInputs; ++j)
         {
-            size_t inputNameSize;
-            fin.read(
-                reinterpret_cast<char*>(&inputNameSize),
-                static_cast<std::streamsize>(sizeof(decltype(inputNameSize))));
-            node._inputNames[j].resize(inputNameSize);
+            size_t inputNameSize = readSizeType(fin);
 
-            fin.read(
-                reinterpret_cast<char*>(node._inputNames[j].data()),
-                static_cast<std::streamsize>(inputNameSize));
+            node._inputNames[j] = readString(fin, inputNameSize);
         }
 
-        int numConstantInputs;
-        fin.read(
-            reinterpret_cast<char*>(&numConstantInputs),
-            static_cast<std::streamsize>(sizeof(decltype(numConstantInputs))));
+        int numConstantInputs = readInt(fin);
         node._constantInputNames.resize(numConstantInputs);
         node._constantInputValues.resize(numConstantInputs);
+        node._constantInputValueTypes.resize(numConstantInputs);
+        node._constantInputStrings.resize(numConstantInputs);
+        node._constantInputStringsCstr.resize(numConstantInputs);
 
         for (int j = 0; j < numConstantInputs; ++j)
         {
-            size_t constantInputNameSize;
-            fin.read(
-                reinterpret_cast<char*>(&constantInputNameSize),
-                static_cast<std::streamsize>(sizeof(decltype(constantInputNameSize))));
-            node._constantInputNames[j].resize(constantInputNameSize);
+            size_t constantInputNameSize = readSizeType(fin);
 
+            node._constantInputNames[j] = readString(fin, constantInputNameSize);
+
+            ValueType valueType;
             fin.read(
-                reinterpret_cast<char*>(node._constantInputNames[j].data()),
-                static_cast<std::streamsize>(constantInputNameSize));
+                reinterpret_cast<char*>(&node._constantInputValueTypes[j]),
+                static_cast<std::streamsize>(sizeof(decltype(valueType))));
         }
 
-        int numOutputs;
-        fin.read(
-            reinterpret_cast<char*>(&numOutputs),
-            static_cast<std::streamsize>(sizeof(decltype(numOutputs))));
+        int numOutputs = readInt(fin);
         node._outputNames.resize(numOutputs);
 
         for (int j = 0; j < numOutputs; ++j)
         {
-            size_t outputNameSize;
-            fin.read(
-                reinterpret_cast<char*>(&outputNameSize),
-                static_cast<std::streamsize>(sizeof(decltype(outputNameSize))));
-            node._outputNames[j].resize(outputNameSize);
+            size_t outputNameSize = readSizeType(fin);
 
-            fin.read(
-                reinterpret_cast<char*>(node._outputNames[j].data()),
-                static_cast<std::streamsize>(outputNameSize));
+            node._outputNames[j] = readString(fin, outputNameSize);
         }
 
         NodeType nodeType;
@@ -243,10 +288,29 @@ NodeEditorIo::Snapshot NodeEditorIo::load(std::wstring filePathWithoutExtension)
 
         for (int j = 0; j < numConstantInputs; ++j)
         {
-            float constantInputValue;
-            fin.read(
-                reinterpret_cast<char*>(&node._constantInputValues[j]),
-                static_cast<std::streamsize>(sizeof(decltype(constantInputValue))));
+            switch (node.getConstantInputValueType(j))
+            {
+            case ValueType::Float:
+            {
+                float value = readFloat(fin);
+                node._constantInputValues[j] = value;
+                break;
+            }
+
+            case ValueType::String:
+            {
+                size_t constantInputStringSize = readSizeType(fin);
+
+                node._constantInputStrings[j] = readString(fin, constantInputStringSize);
+                // hack code!!
+                node._constantInputStringsCstr[j].assign(node._constantInputStrings[j].begin(), node._constantInputStrings[j].end());
+                node._constantInputStringsCstr[j].push_back('\0');
+                break;
+            }
+            default:
+                assert(0 && "unknown value type");
+                break;
+            }
         }
 
         nodes.push_back(node);
@@ -259,8 +323,7 @@ NodeEditorIo::Snapshot NodeEditorIo::load(std::wstring filePathWithoutExtension)
     // copy links into memory
     std::vector<UiLink> links;
     
-    size_t numLinks;
-    fin.read(reinterpret_cast<char*>(&numLinks), static_cast<std::streamsize>(sizeof(size_t)));
+    size_t numLinks = readSizeType(fin);
     links.resize(numLinks);
     fin.read(
         reinterpret_cast<char*>(links.data()),

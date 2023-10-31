@@ -10,6 +10,9 @@ struct Particle
 	float Opacity;
 
 	float3 Color;
+	float RemainLifetime;
+
+
 };
 
 static const uint PARTICLECOUNTER_OFFSET_NUMDEADS = 0;

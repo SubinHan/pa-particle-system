@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Hashable.h"
+#include "Core/ParticlePass.h"
 #include "Util/DxUtil.h"
 
 #include <wrl.h>
@@ -22,17 +22,11 @@ struct EmitConstants
 	UINT MaxNumParticles;
 };
 
-class ParticleEmitter : public Hashable
+class ParticleEmitter : public ParticlePass
 {
 public:
-	ParticleEmitter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource, std::string name);
+	ParticleEmitter(ParticleResource* resource, std::string name);
 	virtual ~ParticleEmitter();
-
-	std::string getName();
-
-	ID3D12RootSignature* getRootSignature();
-	ID3DBlob* getShader();
-	ID3D12PipelineState* getPipelineStateObject();
 
 	void emitParticles(
 		ID3D12GraphicsCommandList* cmdList,
@@ -40,23 +34,19 @@ public:
 		int numParticlesToEmit, 
 		float deltaTime);
 
-	void compileShaders();
-	void setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
+protected:
+	virtual std::vector<CD3DX12_ROOT_PARAMETER> buildRootParameter() override;
+	virtual int getNumSrvUsing() override;
+	virtual int getNumUavUsing() override;
+	virtual bool needsStaticSampler() override;
+
+	virtual void buildPsos() override;
 
 private:
-	void buildRootSignature();
-	void buildShaders();
-	void buildPsos();
-
-private:
-	Microsoft::WRL::ComPtr<ID3D12Device> _device;
-	ParticleResource* _resource;
-
-	std::string _name;
+	void initDefault();
+	void setDefaultShader();
 
 	std::unique_ptr<HlslGeneratorEmit> _hlslGenerator;
 
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
-	Microsoft::WRL::ComPtr<ID3DBlob> _shader;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature;
+	CD3DX12_DESCRIPTOR_RANGE _uavTable;
 };

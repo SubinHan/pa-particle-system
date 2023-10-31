@@ -44,10 +44,16 @@ void EmitCS(
 	}
 
 	Particle newParticle;
+	newParticle.Position = float3(0.0f, 0.0f, 0.0f);
+	newParticle.Size = 0.05f;
+	newParticle.Velocity = float3(0.0f, 0.0f, 0.0f);
+	newParticle.Lifetime = 1.0f;
+	newParticle.Acceleration = float3(0.0f, 0.0f, 0.0f);
+	newParticle.Opacity = 1.0f;
+	newParticle.Color = float3(1.0f, 0.0f, 0.0f);
 
 	%s
 
-	newParticle.Color = float3(1.0f, 0.0f, 0.0f);
 
 	// add particle into buffer
 	// TODO: remove either numDeads or numAlives and derive it with max num of particles.

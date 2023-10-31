@@ -29,6 +29,22 @@ Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslator::compileShader()
 	return shaderBlob;
 }
 
+void HlslTranslator::translateTo(ParticlePass* pass)
+{
+	pass->clearRegisteredShaderStatementNodes();
+	auto blob = compileShader();
+	registerTranslatedShaderNodesInto(pass);
+	pass->setShader(blob);
+}
+
+void HlslTranslator::registerTranslatedShaderNodesInto(ParticlePass* pass)
+{
+	for (auto node : _hlslGenerator->getNodes())
+	{
+		pass->registerShaderStatementNode(node);
+	}
+}
+
 void HlslTranslator::generateNodes()
 {
 	for (int i = 0; i < _nodes.size(); ++i)
@@ -86,6 +102,16 @@ bool HlslTranslator::translateNode(UiNode node)
 		UINT input0Index = indexMap[inputNodeId0];
 		UINT input1Index = indexMap[inputNodeId1];
 		hlslIndex = _hlslGenerator->addFloat3(input0Index, input1Index);
+		break;
+	}
+	case NodeType::MultiplyFloat3ByScalar:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+
+		UINT input0Index = indexMap[inputNodeId0];
+		UINT input1Index = indexMap[inputNodeId1];
+		hlslIndex = _hlslGenerator->multiplyFloat3ByScalar(input0Index, input1Index);
 		break;
 	}
 	default:

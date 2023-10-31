@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/ParticlePass.h"
 #include "Core/Hashable.h"
 #include "Util/DxUtil.h"
 #include "Model/Geometry.h"
@@ -18,12 +19,11 @@ class HlslGeneratorRender;
 struct ObjectConstants;
 struct Material;
 
-class ParticleRenderer : public Hashable
+class ParticleRenderer : public ParticlePass
 {
 public:
-	ParticleRenderer(DxDevice* device, ParticleResource* resource, std::string name);
+	ParticleRenderer(ParticleResource* resource, std::string name);
 
-	std::string getName();
 	void setMaterialName(std::string material);
 
 	void render(
@@ -37,24 +37,24 @@ public:
 	bool isOpaque();
 	void setOpaque(bool newIsOpaque);
 
+protected:
+	virtual std::vector<CD3DX12_ROOT_PARAMETER> buildRootParameter() override;
+	virtual int getNumSrvUsing() override;
+	virtual int getNumUavUsing() override;
+	virtual bool needsStaticSampler() override;
+
+	virtual void buildPsos() override;
+
 private:
-	void buildRootSignature();
 	void buildCommandSignature();
-	void buildShaders();
+	void buildDefaultShader();
 	void buildInputLayout();
-	void buildPsos();
 	void generateEmptyGeometry();
 
-	DxDevice* _device;
-	ParticleResource* _resource;
 	std::string _materialName;
-
-	std::string _name;
 
 	std::unique_ptr<HlslGeneratorRender> _hlslGenerator;
 
-	// for rendering
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature;
 	// for compute indirect commands.
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> _computeRootSignature;
 	Microsoft::WRL::ComPtr<ID3D12CommandSignature> _commandSignature;
@@ -71,4 +71,7 @@ private:
 	std::unique_ptr<MeshGeometry> _emptyGeometry = nullptr;
 
 	bool _isOpaque;
+
+	CD3DX12_DESCRIPTOR_RANGE _passCbvTable;
+	CD3DX12_DESCRIPTOR_RANGE _texSrvTable;
 };

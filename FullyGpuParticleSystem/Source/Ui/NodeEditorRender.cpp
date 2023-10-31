@@ -22,7 +22,11 @@ void NodeEditorRender::onCompileButtonClicked()
 {
 	HlslTranslatorRender translator(_nodes, _links);
 
-	_renderer->setShaderPs(translator.compileShader());
+	// TODO: change to translateTo
+	_renderer->clearRegisteredShaderStatementNodes();
+	auto blob = translator.compileShader();
+	translator.registerTranslatedShaderNodesInto(_renderer);
+	_renderer->setShaderPs(blob);
 }
 
 std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorRender::getCreatableNodes() const
@@ -33,6 +37,7 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorRender::get
         "NewFloat3",
         "NewFloat4",
         "AddFloat3",
+		"SampleTexture2D",
     };
 
     static const std::vector<NodeType> creatableNodeTypes =
@@ -41,6 +46,7 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorRender::get
         NodeType::NewFloat3,
         NodeType::NewFloat4,
         NodeType::AddFloat3,
+        NodeType::SampleTexture2D,
     };
 
     return std::make_pair<>(creatableNodeNames, creatableNodeTypes);

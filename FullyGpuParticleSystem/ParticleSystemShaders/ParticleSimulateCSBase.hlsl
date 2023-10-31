@@ -7,6 +7,8 @@ cbuffer cbUpdateConstants : register(b0)
 	float DeltaTime;
 }
 
+%t
+
 RWStructuredBuffer<Particle> particles		: register(u0);
 
 RWStructuredBuffer<uint> aliveIndices		: register(u1);
@@ -14,6 +16,15 @@ RWStructuredBuffer<uint> newAliveIndices	: register(u2);
 RWStructuredBuffer<uint> deadIndices		: register(u3);
 
 RWByteAddressBuffer counters				: register(u4);
+
+%u
+
+SamplerState gsamPointWrap  : register(s0);
+SamplerState gsamPointClamp  : register(s1);
+SamplerState gsamLinearWrap  : register(s2);
+SamplerState gsamLinearClamp  : register(s3);
+SamplerState gsamAnisotropicWrap  : register(s4);
+SamplerState gsamAnisotropicClamp  : register(s5);
 
 // each thread updates a particle and kills if expired.
 [numthreads(256, 1, 1)]

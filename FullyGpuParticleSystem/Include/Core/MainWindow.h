@@ -78,5 +78,5 @@ protected:
 
 	HWND _hwnd;
 	HINSTANCE _hInstance;
-	std::unique_ptr<DxDevice> _device;
+	DxDevice* _device;
 };

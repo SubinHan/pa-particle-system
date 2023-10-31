@@ -28,6 +28,10 @@ public:
 		float vortexAxisZ,
 		float magnitude,
 		float tightness);
+	UINT curlNoise(
+		UINT prerequisite,
+		float amplitude,
+		float frequency);
 
 	void setPosition(UINT float3Index);
 	void setVelocity(UINT float3Index);

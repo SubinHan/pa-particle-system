@@ -16,7 +16,8 @@ class ICbvSrvUavDemander;
 class DxDevice
 {
 public:
-	DxDevice(HWND mainWindow);
+	static DxDevice& getInstance();
+	static void initDevice(HWND mainWindow);
 
 	void createDepthStencilView();
 	void updateScreenViewport();
@@ -27,6 +28,8 @@ public:
 
 	void registerCbvSrvUavDescriptorDemander(
 		ICbvSrvUavDemander* demander);
+	void registerCbvSrvUavDescriptorDemander(
+		std::shared_ptr<ICbvSrvUavDemander> demander);
 	void unregisterCbvSrvUavDescriptorDemander(
 		ICbvSrvUavDemander* demander);
 	// build descriptor heap sized by registered descriptor demanders.
@@ -84,6 +87,8 @@ public:
 	ComPtr<ID3D12DescriptorHeap> _cbvSrvUavHeap;
 
 private:
+	DxDevice() = default;
+
 	void init();
 	void createDevice();
 	void createFence();
@@ -95,6 +100,9 @@ private:
 	void createRenderTargetView();
 
 private:
+	static DxDevice* _instance;
+	bool _isInitiated;
+
 	ComPtr<IDXGIFactory>	_dxgiFactory;
 	ComPtr<ID3D12Device>	_d3dDevice;
 	ComPtr<ID3D12Fence>		_fence;
@@ -127,6 +135,7 @@ private:
 	tagRECT			_scissorRect;
 
 	std::vector<ICbvSrvUavDemander*> _cbvSrvUavDescriptorDemanders;
+	std::vector<std::shared_ptr<ICbvSrvUavDemander>> _cbvSrvUavDescriptorDemandersShared;
 	bool _needsUpdateDescriptorHeap;
-	bool _bRecordingCommands;
+	int _recordingCommands;
 };

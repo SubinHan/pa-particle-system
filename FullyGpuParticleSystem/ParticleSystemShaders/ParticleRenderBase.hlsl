@@ -37,7 +37,9 @@ struct GeoOut
 StructuredBuffer<Particle> particles : register(t0);
 StructuredBuffer<uint> aliveIndices : register(t1);
 
-Texture2D diffuseMap : register(t2);
+%t
+
+%u
 
 SamplerState gsamPointWrap  : register(s0);
 SamplerState gsamPointClamp  : register(s1);

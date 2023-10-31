@@ -2,25 +2,6 @@
 #include "Util/DxDebug.h"
 #include "Core/ICbvSrvUavDemander.h"
 
-DxDevice::DxDevice(HWND window)
-{
-    _mainWindow = window;
-
-    RECT windowRect;
-    if (GetWindowRect(window, &windowRect))
-    {
-        _clientWidth = windowRect.right - windowRect.left;
-        _clientHeight = windowRect.bottom - windowRect.top;
-    }
-    _clientRefreshRate = 165;
-
-    init();
-
-    assert(_d3dDevice);
-    assert(_swapChain);
-    assert(_commandListAllocator);
-}
-
 void DxDevice::init()
 {
     createDevice();
@@ -147,6 +128,36 @@ void DxDevice::createRenderTargetView()
     }
 }
 
+DxDevice& DxDevice::getInstance()
+{
+    static DxDevice instance;
+
+    return instance;
+}
+
+void DxDevice::initDevice(HWND mainWindow)
+{
+    auto& device = getInstance();
+
+    device._mainWindow = mainWindow;
+
+    RECT windowRect;
+    if (GetWindowRect(mainWindow, &windowRect))
+    {
+        device._clientWidth = windowRect.right - windowRect.left;
+        device._clientHeight = windowRect.bottom - windowRect.top;
+    }
+    device._clientRefreshRate = 165;
+
+    device.init();
+
+    assert(device._d3dDevice);
+    assert(device._swapChain);
+    assert(device._commandListAllocator);
+
+    device._isInitiated = true;
+}
+
 void DxDevice::createDepthStencilView()
 {
     D3D12_HEAP_PROPERTIES heapProperties;
@@ -218,31 +229,30 @@ void DxDevice::updateScissorRect()
 
 ComPtr<ID3D12GraphicsCommandList> DxDevice::startRecordingCommands(void)
 {
-    if (_bRecordingCommands)
+    ++_recordingCommands;
+    if (_recordingCommands > 1)
     {
-        return _commandList;;
+        return _commandList;
     }
 
     ThrowIfFailed(_commandListAllocator->Reset());
     _commandList->Reset(_commandListAllocator.Get(), nullptr);
-    _bRecordingCommands = true;
 
     return _commandList;
 }
 
 void DxDevice::submitCommands(ComPtr<ID3D12GraphicsCommandList> commandList)
 {
-    if (!_bRecordingCommands)
+    --_recordingCommands;
+    if (_recordingCommands != 0)
         return;
 
     ThrowIfFailed(commandList->Close());
-    _bRecordingCommands = false;
 
     ID3D12CommandList* cmdsLists[] = { commandList.Get() };
     _commandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
     flushCommandQueue();
-
 
     if (_needsUpdateDescriptorHeap)
     {
@@ -258,6 +268,13 @@ void DxDevice::registerCbvSrvUavDescriptorDemander(ICbvSrvUavDemander* demander)
     _needsUpdateDescriptorHeap = true;
 }
 
+void DxDevice::registerCbvSrvUavDescriptorDemander(std::shared_ptr<ICbvSrvUavDemander> demander)
+{
+    _cbvSrvUavDescriptorDemandersShared.push_back(demander);
+
+    _needsUpdateDescriptorHeap = true;
+}
+
 void DxDevice::unregisterCbvSrvUavDescriptorDemander(ICbvSrvUavDemander* demander)
 {
     for (int i = 0; i < _cbvSrvUavDescriptorDemanders.size(); ++i)
@@ -265,7 +282,16 @@ void DxDevice::unregisterCbvSrvUavDescriptorDemander(ICbvSrvUavDemander* demande
         if (_cbvSrvUavDescriptorDemanders[i] == demander)
         {
             _cbvSrvUavDescriptorDemanders.erase(_cbvSrvUavDescriptorDemanders.begin() + i);
-            return;
+            break;
+        }
+    }
+
+    for (int i = 0; i < _cbvSrvUavDescriptorDemandersShared.size(); ++i)
+    {
+        if (_cbvSrvUavDescriptorDemandersShared[i].get() == demander)
+        {
+            _cbvSrvUavDescriptorDemandersShared.erase(_cbvSrvUavDescriptorDemandersShared.begin() + i);
+            break;
         }
     }
 
@@ -297,6 +323,15 @@ void DxDevice::buildCbvSrvUavDescriptorHeap()
         CD3DX12_GPU_DESCRIPTOR_HANDLE(_cbvSrvUavHeap->GetGPUDescriptorHandleForHeapStart());
 
     for (auto& demander : _cbvSrvUavDescriptorDemanders)
+    {
+        const auto numDescriptorsToDemand = demander->getNumDescriptorsToDemand();
+
+        demander->buildCbvSrvUav(cpuHandle, gpuHandle);
+        cpuHandle.Offset(numDescriptorsToDemand, _cbvSrvUavDescriptorSize);
+        gpuHandle.Offset(numDescriptorsToDemand, _cbvSrvUavDescriptorSize);
+    }
+
+    for (auto& demander : _cbvSrvUavDescriptorDemandersShared)
     {
         const auto numDescriptorsToDemand = demander->getNumDescriptorsToDemand();
 

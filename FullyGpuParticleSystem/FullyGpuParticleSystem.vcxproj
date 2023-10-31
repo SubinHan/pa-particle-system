@@ -174,12 +174,14 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="FullyGpuParticleSystem.h" />
     <ClInclude Include="Include\Core\MaterialManager.h" />
+    <ClInclude Include="Include\Core\ParticlePass.h" />
     <ClInclude Include="Include\Core\ParticleSorter.h" />
     <ClInclude Include="Include\Core\HlslTranslatorEmit.h" />
     <ClInclude Include="Include\Core\ParticleSystemManager.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeClip.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeCurlNoiseForce.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeDragForce.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeEmpty.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeGetFloat3ByVariableName.h" />
@@ -211,6 +213,9 @@
     <ClInclude Include="Include\Model\PassConstants.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNode.h" />
     <ClInclude Include="Include\Model\RendererType.h" />
+    <ClInclude Include="Include\Model\ResourceRequest.h" />
+    <ClInclude Include="Include\Model\ResourceType.h" />
+    <ClInclude Include="Include\Model\ResourceViewType.h" />
     <ClInclude Include="Include\Model\Texture.h" />
     <ClInclude Include="Include\Ui\IWindow.h" />
     <ClInclude Include="Include\Ui\NodeEditor.h" />
@@ -223,6 +228,7 @@
     <ClInclude Include="Include\Ui\UiLink.h" />
     <ClInclude Include="Include\Ui\UiNode.h" />
     <ClInclude Include="Include\Ui\UiNodeFactory.h" />
+    <ClInclude Include="Include\Ui\ValueType.h" />
     <ClInclude Include="Include\Util\DDSTextureLoader.h" />
     <ClInclude Include="Include\Util\GeometryGenerator.h" />
     <ClInclude Include="Include\Core\PassConstantBuffer.h" />
@@ -248,6 +254,7 @@
     <ClCompile Include="..\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\include\imgui\imnodes.cpp" />
+    <ClCompile Include="Source\Core\ParticlePass.cpp" />
     <ClCompile Include="Source\Core\Hashable.cpp" />
     <ClCompile Include="Source\Core\HlslGeneratorEmit.cpp" />
     <ClCompile Include="Source\Core\HlslGeneratorRender.cpp" />
@@ -261,6 +268,7 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeClip.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeCurlNoiseForce.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeDragForce.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeEmpty.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeGetFloat3ByVariableName.cpp" />

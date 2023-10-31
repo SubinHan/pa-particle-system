@@ -20,6 +20,8 @@ struct Material;
 
 struct ID3D12GraphicsCommandList;
 
+class ShaderStatementNodeCurlNoiseForce;
+
 struct ParticleAppVertex
 {
 	DirectX::XMFLOAT3 Pos;
@@ -90,4 +92,5 @@ private:
 	std::unique_ptr<ParticleSystemManager> _particleSystemManager;
 	std::unique_ptr<ImguiInitializer> _imguiInitializer;
 	std::unique_ptr<ParticleSystemController> _particleSystemController;
+	std::unique_ptr<ShaderStatementNodeCurlNoiseForce> _temp;
 };

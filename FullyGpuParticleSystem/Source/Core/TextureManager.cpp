@@ -41,6 +41,7 @@ Texture TextureManager::getTexture(std::string name)
 
 CD3DX12_GPU_DESCRIPTOR_HANDLE TextureManager::getSrvGpuHandle(std::string textureName)
 {
+	//assert(_textureBuffers.count(textureName) > 0);
 	return _textureBuffers[textureName]->getSrvGpuHandle();
 }
 

@@ -23,11 +23,12 @@ private:
 	void loadParticleSystemManager();
 
 	ParticleSystem* createNewParticleSystem(std::string name);
+	void deleteParticleSystemAndSaveFiles(int index);
 
 private:
 	ParticleSystemManager* _particleSystemManager;
 
-	std::vector<std::unique_ptr<IWindow>> _showingWindow;
+	std::unique_ptr<IWindow> _showingWindow;
 
 	std::vector<float> _spawnRate;
 };

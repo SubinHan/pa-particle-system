@@ -4,6 +4,7 @@
 #include <string>
 
 enum class NodeType;
+enum class ValueType;
 
 class UiNode
 {
@@ -16,6 +17,7 @@ public:
         std::string nodeName,
         std::vector<std::string> inputNames,
         std::vector<std::string> constantInputNames,
+        std::vector<ValueType> constantValueTypes,
         std::vector<std::string> outputNames,
         NodeType nodeType);
 
@@ -27,6 +29,7 @@ public:
     int getNumOutputs() const;
     std::string getInputName(const int index) const;
     std::string getConstantInputName(const int index) const;
+    ValueType getConstantInputValueType(const int index) const;
     std::string getOutputName(const int index) const;
 
     bool containsAttributeAsInput(const int attributeId) const;
@@ -36,7 +39,11 @@ public:
     int getOutputId();
 
     float* getConstantInputAddress(const int index);
+    char* getConstantInputStringAddress(const int index);
     float getConstantInputValue(const int index) const;
+    std::string getConstantInputValueAsString(const int index) const;
+
+    void updateConstantInputStringFromCstr(int index);
 
 private:
     int _id;
@@ -46,5 +53,8 @@ private:
     std::vector<std::string> _outputNames;
     NodeType _nodeType;
 
+    std::vector<ValueType> _constantInputValueTypes;
     std::vector<float> _constantInputValues;
+    std::vector<std::string> _constantInputStrings;
+    std::vector<std::vector<char>> _constantInputStringsCstr;
 };

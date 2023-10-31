@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Model/ResourceRequest.h"
 #include "d3dcommon.h"
 
 #include <string>
@@ -16,9 +17,8 @@ public:
 	HlslGenerator(std::wstring baseShaderPath);
 	virtual ~HlslGenerator();
 
-	Microsoft::WRL::ComPtr<ID3DBlob> compile(std::wstring outputPath);
-
-	void generateShaderFile(std::wstring& outputPath);
+	void generateShaderFile(const std::wstring& outputPath);
+	std::vector<std::shared_ptr<ShaderStatementNode>> getNodes();
 
 	UINT empty();
 	UINT newFloat(float x);
@@ -46,8 +46,16 @@ protected:
 	std::vector<std::vector<UINT>> _graph;
 
 private:
-	void insertCode(std::ofstream& fout);
+	void findNumRegisters();
+	int parseNumBetween(std::string str, std::string prefix, std::string postfix);
+
+	void insertStatements(std::ofstream& fout);
 	void topologySort(UINT index);
+
+	std::vector<ResourceRequest> collectSrvRequests();
+
+	void insertSrvs(std::ofstream& fout);
+	std::string getTypeInShader(ID3D12Resource* resource) const; 
 
 private:
 	std::wstring _baseShaderPath;
@@ -55,4 +63,9 @@ private:
 	// for topological sort
 	std::vector<bool> _visited;
 	std::deque<UINT> _topologicalOrder;
+
+	int _numSrvInBaseShader;
+	int _numUavInBaseShader;
+
+	std::vector<ResourceRequest> _requestedSrvResources;
 };

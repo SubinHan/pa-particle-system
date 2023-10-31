@@ -15,6 +15,8 @@
 #include "Ui/NodeEditorEmit.h"
 #include "Ui/ParticleSystemController.h"
 
+#include "Core/ShaderStatementNode/ShaderStatementNodeCurlNoiseForce.h"
+
 #include "imgui.h"
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
@@ -47,9 +49,9 @@ bool ParticleApp::initialize()
 
 	auto commandList = _device->startRecordingCommands();
 
-	_imguiInitializer = std::make_unique<ImguiInitializer>(_device.get(), _hwnd);
+	_imguiInitializer = std::make_unique<ImguiInitializer>(_device, _hwnd);
 
-	_particleSystemManager = std::make_unique<ParticleSystemManager>(_device.get());
+	_particleSystemManager = std::make_unique<ParticleSystemManager>(_device);
 
 	_particleSystemController =
 		std::make_unique<ParticleSystemController>(_particleSystemManager.get());
@@ -174,7 +176,7 @@ void ParticleApp::drawObjects(ID3D12GraphicsCommandList* commandList, const Game
 	commandList->ResourceBarrier(1, &presentToRender);
 
 	commandList->ClearRenderTargetView(currentBackBufferView,
-		Colors::LightSteelBlue, 0, nullptr);
+		Colors::Black, 0, nullptr);
 	commandList->ClearDepthStencilView(depthStencilView,
 		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
 		1.0f, 0, 0, nullptr);
@@ -257,7 +259,7 @@ void ParticleApp::loadTextures(ID3D12GraphicsCommandList* commandList)
 		TextureManager* textureManager = TextureManager::getInstance();
 		textureManager->loadTexture(
 			commandList,
-			_device.get(),
+			_device,
 			texturesName[i],
 			texturesPath[i]);
 	}

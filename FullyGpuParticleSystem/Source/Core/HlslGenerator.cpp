@@ -14,28 +14,29 @@
 #include "Core/ShaderStatementNode/ShaderStatementNodeMaskX.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeMaskW.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeGetFloatByVariableName.h"
+#include "Model/ResourceViewType.h"
 #include "Util/DxUtil.h"
 
 #include <fstream>
 #include <assert.h>
 #include <queue>
 
-HlslGenerator::HlslGenerator(std::wstring baseShaderPath)
-	: _baseShaderPath(baseShaderPath)
+static const std::wstring SHADER_TEMP_PATH = L"ParticleSystemShaders/Generated/temp.hlsl";
+
+HlslGenerator::HlslGenerator(std::wstring baseShaderPath) :
+	_baseShaderPath(baseShaderPath),
+	_numSrvInBaseShader(0),
+	_numUavInBaseShader(0)
 {
+	findNumRegisters();
 }
 
 HlslGenerator::~HlslGenerator() = default;
 
-Microsoft::WRL::ComPtr<ID3DBlob> HlslGenerator::compile(std::wstring outputPath)
+void HlslGenerator::generateShaderFile(const std::wstring& outputPath)
 {
-	generateShaderFile(outputPath);
+	//std::vector<ResourceRequest> srvRequests = collectSrvRequests();
 
-	return nullptr;
-}
-
-void HlslGenerator::generateShaderFile(std::wstring& outputPath)
-{
 	std::ifstream fin;
 	fin.open(_baseShaderPath);
 	assert(fin.is_open());
@@ -51,17 +52,34 @@ void HlslGenerator::generateShaderFile(std::wstring& outputPath)
 	{
 		std::string line(buffer);
 
-		if (line.find("%s") == std::string::npos)
+		if (line.find("%s") != std::string::npos)
 		{
-			fout << buffer << std::endl;
+			insertStatements(fout);
+			continue;
+		}
+		
+		if (line.find("%u") != std::string::npos)
+		{
+			// TODO: insert unordered access view
 			continue;
 		}
 
-		insertCode(fout);
+		if (line.find("%t") != std::string::npos)
+		{
+			insertSrvs(fout);
+			continue;
+		}
+
+		fout << buffer << std::endl;
 	}
 
 	fin.close();
 	fout.close();
+}
+
+std::vector<std::shared_ptr<ShaderStatementNode>> HlslGenerator::getNodes()
+{
+	return _nodes;
 }
 
 UINT HlslGenerator::empty()
@@ -223,7 +241,51 @@ UINT HlslGenerator::getDeltaTime()
 	return nodeIndex;
 }
 
-void HlslGenerator::insertCode(std::ofstream& fout)
+void HlslGenerator::findNumRegisters()
+{
+	std::ifstream fin;
+	fin.open(_baseShaderPath);
+	assert(fin.is_open());
+
+	constexpr UINT BUFFER_SIZE = 512;
+	char buffer[BUFFER_SIZE];
+
+	const std::string registerPostfix = ")";
+	const std::string cbvRegisterPrefix = "register(b";
+	const std::string srvRegisterPrefix = "register(t";
+	const std::string uavRegisterPrefix = "register(u";
+
+	while (fin.getline(buffer, BUFFER_SIZE))
+	{
+		std::string line(buffer);
+
+		_numSrvInBaseShader = max(_numSrvInBaseShader, parseNumBetween(line, srvRegisterPrefix, registerPostfix) + 1);
+		_numUavInBaseShader = max(_numUavInBaseShader, parseNumBetween(line, uavRegisterPrefix, registerPostfix) + 1);
+	}
+
+	fin.close();
+}
+
+int HlslGenerator::parseNumBetween(std::string str, std::string prefix, std::string postfix)
+{
+	auto start = str.find(prefix);
+	if (start != std::string::npos)
+	{
+		start += prefix.size();
+		auto end = str.find(postfix, start);
+		int length = end - start;
+
+		// if "register(t10);", then registerNumber == "10"
+		std::string numberStr = str.substr(start, length);
+		int number = std::stoi(numberStr);
+		
+		return number;
+	}
+
+	return -1;
+}
+
+void HlslGenerator::insertStatements(std::ofstream& fout)
 {
 	const UINT numNodes = _graph.size();
 	_visited.resize(numNodes);
@@ -255,6 +317,77 @@ void HlslGenerator::topologySort(UINT index)
 	}
 
 	_topologicalOrder.push_front(index);
+}
+
+//std::vector<ResourceRequest> HlslGenerator::collectSrvRequests()
+//{
+//	std::vector<ResourceRequest> result;
+//
+//	for (auto node : _nodes)
+//	{
+//		std::vector<ResourceRequest> requests = node->getResourceRequests();
+//
+//		for (auto request : requests)
+//		{
+//			if (request.type == ResourceViewType::Srv)
+//			{
+//				result.push_back(request);
+//			}
+//		}
+//	}
+//
+//	return result;
+//}
+
+void HlslGenerator::insertSrvs(std::ofstream& fout)
+{
+	int numSrv = 0;
+
+	for (auto node : _nodes)
+	{
+		int numResourcesToBind = node->getNumResourcesToBind();
+		if (numResourcesToBind == 0)
+			continue;
+
+		std::vector<std::string> variableNames;
+
+		for (int i = 0; i < numResourcesToBind; ++i)
+		{
+			if (node->getResourceViewType(i) == ResourceViewType::Srv) 
+			{
+				std::string type = node->getTypeInShader(i);
+				std::string variableNameInShader = "texture" + std::to_string(numSrv);
+
+				fout << type << " " << variableNameInShader << " : register(t" << _numSrvInBaseShader + numSrv << ");" << std::endl;
+				++numSrv;
+
+				variableNames.push_back(variableNameInShader);
+			}
+		}
+		node->onResourceBound(variableNames);
+	}
+}
+
+std::string HlslGenerator::getTypeInShader(ID3D12Resource* resource) const
+{
+	switch (resource->GetDesc().Dimension)
+	{
+	case D3D12_RESOURCE_DIMENSION_TEXTURE2D:
+	{
+		return "Texture2D";
+	}
+
+	case D3D12_RESOURCE_DIMENSION_TEXTURE3D:
+	{
+		return "Texture3D";
+	}
+
+	default:
+	{
+		assert(0 && "Cannot get type in shader from resource.");
+		return "ERROR";
+	}
+	}
 }
 
 std::string HlslGenerator::getNewLocalVariableName()

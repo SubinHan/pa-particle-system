@@ -1,6 +1,7 @@
 #include "Ui/NodeEditor.h"
 
 #include "Ui/NodeType.h"
+#include "Ui/ValueType.h"
 #include "Ui/UiNodeFactory.h"
 #include "Io/NodeEditorIo.h"
 
@@ -91,7 +92,27 @@ void NodeEditor::show()
 
             ImNodes::BeginStaticAttribute(currentId);
             ImGui::PushItemWidth(120.f);
-            ImGui::DragFloat(node.getConstantInputName(i).c_str(), node.getConstantInputAddress(i), 0.01f);
+
+            const std::string label = node.getConstantInputName(i);
+            
+            switch (node.getConstantInputValueType(i))
+            {
+            case ValueType::Float:
+            {
+                ImGui::DragFloat(node.getConstantInputName(i).c_str(), node.getConstantInputAddress(i), 0.01f);
+                break;
+            }
+            case ValueType::String:
+            {
+                ImGui::InputText(label.c_str(), node.getConstantInputStringAddress(i), 64);
+                node.updateConstantInputStringFromCstr(i);
+                break;
+            }
+            default:
+                assert(0 && "unknown value type");
+                break;
+            }
+            
             ImGui::PopItemWidth();
             ImNodes::EndStaticAttribute();
         }

@@ -21,8 +21,7 @@ std::string NodeEditorSimulate::getName() const
 void NodeEditorSimulate::onCompileButtonClicked()
 {
 	HlslTranslatorSimulate translator(_nodes, _links);
-
-	_simulator->setShader(translator.compileShader());
+	translator.translateTo(_simulator);
 }
 
 std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorSimulate::getCreatableNodes() const
@@ -32,6 +31,7 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorSimulate::g
 		"PointAttractionForce",
 		"DragForce",
 		"VortexForce",
+		"CurlNoiseForce",
 	};
 
 	static const std::vector<NodeType> creatableNodeTypes =
@@ -39,6 +39,7 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorSimulate::g
 		NodeType::PointAttractionForce,
 		NodeType::DragForce,
 		NodeType::VortexForce,
+		NodeType::CurlNoiseForce,
 	};
 
 	return std::make_pair<>(creatableNodeNames, creatableNodeTypes);

@@ -2,6 +2,7 @@
 
 #include <array>
 
+// IMPORTANT: add
 enum class NodeType
 {
 	Empty,
@@ -20,6 +21,9 @@ enum class NodeType
 	PointAttractionForce,
 	DragForce,
 	VortexForce,
+	CurlNoiseForce,
+	MultiplyFloat3ByScalar,
+	SampleTexture2D,
 	Size
 };
 
@@ -41,6 +45,9 @@ const std::array<NodeType, static_cast<size_t>(NodeType::Size)> nodeTypes =
 	NodeType::PointAttractionForce,
 	NodeType::DragForce,
 	NodeType::VortexForce,
+	NodeType::CurlNoiseForce,
+	NodeType::MultiplyFloat3ByScalar,
+	NodeType::SampleTexture2D,
 };
 
 const std::array<std::string, static_cast<size_t>(NodeType::Size)> nodeNames =
@@ -61,4 +68,7 @@ const std::array<std::string, static_cast<size_t>(NodeType::Size)> nodeNames =
 	"PointAttractionForce",
 	"DragForce",
 	"VortexForce",
+	"CurlNoiseForce",
+	"MultiplyFloat3ByScalar",
+	"SampleTexture2D",
 };

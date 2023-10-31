@@ -205,6 +205,21 @@
     * Node를 삭제할 수 있음
     * 각 Emitter, Simulator, Renderer Editor에서 사용할 수 있는 node들만 생성할 수 있음
   * <img src="./img/20231027_particles.webp">
+  * 배경 변경(하늘색 -> 검은색)
+
+
+##### 4주차: 각종 Simulation 힘 적용 및 Fire 렌더링 (2023.10.30. ~ 2023.11.03.)
+* 월요일:
+  + Perlin Noise 학습
+  + Curl Noise를 활용하기 위한 구조적 개선
+    + 각 Pass(Emitter, Simulator, Renderer)는 동적으로 리소스(텍스처)를 활용할 수 있음.
+    + 어떤 Shader statement nodes로 구성되었느냐에 따라서 동적으로 root signature, pso, shader를 빌드
+* 화요일:
+  * Curl Noise 적용
+  * 코드 리팩토링 및 구조적 개선
+  * <img src="./img/curl_noise.webp">
+  * 
+
 
 <hr/>
 
@@ -365,4 +380,7 @@ compileShaders();
 * Parallel sort
   * [Bathcer's Algorithm](https://math.mit.edu/~shor/18.310/batcher.pdf)
   * [Bitonic sorter](https://en.wikipedia.org/wiki/Bitonic_sorter)
+
+* Ribbon Trail
+  * [Ribbon and Trail](https://doc.stride3d.net/4.0/en/manual/particles/ribbons-and-trails.html)
 

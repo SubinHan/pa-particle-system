@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Core/ICbvSrvUavDemander.h"
-#include "Core/Hashable.h"
+#include "Core/ParticlePass.h"
 #include "Util/DxUtil.h"
 
 #include <memory>
@@ -13,33 +12,32 @@ struct ID3D12RootSignature;
 
 class ParticleResource;
 class HlslGeneratorSimulate;
+class ShaderStatementNode;
 
 struct ParticleSimulateConstants
 {
 	float DeltaTime;
 };
 
-class ParticleSimulator : public Hashable
+class ParticleSimulator : public ParticlePass
 {
 public:
-	ParticleSimulator(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource, std::string name);
+	ParticleSimulator(ParticleResource* resource, std::string name);
 	~ParticleSimulator();
-
-	std::string getName();
-
-	ID3D12RootSignature* getRootSignature();
-	ID3DBlob* getShader();
-	ID3D12PipelineState* getPipelineStateObject();
-
 	void simulateParticles(ID3D12GraphicsCommandList* cmdList, float deltaTime);
 
-	void compileShader();
-	void setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
+protected:
+	virtual std::vector<CD3DX12_ROOT_PARAMETER> buildRootParameter() override;
+	virtual int getNumSrvUsing() override;
+	virtual int getNumUavUsing() override;
+	virtual bool needsStaticSampler() override;
+
+	virtual void buildPsos() override;
 
 private:
-	void buildRootSignature();
-	void buildShaders();
-	void buildPsos();
+	void setDefaultShader();
+	void buildPostSimulationShader();
+	
 
 private:
 	static constexpr int ROOT_SLOT_PASS_CONSTANTS_BUFFER = 0;
@@ -49,19 +47,12 @@ private:
 	static constexpr int ROOT_SLOT_DEADS_INDICES_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER_BACK + 1;
 	static constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_DEADS_INDICES_BUFFER + 1;
 
-	Microsoft::WRL::ComPtr<ID3D12Device> _device;
-	ParticleResource* _resource;
-
-	std::string _name;
-
 	std::unique_ptr<HlslGeneratorSimulate> _hlslGenerator;
-
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
-	Microsoft::WRL::ComPtr<ID3DBlob> _shader;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature;
 
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoPost;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderPost;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignaturePost;
 
+	CD3DX12_DESCRIPTOR_RANGE _uavTable0;
+	CD3DX12_DESCRIPTOR_RANGE _uavTable1;
 };

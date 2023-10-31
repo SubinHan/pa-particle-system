@@ -21,8 +21,7 @@ std::string NodeEditorEmit::getName() const
 void NodeEditorEmit::onCompileButtonClicked()
 {
     HlslTranslatorEmit translator(_nodes, _links);
-
-    _emitter->setShader(translator.compileShader());
+    translator.translateTo(_emitter);
 }
 
 std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorEmit::getCreatableNodes() const
@@ -34,6 +33,7 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorEmit::getCr
         "NewFloat4",
         "RandFloat3",
         "AddFloat3",
+        "MultiplyFloat3ByScalar"
     };
 
     static const std::vector<NodeType> creatableNodeTypes=
@@ -43,6 +43,7 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorEmit::getCr
         NodeType::NewFloat4,
         NodeType::RandFloat3,
         NodeType::AddFloat3,
+        NodeType::MultiplyFloat3ByScalar,
     };
 
     return std::make_pair<>(creatableNodeNames, creatableNodeTypes);
