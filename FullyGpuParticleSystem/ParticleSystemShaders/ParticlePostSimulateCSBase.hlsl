@@ -1,4 +1,4 @@
-#include "Particle.hlsl"
+#include "ParticleSystemShaders/Particle.hlsl"
 
 RWByteAddressBuffer counters				: register(u0);
 

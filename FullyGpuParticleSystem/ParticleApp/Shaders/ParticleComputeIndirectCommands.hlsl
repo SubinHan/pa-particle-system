@@ -1,4 +1,4 @@
-#include "ParticleApp/Shaders/Particle.hlsl"
+#include "ParticleSystemShaders/Particle.hlsl"
 
 struct IndirectCommand
 {

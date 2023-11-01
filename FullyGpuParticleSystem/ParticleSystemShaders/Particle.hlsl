@@ -1,18 +1,21 @@
 struct Particle
 {
 	float3 Position;
-	float Size;
+	float InitialSize;
 
 	float3 Velocity;
-	float Lifetime;
+	float InitialLifetime;
 
 	float3 Acceleration;
-	float Opacity;
+	float InitialOpacity;
 
-	float3 Color;
+	float3 InitialColor;
 	float RemainLifetime;
 
+	float3 EndColor;
+	float EndSize;
 
+	float EndOpacity;
 };
 
 static const uint PARTICLECOUNTER_OFFSET_NUMDEADS = 0;

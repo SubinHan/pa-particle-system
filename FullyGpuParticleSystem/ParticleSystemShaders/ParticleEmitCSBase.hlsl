@@ -1,6 +1,6 @@
-#include "ParticleApp/Shaders/Util.hlsl"
-#include "ParticleApp/Shaders/Particle.hlsl"
-#include "ParticleApp/Shaders/ParticleSystem.hlsl"
+#include "ParticleSystemShaders/Util.hlsl"
+#include "ParticleSystemShaders/Particle.hlsl"
+#include "ParticleSystemShaders/ParticleSystem.hlsl"
 
 cbuffer cbEmitConstants : register(b1)
 {
@@ -45,16 +45,19 @@ void EmitCS(
 
 	Particle newParticle;
 	newParticle.Position = float3(0.0f, 0.0f, 0.0f);
-	newParticle.Size = 0.05f;
+	newParticle.InitialSize = 1.0f;
 	newParticle.Velocity = float3(0.0f, 0.0f, 0.0f);
-	newParticle.Lifetime = 1.0f;
+	newParticle.InitialLifetime = 1.0f;
 	newParticle.Acceleration = float3(0.0f, 0.0f, 0.0f);
-	newParticle.Opacity = 1.0f;
-	newParticle.Color = float3(1.0f, 0.0f, 0.0f);
+	newParticle.InitialOpacity = 1.0f;
+	newParticle.InitialColor = float3(1.0f, 1.0f, 1.0f);
+	newParticle.EndColor = float3(1.0f, 1.0f, 1.0f);
+	newParticle.EndSize = 0.01f;
+	newParticle.EndOpacity = 0.0f;
 
 	%s
 
-
+	newParticle.RemainLifetime = newParticle.InitialLifetime;
 	// add particle into buffer
 	// TODO: remove either numDeads or numAlives and derive it with max num of particles.
 	uint numDeads;

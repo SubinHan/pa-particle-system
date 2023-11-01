@@ -1,5 +1,5 @@
-#include "ParticleApp/Shaders/Particle.hlsl"
-#include "ParticleApp/Shaders/Util.hlsl"
+#include "ParticleSystemShaders/Particle.hlsl"
+#include "ParticleSystemShaders/Util.hlsl"
 #include "ParticleSystemShaders/ParticleSimulateUtil.hlsl"
 
 cbuffer cbUpdateConstants : register(b0)
@@ -40,9 +40,9 @@ void SimulateCS(
 	if (uint(id) < numAlives)
 	{
 		const int particleIndex = aliveIndices[id];
-		particles[particleIndex].Lifetime -= DeltaTime;
+		particles[particleIndex].RemainLifetime -= DeltaTime;
 
-		const bool isExpired = particles[particleIndex].Lifetime <= 0.f;
+		const bool isExpired = particles[particleIndex].RemainLifetime <= 0.f;
 
 		if (isExpired)
 		{

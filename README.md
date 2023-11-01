@@ -218,7 +218,13 @@
   * Curl Noise 적용
   * 코드 리팩토링 및 구조적 개선
   * <img src="./img/curl_noise.webp">
-  * 
+  * 위에서 파티클들이 초기에 burst 되는 것은 의도된 것이 아니며, 변경되는 deltaTime으로 인해서 정확한 파티클의 움직임이 계산되지 않은 결과임
+* 수요일:
+  * 이제 파티클의 size, color, opacity 등을 lifetime 기반으로 선형적으로 보간함
+  * 노드 에디터 안정성 개선
+    * 적절히 연결되지 않은 노드는 컴파일되지 않음
+  * 각종 노드들 추가
+  * 불 렌더링 시작
 
 
 <hr/>
@@ -383,4 +389,9 @@ compileShaders();
 
 * Ribbon Trail
   * [Ribbon and Trail](https://doc.stride3d.net/4.0/en/manual/particles/ribbons-and-trails.html)
+
+* Perlin Noise
+  * [Perlin Noise](https://en.wikipedia.org/wiki/Perlin_noise)
+
+* 
 

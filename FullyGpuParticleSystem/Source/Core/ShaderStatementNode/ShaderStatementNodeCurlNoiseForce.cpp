@@ -77,7 +77,7 @@ ResourceViewType ShaderStatementNodeCurlNoiseForce::getResourceViewType(int inde
 std::string ShaderStatementNodeCurlNoiseForce::getTypeInShader(int index) const
 {
 	assert(index == 0 && "index is wrong");
-	return "Texture3D";
+	return "Texture3D<float3>";
 }
 
 void ShaderStatementNodeCurlNoiseForce::onResourceBound(std::vector<std::string> variableNamesInShader)

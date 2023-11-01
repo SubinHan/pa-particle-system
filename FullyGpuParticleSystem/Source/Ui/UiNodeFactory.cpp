@@ -17,18 +17,34 @@ UiNode UiNodeFactory::createNode(const int id, NodeType nodeType)
 		return createNewFloat3(id);
 	case NodeType::NewFloat4:
 		return createNewFloat4(id);
+	case NodeType::RandFloat:
+		return createRandFloat(id);
 	case NodeType::RandFloat3:
 		return createRandFloat3(id);
 	case NodeType::AddFloat3:
 		return createAddFloat3(id);
+	case NodeType::MultiplyFloat:
+		return createMultiplyFloat(id);
 	case NodeType::MultiplyFloat3ByScalar:
 		return createMultiplyFloat3ByScalar(id);
+	case NodeType::MaskX:
+		return createMaskX(id);
+	case NodeType::MaskY:
+		return createMaskY(id);
+	case NodeType::MaskZ:
+		return createMaskZ(id);
+	case NodeType::MaskW:
+		return createMaskW(id);
 	case NodeType::GetParticlePosition:
 		return createGetParticlePosition(id);
 	case NodeType::GetParticleVelocity:
 		return createGetParticleVelocity(id);
 	case NodeType::GetParticleAcceleration:
 		return createGetParticleAcceleration(id);
+	case NodeType::GetParticleColor:
+		return createGetParticleColor(id);
+	case NodeType::GetParticleAlpha:
+		return createGetParticleAlpha(id);
 	case NodeType::EmitterOutput:
 		return createEmitterOutput(id);
 	case NodeType::SimulatorOutput:
@@ -45,8 +61,20 @@ UiNode UiNodeFactory::createNode(const int id, NodeType nodeType)
 		return createVortexForce(id);
 	case NodeType::CurlNoiseForce:
 		return createCurlNoiseForce(id);
-	case NodeType::SampleTexture2D:
+	case NodeType::SampleTexture2d:
 		return createSampleTexture2d(id);
+	case NodeType::GrayscaleToTranslucent:
+		return createGrayscaleToTranslucent(id);
+	case NodeType::SetColorOfFloat4:
+		return createSetColorOfFloat4(id);
+	case NodeType::SampleTexture2dSubUvAnimation:
+		return createSampleTexture2dSubUvAnimation(id);
+	case NodeType::MakeFloat4ByColorAlpha:
+		return createMakeFloat4ByColorAlpha(id);
+	case NodeType::MakeFloat3:
+		return createMakeFloat3(id);
+	case NodeType::MakeFloat4:
+		return createMakeFloat4(id);
 	default:
 		// should never reach here.
 		assert(0 && "Unknown node type was given.");
@@ -127,6 +155,20 @@ UiNode UiNodeFactory::createNewFloat4(const int id)
 	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
 
 	return UiNode(id, nodeName, emptyVector, constantInputNames, constantsValueTypes, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createRandFloat(const int id)
+{
+	constexpr auto nodeType = NodeType::RandFloat;
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, emptyVector, emptyVector, emptyValueType, outputNames, nodeType);
 }
 
 UiNode UiNodeFactory::createRandFloat3(const int id)
@@ -234,6 +276,10 @@ UiNode UiNodeFactory::createEmitterOutput(const int id)
 		"initialLifetime",
 		"initialSize",
 		"initialOpacity",
+		"InitialColor",
+		"EndSize",
+		"EndOpacity",
+		"EndColor"
 	};
 	std::vector<std::string> emptyVector;
 	std::vector<ValueType> emptyValueType;
@@ -370,7 +416,7 @@ UiNode UiNodeFactory::createCurlNoiseForce(const int id)
 
 UiNode UiNodeFactory::createSampleTexture2d(const int id)
 {
-	constexpr auto nodeType = NodeType::SampleTexture2D;
+	constexpr auto nodeType = NodeType::SampleTexture2d;
 	std::vector<std::string> emptyVector;
 	std::vector<std::string> constantsNames =
 	{
@@ -388,4 +434,246 @@ UiNode UiNodeFactory::createSampleTexture2d(const int id)
 
 	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
 	return UiNode(id, nodeName, emptyVector, constantsNames, constantsValueTypes, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createGrayscaleToTranslucent(const int id)
+{
+	constexpr auto nodeType = NodeType::GrayscaleToTranslucent;
+	std::vector<std::string> inputNames =
+	{
+		"grayscaleColorFloat4"
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float4",
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createSetColorOfFloat4(const int id)
+{
+	constexpr auto nodeType = NodeType::SetColorOfFloat4;
+	std::vector<std::string> inputNames =
+	{
+		"float4",
+		"color"
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float4",
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createGetParticleColor(const int id)
+{
+	constexpr auto nodeType = NodeType::GetParticleColor;
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float3"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, emptyVector, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createGetParticleAlpha(const int id)
+{
+	constexpr auto nodeType = NodeType::GetParticleAlpha;
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float3"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, emptyVector, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createSampleTexture2dSubUvAnimation(const int id)
+{
+	constexpr auto nodeType = NodeType::SampleTexture2dSubUvAnimation;
+	std::vector<std::string> emptyVector;
+	std::vector<std::string> constantsNames =
+	{
+		"textureName",
+		"numSubTexturesX",
+		"numSubTexturesY",
+	};
+	std::vector<ValueType> constantsValueTypes =
+	{
+		ValueType::String,
+		ValueType::Float,
+		ValueType::Float,
+	};
+
+	std::vector<std::string> outputNames =
+	{
+		"float4",
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, emptyVector, constantsNames, constantsValueTypes, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createMultiplyFloat(const int id)
+{
+	constexpr auto nodeType = NodeType::MultiplyFloat;
+	std::vector<std::string> inputNames =
+	{
+		"floatInput0",
+		"floatInput1",
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createMakeFloat4ByColorAlpha(const int id)
+{
+	constexpr auto nodeType = NodeType::MakeFloat4ByColorAlpha;
+	std::vector<std::string> inputNames =
+	{
+		"float3Input",
+		"floatInput",
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float4"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createMakeFloat3(const int id)
+{
+	constexpr auto nodeType = NodeType::MakeFloat3;
+	std::vector<std::string> inputNames =
+	{
+		"floatX",
+		"floatY",
+		"floatZ",
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float3"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createMakeFloat4(const int id)
+{
+	constexpr auto nodeType = NodeType::MakeFloat4;
+	std::vector<std::string> inputNames =
+	{
+		"floatX",
+		"floatY",
+		"floatZ",
+		"floatW",
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float4"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createMaskX(const int id)
+{
+	constexpr auto nodeType = NodeType::MaskX;
+	std::vector<std::string> inputNames =
+	{
+		"floatInput",
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createMaskY(const int id)
+{
+	constexpr auto nodeType = NodeType::MaskY;
+	std::vector<std::string> inputNames =
+	{
+		"floatInput",
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createMaskZ(const int id)
+{
+	constexpr auto nodeType = NodeType::MaskZ;
+	std::vector<std::string> inputNames =
+	{
+		"floatInput",
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createMaskW(const int id)
+{
+	constexpr auto nodeType = NodeType::MaskW;
+	std::vector<std::string> inputNames =
+	{
+		"floatInput",
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
 }

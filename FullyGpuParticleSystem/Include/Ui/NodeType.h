@@ -2,7 +2,8 @@
 
 #include <array>
 
-// IMPORTANT: add
+// IMPORTANT: do not add new node type in the middle of enums.
+// must add into before 'Size' to prevent occurring conflicts to save/load nodes.
 enum class NodeType
 {
 	Empty,
@@ -23,7 +24,21 @@ enum class NodeType
 	VortexForce,
 	CurlNoiseForce,
 	MultiplyFloat3ByScalar,
-	SampleTexture2D,
+	SampleTexture2d,
+	GrayscaleToTranslucent,
+	SetColorOfFloat4,
+	GetParticleColor,
+	SampleTexture2dSubUvAnimation,
+	MultiplyFloat,
+	MakeFloat4ByColorAlpha,
+	MaskX,
+	GetParticleAlpha,
+	RandFloat,
+	MaskY,
+	MaskZ,
+	MaskW,
+	MakeFloat4,
+	MakeFloat3,
 	Size
 };
 
@@ -47,7 +62,21 @@ const std::array<NodeType, static_cast<size_t>(NodeType::Size)> nodeTypes =
 	NodeType::VortexForce,
 	NodeType::CurlNoiseForce,
 	NodeType::MultiplyFloat3ByScalar,
-	NodeType::SampleTexture2D,
+	NodeType::SampleTexture2d,
+	NodeType::GrayscaleToTranslucent,
+	NodeType::SetColorOfFloat4,
+	NodeType::GetParticleColor,
+	NodeType::SampleTexture2dSubUvAnimation,
+	NodeType::MultiplyFloat,
+	NodeType::MakeFloat4ByColorAlpha,
+	NodeType::MaskX,
+	NodeType::GetParticleAlpha,
+	NodeType::RandFloat,
+	NodeType::MaskY,
+	NodeType::MaskZ,
+	NodeType::MaskW,
+	NodeType::MakeFloat4,
+	NodeType::MakeFloat3,
 };
 
 const std::array<std::string, static_cast<size_t>(NodeType::Size)> nodeNames =
@@ -71,4 +100,18 @@ const std::array<std::string, static_cast<size_t>(NodeType::Size)> nodeNames =
 	"CurlNoiseForce",
 	"MultiplyFloat3ByScalar",
 	"SampleTexture2D",
+	"GrayscaleToTranslucent",
+	"SetColorOfFloat4",
+	"GetParticleColor",
+	"SampelTexture2dSubUvAnimation",
+	"MultiplyFloat",
+	"MakeFloat4ByColorAlpha",
+	"MaskX",
+	"GetParticleAlpha",
+	"RandFloat",
+	"MaskY",
+	"MaskZ",
+	"MaskW",
+	"MakeFloat4",
+	"MakeFloat3",
 };

@@ -12,8 +12,10 @@ public:
 	static UiNode createNewFloat(const int id);
 	static UiNode createNewFloat3(const int id);
 	static UiNode createNewFloat4(const int id);
+	static UiNode createRandFloat(const int id);
 	static UiNode createRandFloat3(const int id);
 	static UiNode createAddFloat3(const int id);
+	static UiNode createMultiplyFloat(const int id);
 	static UiNode createMultiplyFloat3ByScalar(const int id);
 	static UiNode createGetParticlePosition(const int id);
 	static UiNode createGetParticleVelocity(const int id);
@@ -27,4 +29,16 @@ public:
 	static UiNode createVortexForce(const int id);
 	static UiNode createCurlNoiseForce(const int id);
 	static UiNode createSampleTexture2d(const int id);
+	static UiNode createGrayscaleToTranslucent(const int id);
+	static UiNode createSetColorOfFloat4(const int id);
+	static UiNode createGetParticleColor(const int id);
+	static UiNode createGetParticleAlpha(const int id);
+	static UiNode createSampleTexture2dSubUvAnimation(const int id);
+	static UiNode createMakeFloat4ByColorAlpha(const int id);
+	static UiNode createMakeFloat3(const int id);
+	static UiNode createMakeFloat4(const int id);
+	static UiNode createMaskX(const int id);
+	static UiNode createMaskY(const int id);
+	static UiNode createMaskZ(const int id);
+	static UiNode createMaskW(const int id);
 };

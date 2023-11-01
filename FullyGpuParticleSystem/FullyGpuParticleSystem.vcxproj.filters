@@ -267,6 +267,36 @@
     <ClInclude Include="Include\Ui\ValueType.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeGrayscaleToTranslucent.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetColorOfFloat4.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSampleTexture2dSubUvAnimation.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat4ByColorAlpha.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMultiplyFloat.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMaskY.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMaskZ.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat4.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat3.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -491,6 +521,36 @@
     <ClCompile Include="Source\Core\ParticlePass.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeGrayscaleToTranslucent.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetColorOfFloat4.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSampleTexture2dSubUvAnimation.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat4ByColorAlpha.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMultiplyFloat.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMaskY.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMaskZ.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat4.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat3.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FullyGpuParticleSystem.rc">
@@ -509,13 +569,11 @@
     <FxCompile Include="ParticleApp\Shaders\color.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\VertexShader.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticleEmitCS.hlsl" />
-    <FxCompile Include="ParticleApp\Shaders\Util.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\Util.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticleSimulateCS.hlsl" />
-    <FxCompile Include="ParticleApp\Shaders\Particle.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticleRender.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticlePostSimulateCS.hlsl" />
-    <FxCompile Include="ParticleApp\Shaders\ParticleSystem.hlsl" />
-    <FxCompile Include="ParticleApp\Shaders\ParticleSortCS.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleSortCS.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticleComputeIndirectCommands.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleRenderVSBase.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleRenderGSBase.hlsl" />

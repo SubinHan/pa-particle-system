@@ -89,6 +89,11 @@ bool HlslTranslator::translateNode(UiNode node)
 		hlslIndex = _hlslGenerator->newFloat4(r, g, b, a);
 		break;
 	}
+	case NodeType::RandFloat:
+	{
+		hlslIndex = _hlslGenerator->randFloat();
+		break;
+	}
 	case NodeType::RandFloat3:
 	{
 		hlslIndex = _hlslGenerator->randFloat3();
@@ -99,19 +104,131 @@ bool HlslTranslator::translateNode(UiNode node)
 		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
 		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
 
-		UINT input0Index = indexMap[inputNodeId0];
-		UINT input1Index = indexMap[inputNodeId1];
-		hlslIndex = _hlslGenerator->addFloat3(input0Index, input1Index);
+		if (inputNodeId0 != -1 && inputNodeId1 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			UINT input1Index = indexMap[inputNodeId1];
+			hlslIndex = _hlslGenerator->addFloat3(input0Index, input1Index);
+		}
+		break;
+	}
+	case NodeType::MultiplyFloat:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+
+		if (inputNodeId0 != -1 && inputNodeId1 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			UINT input1Index = indexMap[inputNodeId1];
+			hlslIndex = _hlslGenerator->multiplyFloat(input0Index, input1Index);
+		}
 		break;
 	}
 	case NodeType::MultiplyFloat3ByScalar:
 	{
 		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
 		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
-
-		UINT input0Index = indexMap[inputNodeId0];
-		UINT input1Index = indexMap[inputNodeId1];
-		hlslIndex = _hlslGenerator->multiplyFloat3ByScalar(input0Index, input1Index);
+		if (inputNodeId0 != -1 && inputNodeId1 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			UINT input1Index = indexMap[inputNodeId1];
+			hlslIndex = _hlslGenerator->multiplyFloat3ByScalar(input0Index, input1Index);
+		}
+		break;
+	}
+	case NodeType::MaskX:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		if (inputNodeId0 != -1 )
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			hlslIndex = _hlslGenerator->maskX(input0Index);
+		}
+		break;
+	}
+	case NodeType::MaskY:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		if (inputNodeId0 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			hlslIndex = _hlslGenerator->maskY(input0Index);
+		}
+		break;
+	}
+	case NodeType::MaskZ:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		if (inputNodeId0 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			hlslIndex = _hlslGenerator->maskZ(input0Index);
+		}
+		break;
+	}
+	case NodeType::MaskW:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		if (inputNodeId0 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			hlslIndex = _hlslGenerator->maskW(input0Index);
+		}
+		break;
+	}
+	case NodeType::SetColorOfFloat4:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		if (inputNodeId0 != -1 && inputNodeId1 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			UINT input1Index = indexMap[inputNodeId1];
+			hlslIndex = _hlslGenerator->setColorOfFloat4(input0Index, input1Index);
+		}
+		break;
+	}
+	case NodeType::MakeFloat4ByColorAlpha:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		if (inputNodeId0 != -1 && inputNodeId1 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			UINT input1Index = indexMap[inputNodeId1];
+			hlslIndex = _hlslGenerator->makeFloat4ByColorAlpha(input0Index, input1Index);
+		}
+		break;
+	}
+	case NodeType::MakeFloat3:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		const int inputNodeId2 = findOppositeNodeByInputAttrbuteId(node.getInputId(2));
+		if (inputNodeId0 != -1 && inputNodeId1 != -1 && inputNodeId2 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			UINT input1Index = indexMap[inputNodeId1];
+			UINT input2Index = indexMap[inputNodeId2];
+			hlslIndex = _hlslGenerator->makeFloat3(input0Index, input1Index, input2Index);
+		}
+		break;
+	}
+	case NodeType::MakeFloat4:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		const int inputNodeId2 = findOppositeNodeByInputAttrbuteId(node.getInputId(2));
+		const int inputNodeId3 = findOppositeNodeByInputAttrbuteId(node.getInputId(3));
+		if (inputNodeId0 != -1 && inputNodeId1 != -1 && inputNodeId2 != -1 && inputNodeId3 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			UINT input1Index = indexMap[inputNodeId1];
+			UINT input2Index = indexMap[inputNodeId2];
+			UINT input3Index = indexMap[inputNodeId3];
+			hlslIndex = _hlslGenerator->makeFloat4(input0Index, input1Index, input2Index, input3Index);
+		}
 		break;
 	}
 	default:
@@ -206,7 +323,5 @@ int HlslTranslator::findOppositeNodeByInputAttrbuteId(int inputId)
 		}
 	}
 
-	// never reach here
-	assert(0);
 	return -1;
 }

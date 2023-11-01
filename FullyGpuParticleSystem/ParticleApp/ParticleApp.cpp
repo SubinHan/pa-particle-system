@@ -245,18 +245,21 @@ void ParticleApp::loadTextures(ID3D12GraphicsCommandList* commandList)
 {
 	// parallel vectors:
 	const std::vector<std::string> texturesName = {
-		"default"
+		"default",
+		"fire",
 	};
 
 	const std::vector<std::wstring> texturesPath = {
-		L"textures/circle_05.dds"
+		L"textures/circle_05.dds",
+		L"textures/fire_subuv.dds",
 	};
 
 	assert(texturesName.size() == texturesPath.size());
 
+	TextureManager* textureManager = TextureManager::getInstance();
+
 	for (int i = 0; i < texturesName.size(); ++i)
 	{
-		TextureManager* textureManager = TextureManager::getInstance();
 		textureManager->loadTexture(
 			commandList,
 			_device,

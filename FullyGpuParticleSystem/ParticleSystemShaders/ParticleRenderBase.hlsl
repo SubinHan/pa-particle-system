@@ -1,5 +1,6 @@
-#include "ParticleApp/Shaders/Particle.hlsl"
-#include "ParticleApp/Shaders/ParticleSystem.hlsl"
+#include "ParticleSystemShaders/Particle.hlsl"
+#include "ParticleSystemShaders/ParticleSystem.hlsl"
+#include "ParticleSystemShaders/Util.hlsl"
 
 cbuffer cbPass : register(b1)
 {
@@ -23,6 +24,7 @@ struct VertexOut
 {
 	float3 CenterW	: POSITION;
 	float Size : SIZE;
+	uint ThreadId : THREADID;
 };
 
 struct GeoOut
@@ -31,7 +33,7 @@ struct GeoOut
 	float3 PosW : POSITION;
 	float3 NormalW : NORMAL;
 	float2 TexC : TEXCOORD;
-	uint PrimId : SV_PrimitiveID;
+	uint ThreadId : THREADID;
 };
 
 StructuredBuffer<Particle> particles : register(t0);
@@ -51,14 +53,26 @@ SamplerState gsamAnisotropicClamp  : register(s5);
 VertexOut ParticleVS(
 	uint vid : SV_VertexID)
 {
-	const uint particleIndex = aliveIndices[vid];
+	const uint threadId = vid;
+
+	const uint particleIndex = aliveIndices[threadId];
 	Particle particle = particles[particleIndex];
 
 	VertexOut vertexOut;
 
 	const float4 posW = mul(float4(particle.Position, 1.0f), gWorld);
 	vertexOut.CenterW = posW;
-	vertexOut.Size = particle.Size;
+
+	float initialLifetime = particle.InitialLifetime;
+	float remainLifetime = particle.RemainLifetime;
+	float normalizedLifetimeInv = (initialLifetime - remainLifetime) / initialLifetime;
+
+	float initialSize = particle.InitialSize;
+	float endSize = particle.EndSize;
+	float interpolatedSize = lerp(initialSize, endSize, normalizedLifetimeInv);
+
+	vertexOut.Size = interpolatedSize;
+	vertexOut.ThreadId = threadId;
 
 	return vertexOut;
 }
@@ -66,7 +80,6 @@ VertexOut ParticleVS(
 [maxvertexcount(4)]
 void ParticleGS(
 	point VertexOut gin[1],
-	uint primId : SV_PrimitiveID,
 	inout TriangleStream<GeoOut> triStream)
 {
 	float3 up = float3(0.0f, 1.0f, 0.0f);
@@ -100,7 +113,7 @@ void ParticleGS(
 		geoOut.PosW = vertices[i].xyz;
 		geoOut.NormalW = look;
 		geoOut.TexC = texC[i];
-		geoOut.PrimId = primId;
+		geoOut.ThreadId = gin[0].ThreadId;
 
 		triStream.Append(geoOut);
 	}
@@ -109,6 +122,22 @@ void ParticleGS(
 float4 ParticlePS(GeoOut pin) : SV_Target
 {
 	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	const uint particleIndex = aliveIndices[pin.ThreadId];
+	Particle particle = particles[particleIndex];
+
+	float initialLifetime = particle.InitialLifetime;
+	float remainLifetime = particle.RemainLifetime;
+	float normalizedLifetimeInv = (initialLifetime - remainLifetime) / initialLifetime;
+
+	float3 initialColor = particle.InitialColor;
+	float3 endColor = particle.EndColor;
+	float3 interpolatedColor = lerp(initialColor, endColor, normalizedLifetimeInv);
+
+	float initialOpacity = particle.InitialOpacity;
+	float endOpacity = particle.EndOpacity;
+	float interpolatedOpacity = lerp(initialOpacity, endOpacity, normalizedLifetimeInv);
+
+	color = float4(interpolatedColor, interpolatedOpacity);
 
 	%s
 

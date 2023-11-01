@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Util/MathHelper.h"
-
 #include "Core/ShaderStatementNode/ShaderStatementNode.h"
 
 class ShaderStatementNodeNewRandFloat3 : public ShaderStatementNode
@@ -13,7 +11,4 @@ public:
 	virtual std::string generateStatements() const override;
 
 private:
-	float _x;
-	float _y;
-	float _z;
 };

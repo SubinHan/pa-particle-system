@@ -105,7 +105,7 @@ void ParticleSorter::buildRootSignature()
 void ParticleSorter::buildShaders()
 {
 	_shader = DxUtil::compileShader(
-		L"ParticleApp\\Shaders\\ParticleSortCS.hlsl",
+		L"ParticleSystemShaders\\ParticleSortCS.hlsl",
 		nullptr,
 		"BitonicSortCS",
 		"cs_5_1");

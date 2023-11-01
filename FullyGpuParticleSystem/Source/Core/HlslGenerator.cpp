@@ -5,15 +5,23 @@
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewFloat.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewFloat3.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewFloat4.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeNewRandFloat.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewRandFloat3.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewRandFloat4.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeSetAlpha.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeAddFloat4.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeAddFloat3.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeMultiplyFloat.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeMultiplyFloat3ByScalar.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeMaskX.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeMaskY.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeMaskZ.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeMaskW.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeGetFloatByVariableName.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeSetColorOfFloat4.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeMakeFloat4ByColorAlpha.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeMakeFloat3.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeMakeFloat4.h"
 #include "Model/ResourceViewType.h"
 #include "Util/DxUtil.h"
 
@@ -124,6 +132,17 @@ UINT HlslGenerator::newFloat4(float x, float y, float z, float w)
 	return nodeIndex;
 }
 
+UINT HlslGenerator::randFloat()
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeNewRandFloat>(newLocalVariableName);
+	addNode(newNode);
+
+	return nodeIndex;
+}
+
 UINT HlslGenerator::randFloat3()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
@@ -189,6 +208,20 @@ UINT HlslGenerator::addFloat3(UINT float3Index0, UINT float3Index1)
 	return nodeIndex;
 }
 
+UINT HlslGenerator::multiplyFloat(UINT floatIndex0, UINT floatIndex1)
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeMultiplyFloat>(newLocalVariableName);
+	newNode->setInput(_nodes[floatIndex0], _nodes[floatIndex1]);
+	addNode(newNode);
+	linkNode(floatIndex0, nodeIndex);
+	linkNode(floatIndex1, nodeIndex);
+
+	return nodeIndex;
+}
+
 UINT HlslGenerator::multiplyFloat3ByScalar(UINT float3Index, UINT floatIndex)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
@@ -217,6 +250,32 @@ UINT HlslGenerator::maskX(UINT float4Index)
 	return nodeIndex;
 }
 
+UINT HlslGenerator::maskY(UINT float4Index)
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeMaskY>(newLocalVariableName);
+	newNode->setInput(_nodes[float4Index]);
+	addNode(newNode);
+	linkNode(float4Index, nodeIndex);
+
+	return nodeIndex;
+}
+
+UINT HlslGenerator::maskZ(UINT float4Index)
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeMaskZ>(newLocalVariableName);
+	newNode->setInput(_nodes[float4Index]);
+	addNode(newNode);
+	linkNode(float4Index, nodeIndex);
+
+	return nodeIndex;
+}
+
 UINT HlslGenerator::maskW(UINT float4Index)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
@@ -237,6 +296,66 @@ UINT HlslGenerator::getDeltaTime()
 	auto newNode =
 		std::make_shared<ShaderStatementNodeGetFloatByVariableName>(newLocalVariableName, "DeltaTime");
 	addNode(newNode);
+
+	return nodeIndex;
+}
+
+UINT HlslGenerator::setColorOfFloat4(UINT float4Index, UINT colorIndex)
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeSetColorOfFloat4>(newLocalVariableName);
+	newNode->setInputFloat4(_nodes[float4Index]);
+	newNode->setInputColor(_nodes[colorIndex]);
+	addNode(newNode);
+	linkNode(float4Index, nodeIndex);
+	linkNode(colorIndex, nodeIndex);
+
+	return nodeIndex;
+}
+
+UINT HlslGenerator::makeFloat4ByColorAlpha(UINT float3Index, UINT floatIndex)
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeMakeFloat4ByColorAlpha>(newLocalVariableName);
+	newNode->setInput(_nodes[float3Index], _nodes[floatIndex]);
+	addNode(newNode);
+	linkNode(float3Index, nodeIndex);
+	linkNode(floatIndex, nodeIndex);
+
+	return nodeIndex;
+}
+
+UINT HlslGenerator::makeFloat3(UINT floatXIndex, UINT floatYIndex, UINT floatZIndex)
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeMakeFloat3>(newLocalVariableName);
+	newNode->setInput(_nodes[floatXIndex], _nodes[floatYIndex], _nodes[floatZIndex]);
+	addNode(newNode);
+	linkNode(floatXIndex, nodeIndex);
+	linkNode(floatYIndex, nodeIndex);
+	linkNode(floatZIndex, nodeIndex);
+
+	return nodeIndex;
+}
+
+UINT HlslGenerator::makeFloat4(UINT floatXIndex, UINT floatYIndex, UINT floatZIndex, UINT floatWIndex)
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeMakeFloat4>(newLocalVariableName);
+	newNode->setInput(_nodes[floatXIndex], _nodes[floatYIndex], _nodes[floatZIndex], _nodes[floatWIndex]);
+	addNode(newNode);
+	linkNode(floatXIndex, nodeIndex);
+	linkNode(floatYIndex, nodeIndex);
+	linkNode(floatZIndex, nodeIndex);
+	linkNode(floatWIndex, nodeIndex);
 
 	return nodeIndex;
 }

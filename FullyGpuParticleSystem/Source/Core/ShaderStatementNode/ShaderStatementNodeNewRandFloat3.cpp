@@ -1,5 +1,7 @@
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewRandFloat3.h"
 
+#include "Util/MathHelper.h"
+
 ShaderStatementNodeNewRandFloat3::ShaderStatementNodeNewRandFloat3(std::string variableName) :
 	ShaderStatementNode(variableName)
 {

@@ -61,9 +61,12 @@ bool HlslTranslatorSimulate::translateNode(UiNode node)
 		const float strength = node.getConstantInputValue(4);
 
 		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		if (inputNodeId != -1)
+		{
+			UINT inputIndex = indexMap[inputNodeId];
+			hlslIndex = hlslGeneratorSimulate->pointAttraction(inputIndex, x, y, z, radius, strength);
+		}
 		
-		UINT inputIndex = indexMap[inputNodeId];
-		hlslIndex = hlslGeneratorSimulate->pointAttraction(inputIndex, x, y, z, radius, strength);
 		break;
 	}
 
@@ -72,9 +75,11 @@ bool HlslTranslatorSimulate::translateNode(UiNode node)
 		const float dragCoefficient = node.getConstantInputValue(0);
 
 		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-
-		UINT inputIndex = indexMap[inputNodeId];
-		hlslIndex = hlslGeneratorSimulate->drag(inputIndex, dragCoefficient);
+		if (inputNodeId != -1)
+		{
+			UINT inputIndex = indexMap[inputNodeId];
+			hlslIndex = hlslGeneratorSimulate->drag(inputIndex, dragCoefficient);
+		}
 		break;
 	}
 	
@@ -90,18 +95,20 @@ bool HlslTranslatorSimulate::translateNode(UiNode node)
 		const float tightness = node.getConstantInputValue(7);
 
 		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-
-		UINT inputIndex = indexMap[inputNodeId];
-		hlslIndex = hlslGeneratorSimulate->vortex(
-			inputIndex, 
-			vortexCenterX,
-			vortexCenterY,
-			vortexCenterZ,
-			vortexAxisX,
-			vortexAxisY,
-			vortexAxisZ,
-			magnitude,
-			tightness);
+		if (inputNodeId != -1)
+		{
+			UINT inputIndex = indexMap[inputNodeId];
+			hlslIndex = hlslGeneratorSimulate->vortex(
+				inputIndex,
+				vortexCenterX,
+				vortexCenterY,
+				vortexCenterZ,
+				vortexAxisX,
+				vortexAxisY,
+				vortexAxisZ,
+				magnitude,
+				tightness);
+		}
 		break;
 	}
 
@@ -111,12 +118,14 @@ bool HlslTranslatorSimulate::translateNode(UiNode node)
 		const float frequency = node.getConstantInputValue(1);
 
 		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-
-		UINT inputIndex = indexMap[inputNodeId];
-		hlslIndex = hlslGeneratorSimulate->curlNoise(
-			inputIndex,
-			amplitude,
-			frequency);
+		if (inputNodeId != -1)
+		{
+			UINT inputIndex = indexMap[inputNodeId];
+			hlslIndex = hlslGeneratorSimulate->curlNoise(
+				inputIndex,
+				amplitude,
+				frequency);
+		}
 		break;
 	}
 

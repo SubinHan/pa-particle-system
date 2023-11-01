@@ -43,16 +43,48 @@ bool HlslTranslatorRender::translateNode(UiNode node)
 	case NodeType::RendererOutput:
 	{
 		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-
-		UINT input0Index = indexMap[inputNodeId0];
-
-		hlslGeneratorRender->setOutputColor(input0Index);
+		if (inputNodeId0 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			hlslGeneratorRender->setOutputColor(input0Index);
+		}
 		break;
 	}
-	case NodeType::SampleTexture2D:
+	case NodeType::SampleTexture2d:
 	{
 		const std::string textureName = node.getConstantInputValueAsString(0);
 		hlslIndex = hlslGeneratorRender->sampleTexture2d(textureName);
+		break;
+	}
+	case NodeType::GrayscaleToTranslucent:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		if (inputNodeId0 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			hlslIndex =  hlslGeneratorRender->grayscaleToTranslucent(input0Index);
+		}
+		break;
+	}
+	case NodeType::GetParticleColor:
+	{
+		hlslIndex = hlslGeneratorRender->getParticleColor();
+		break;
+	}
+	case NodeType::GetParticleAlpha:
+	{
+		hlslIndex = hlslGeneratorRender->getParticleAlpha();
+		break;
+	}
+	case NodeType::SampleTexture2dSubUvAnimation:
+	{
+		const std::string textureName = node.getConstantInputValueAsString(0);
+		const float numSubTexturesX = node.getConstantInputValue(1);
+		const float numSubTexturesY = node.getConstantInputValue(2);
+		hlslIndex = hlslGeneratorRender->sampleTexture2dSubUvAnimation(
+			textureName, 
+			numSubTexturesX, 
+			numSubTexturesY);
 		break;
 	}
 	default:

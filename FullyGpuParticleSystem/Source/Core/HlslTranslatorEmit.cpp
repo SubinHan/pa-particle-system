@@ -42,26 +42,85 @@ bool HlslTranslatorEmit::translateNode(UiNode node)
 	{
 	case NodeType::EmitterOutput:
 	{
+		// initial position
 		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		if (inputNodeId0 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			hlslGeneratorEmit->setInitialPosition(input0Index);
+		}
+
+		// initial velocity
 		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		if (inputNodeId1 != -1)
+		{
+			UINT input1Index = indexMap[inputNodeId1];
+			hlslGeneratorEmit->setInitialVelocity(input1Index);
+		}
+
+		// initial acceleration
 		const int inputNodeId2 = findOppositeNodeByInputAttrbuteId(node.getInputId(2));
+		if (inputNodeId2 != -1)
+		{
+			UINT input2Index = indexMap[inputNodeId2];
+			hlslGeneratorEmit->setInitialAcceleration(input2Index);
+		}
+
+		// initial lifetime
 		const int inputNodeId3 = findOppositeNodeByInputAttrbuteId(node.getInputId(3));
+		if (inputNodeId3 != -1)
+		{
+			UINT input3Index = indexMap[inputNodeId3];
+			hlslGeneratorEmit->setInitialLifetime(input3Index);
+		}
+
+		// initial size
 		const int inputNodeId4 = findOppositeNodeByInputAttrbuteId(node.getInputId(4));
+		if (inputNodeId4 != -1)
+		{
+			UINT input4Index = indexMap[inputNodeId4];
+			hlslGeneratorEmit->setInitialSize(input4Index);
+		}
+
+		// initial opacity
 		const int inputNodeId5 = findOppositeNodeByInputAttrbuteId(node.getInputId(5));
+		if (inputNodeId5 != -1)
+		{
+			UINT input5Index = indexMap[inputNodeId5];
+			hlslGeneratorEmit->setInitialOpacity(input5Index);
+		}
+		
+		// initial color
+		const int inputNodeId6 = findOppositeNodeByInputAttrbuteId(node.getInputId(6));
+		if (inputNodeId6 != -1)
+		{
+			UINT initialColorIndex = indexMap[inputNodeId6];
+			hlslGeneratorEmit->setInitialColor(initialColorIndex);
+		}
 
-		UINT input0Index = indexMap[inputNodeId0];
-		UINT input1Index = indexMap[inputNodeId1];
-		UINT input2Index = indexMap[inputNodeId2];
-		UINT input3Index = indexMap[inputNodeId3];
-		UINT input4Index = indexMap[inputNodeId4];
-		UINT input5Index = indexMap[inputNodeId5];
+		// end size
+		const int inputNodeId7 = findOppositeNodeByInputAttrbuteId(node.getInputId(7));
+		if (inputNodeId7 != -1)
+		{
+			UINT endSizeIndex = indexMap[inputNodeId7];
+			hlslGeneratorEmit->setEndSize(endSizeIndex);
+		}
 
-		hlslGeneratorEmit->setInitialPosition(input0Index);
-		hlslGeneratorEmit->setInitialVelocity(input1Index);
-		hlslGeneratorEmit->setInitialAcceleration(input2Index);
-		hlslGeneratorEmit->setInitialLifetime(input3Index);
-		hlslGeneratorEmit->setInitialSize(input4Index);
-		hlslGeneratorEmit->setInitialOpacity(input5Index);
+		// end opacity
+		const int inputNodeId8 = findOppositeNodeByInputAttrbuteId(node.getInputId(8));
+		if (inputNodeId8 != -1)
+		{
+			UINT endOpacityIndex = indexMap[inputNodeId8];
+			hlslGeneratorEmit->setEndOpacity(endOpacityIndex);
+		}
+	
+		// end color
+		const int inputNodeId9 = findOppositeNodeByInputAttrbuteId(node.getInputId(9));
+		if (inputNodeId9 != -1)
+		{
+			UINT endColorIndex = indexMap[inputNodeId9];
+			hlslGeneratorEmit->setEndColor(endColorIndex);
+		}
 		break;
 	}
 	default:

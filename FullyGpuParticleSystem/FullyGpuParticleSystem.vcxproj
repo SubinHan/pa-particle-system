@@ -178,6 +178,10 @@
     <ClInclude Include="Include\Core\ParticleSorter.h" />
     <ClInclude Include="Include\Core\HlslTranslatorEmit.h" />
     <ClInclude Include="Include\Core\ParticleSystemManager.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat3.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat4.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMaskY.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat4ByColorAlpha.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeClip.h" />
@@ -186,8 +190,11 @@
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeEmpty.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeGetFloat3ByVariableName.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeGetFloatByVariableName.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeGrayscaleToTranslucent.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMaskW.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMaskX.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMaskZ.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMultiplyFloat.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMultiplyFloat3ByScalar.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewFloat.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewFloat3.h" />
@@ -195,8 +202,11 @@
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat3.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat4.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodePointAttractionForce.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSampleTexture2d.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSampleTexture2dSubUvAnimation.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetAlpha.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetColorOfFloat4.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeVortexForce.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeWindForce.h" />
@@ -273,8 +283,15 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeEmpty.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeGetFloat3ByVariableName.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeGetFloatByVariableName.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeGrayscaleToTranslucent.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat3.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat4.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat4ByColorAlpha.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMaskW.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMaskX.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMaskY.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMaskZ.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMultiplyFloat.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeMultiplyFloat3ByScalar.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat1.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewFloat3.cpp" />
@@ -293,11 +310,14 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ParticleApp\ParticleApp.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNode.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat3.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeNewRandFloat4.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodePointAttractionForce.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSampleTexture2d.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSampleTexture2dSubUvAnimation.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetAlpha.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetColorOfFloat4.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeVortexForce.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeWindForce.cpp" />
@@ -335,9 +355,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="ParticleApp\Shaders\Particle.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\ParticleComputeIndirectCommands.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -356,13 +373,10 @@
     <FxCompile Include="ParticleApp\Shaders\ParticleSimulateCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="ParticleApp\Shaders\ParticleSortCS.hlsl">
+    <FxCompile Include="ParticleSystemShaders\ParticleSortCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="ParticleApp\Shaders\ParticleSystem.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="ParticleApp\Shaders\Util.hlsl">
+    <FxCompile Include="ParticleSystemShaders\Util.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleApp\Shaders\VertexShader.hlsl">

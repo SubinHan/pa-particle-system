@@ -5,13 +5,19 @@
 struct Particle
 {
 	DirectX::XMFLOAT3 Position;
-	float Size;
+	float InitialSize;
 
 	DirectX::XMFLOAT3 Velocity;
-	float Lifetime;
+	float InitialLifetime;
 
 	DirectX::XMFLOAT3 Acceleration;
-	float Opacity;
+	float InitialOpacity;
 
-	DirectX::XMFLOAT3 Color;
+	DirectX::XMFLOAT3 InitialColor;
+	float RemainLifetime;
+
+	DirectX::XMFLOAT3 EndColor;
+	float EndSize;
+
+	float EndOpacity;
 };

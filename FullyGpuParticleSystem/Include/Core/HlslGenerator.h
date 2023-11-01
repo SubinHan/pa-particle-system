@@ -24,16 +24,24 @@ public:
 	UINT newFloat(float x);
 	UINT newFloat3(float x, float y, float z);
 	UINT newFloat4(float x, float y, float z, float w);
+	UINT randFloat();
 	UINT randFloat3();
 	UINT randFloat4();
 	UINT setAlpha(UINT float4Index, UINT alphaIndex);
 	UINT addFloat4(UINT float4Index0, UINT float4Index1);
 	UINT addFloat3(UINT float3Index0, UINT float3Index1);
+	UINT multiplyFloat(UINT floatIndex0, UINT floatIndex1);
 	UINT multiplyFloat3ByScalar(UINT float3Index, UINT floatIndex);
 	UINT branch(UINT aIndex, UINT bIndex, UINT aLargerThanB, UINT aEqualB, UINT bLargerThanA);
 	UINT maskX(UINT float4Index);
+	UINT maskY(UINT float4Index);
+	UINT maskZ(UINT float4Index);
 	UINT maskW(UINT float4Index);
 	UINT getDeltaTime();
+	UINT setColorOfFloat4(UINT float4Index, UINT colorIndex);
+	UINT makeFloat4ByColorAlpha(UINT float3Index, UINT floatIndex);
+	UINT makeFloat3(UINT floatXIndex, UINT floatYIndex, UINT floatZIndex);
+	UINT makeFloat4(UINT floatXIndex, UINT floatYIndex, UINT floatZIndex, UINT floatWIndex);
 
 protected:
 	std::string getNewLocalVariableName();

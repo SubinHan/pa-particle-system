@@ -37,7 +37,16 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorRender::get
         "NewFloat3",
         "NewFloat4",
         "AddFloat3",
+		"MultiplyFloat",
+		"MultiplyFloat3ByScalar",
+		"MaskX",
 		"SampleTexture2D",
+		"GrayscaleToTranslucent",
+		"SetColorOfFloat4",
+		"GetParticleColor",
+		"GetParticleAlpha",
+		"SampleTexture2DSubUvAnmation",
+		"MakeFloat4ByColorAlpha",
     };
 
     static const std::vector<NodeType> creatableNodeTypes =
@@ -46,7 +55,16 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorRender::get
         NodeType::NewFloat3,
         NodeType::NewFloat4,
         NodeType::AddFloat3,
-        NodeType::SampleTexture2D,
+		NodeType::MultiplyFloat,
+		NodeType::MultiplyFloat3ByScalar,
+		NodeType::MaskX,
+        NodeType::SampleTexture2d,
+        NodeType::GrayscaleToTranslucent,
+        NodeType::SetColorOfFloat4,
+        NodeType::GetParticleColor,
+		NodeType::GetParticleAlpha,
+		NodeType::SampleTexture2dSubUvAnimation,
+		NodeType::MakeFloat4ByColorAlpha,
     };
 
     return std::make_pair<>(creatableNodeNames, creatableNodeTypes);
