@@ -82,6 +82,7 @@
 * Collision
 * Lighting
 * Curl Noise를 Perlin Noise 기반으로
+* Orphan node들을 shader code로 변환하지 않아야 함
 * Shader generation에서 node dependency 무결성 확인
   * i.e.) float3에 float4를 대입하지는 않는지?
   * 각 node들이 type 정보를 유지하여 적절한 input임을 검증해야 함
@@ -90,7 +91,12 @@
 
 ##### 진행 중인 Task
 * Particle System 학습
-* 
+* Ribbon, Trail rendering 학습
+  * Spline 학습
+  * 1차적 구현 목표:
+    * https://youtu.be/Zn9-U5vQl3g?si=OwzghEU3Dq-Bh-fX&t=155
+    * Spawntime 기반으로 particle 정렬 후
+    * 이들을 지나는 spline 렌더링
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -117,6 +123,7 @@
   * 새로운 Particle System 추가 가능
   * Particle System의 상태를 저장 및 로드
   * Opaque/Translucent 변환 가능
+  * input node가 유효하지 않다면 컴파일하지 않음
 * Simulation Node:
   * Vortex Force
   * Point Attraction Force
