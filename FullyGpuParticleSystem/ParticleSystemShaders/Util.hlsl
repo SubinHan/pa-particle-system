@@ -40,3 +40,19 @@ float2 subUv(float2 texC, uint subUvDimensionX, uint subUvDimensionY, uint index
 
 	return float2(subUvSize.x * indexX, subUvSize.y * indexY) + actualTexC;
 }
+
+float3 catmullRom(float3 p0, float3 p1, float3 p2, float3 p3, float t)
+{
+	float3 result;
+
+	float t2 = t * t;
+	float t3 = t2 * t;
+	
+	result =
+		0.5f * (
+			(2.0f * p1) + (-p0 + p2) * t +
+			(2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
+			(-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3);
+
+	return result;
+}

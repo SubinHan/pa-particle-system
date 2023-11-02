@@ -97,6 +97,8 @@
     * https://youtu.be/Zn9-U5vQl3g?si=OwzghEU3Dq-Bh-fX&t=155
     * Spawntime 기반으로 particle 정렬 후
     * 이들을 지나는 spline 렌더링
+      * Bezier curve
+      * Catmull-rom spline?
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -255,6 +257,8 @@
     * ExecuteIndirect 호출에서 commands의 수를 세는 counter buffer를 함께 넘기므로, maxCommandsCount가 실제 indirectComamnds의 개수에 비해 현저히 적더라도 별 문제 없을 것이라고 생각하였으나, 특정 GPU 드라이버들은 적절한 maxCommandsCount를 넘겨주어야만 좋은 성능을 낼 수 있음(출처: PIX 디버거 분석 도구)
     * 이와 관련한 tasks는 차후 최적화 단계에서 해결할 예정
   * Ribbon, Trail rendering 준비: Spline 학습
+* 금요일:
+  * 
 <hr/>
 
 ### 세부 구현 설명
@@ -447,5 +451,6 @@ compileShaders();
 * Perlin Noise
   * [Perlin Noise](https://en.wikipedia.org/wiki/Perlin_noise)
 
-* 
+* Bezier Curve(spline)
+  * [Bezier Curve](https://www.particleincell.com/2012/bezier-splines/)
 
