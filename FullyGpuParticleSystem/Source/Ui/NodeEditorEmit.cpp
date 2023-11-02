@@ -28,38 +28,14 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorEmit::getCr
 {
     static const std::vector<std::string> creatableNodeNames =
     {
-        "NewFloat",
-        "NewFloat3",
-        "NewFloat4",
         "RandFloat",
         "RandFloat3",
-        "AddFloat3",
-        "MaskX",
-        "MaskY",
-        "MaskZ",
-        "MaskW",
-        "MakeFloat3",
-        "MakeFloat4",
-        "MultiplyFloat3ByScalar",
-        "MultiplyFloat",
     };
 
     static const std::vector<NodeType> creatableNodeTypes=
     {
-        NodeType::NewFloat,
-        NodeType::NewFloat3,
-        NodeType::NewFloat4,
         NodeType::RandFloat,
         NodeType::RandFloat3,
-        NodeType::AddFloat3,
-        NodeType::MaskX,
-        NodeType::MaskY,
-        NodeType::MaskZ,
-        NodeType::MaskW,
-        NodeType::MakeFloat3,
-        NodeType::MakeFloat4,
-        NodeType::MultiplyFloat3ByScalar,
-        NodeType::MultiplyFloat,
     };
 
     return std::make_pair<>(creatableNodeNames, creatableNodeTypes);

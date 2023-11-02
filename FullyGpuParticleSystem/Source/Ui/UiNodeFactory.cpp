@@ -21,6 +21,8 @@ UiNode UiNodeFactory::createNode(const int id, NodeType nodeType)
 		return createRandFloat(id);
 	case NodeType::RandFloat3:
 		return createRandFloat3(id);
+	case NodeType::AddFloat:
+		return createAddFloat(id);
 	case NodeType::AddFloat3:
 		return createAddFloat3(id);
 	case NodeType::MultiplyFloat:
@@ -185,6 +187,25 @@ UiNode UiNodeFactory::createRandFloat3(const int id)
 	return UiNode(id, nodeName, emptyVector, emptyVector, emptyValueType, outputNames, nodeType);
 }
 
+UiNode UiNodeFactory::createAddFloat(const int id)
+{
+	constexpr auto nodeType = NodeType::AddFloat;
+	std::vector<std::string> inputNames =
+	{
+		"floatInput0",
+		"floatInput1",
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
 UiNode UiNodeFactory::createAddFloat3(const int id)
 {
 	constexpr auto nodeType = NodeType::AddFloat3;
@@ -210,7 +231,7 @@ UiNode UiNodeFactory::createMultiplyFloat3ByScalar(const int id)
 	std::vector<std::string> inputNames =
 	{
 		"float3input0",
-		"float3input1",
+		"floatinput1",
 	};
 	std::vector<std::string> emptyVector;
 	std::vector<ValueType> emptyValueType;
@@ -494,7 +515,7 @@ UiNode UiNodeFactory::createGetParticleAlpha(const int id)
 	std::vector<ValueType> emptyValueType;
 	std::vector<std::string> outputNames =
 	{
-		"float3"
+		"float"
 	};
 
 	std::string nodeName = nodeNames[static_cast<int>(nodeType)];

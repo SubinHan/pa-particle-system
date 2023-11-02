@@ -33,4 +33,7 @@ protected:
     std::vector<UiLink> _links;
 
     bool _isAlive;
+    
+private:
+    std::pair<std::vector<std::string>, std::vector<NodeType>> getCreatableNodesImpl() const;
 };

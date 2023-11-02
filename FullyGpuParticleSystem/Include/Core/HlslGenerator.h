@@ -28,8 +28,9 @@ public:
 	UINT randFloat3();
 	UINT randFloat4();
 	UINT setAlpha(UINT float4Index, UINT alphaIndex);
-	UINT addFloat4(UINT float4Index0, UINT float4Index1);
+	UINT addFloat(UINT floatIndex0, UINT floatIndex1);
 	UINT addFloat3(UINT float3Index0, UINT float3Index1);
+	UINT addFloat4(UINT float4Index0, UINT float4Index1);
 	UINT multiplyFloat(UINT floatIndex0, UINT floatIndex1);
 	UINT multiplyFloat3ByScalar(UINT float3Index, UINT floatIndex);
 	UINT branch(UINT aIndex, UINT bIndex, UINT aLargerThanB, UINT aEqualB, UINT bLargerThanA);

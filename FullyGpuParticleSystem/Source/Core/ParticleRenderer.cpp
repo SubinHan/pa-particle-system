@@ -107,9 +107,11 @@ void ParticleRenderer::render(
 
 	_resource->transitCommandBufferToIndirectArgument(cmdList);
 
+	// TODO: Optimization - Set proper NumMaxCommands.
 	cmdList->ExecuteIndirect(
 		_commandSignature.Get(),
 		_resource->getMaxNumParticles(),
+		//1000,
 		_resource->getIndirectCommandsResource(),
 		0,
 		_resource->getIndirectCommandsResource(),

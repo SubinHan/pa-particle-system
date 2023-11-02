@@ -6,7 +6,8 @@
 #include "d3dx12.h"
 #include "d3d11.h"
 
-static constexpr int MAX_NUM_PARTICLES = 1'048'576;
+static constexpr int MAX_NUM_PARTICLES = 1'048'576 / 2;
+//static constexpr int MAX_NUM_PARTICLES = 65'536;
 
 using namespace DirectX;
 

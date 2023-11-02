@@ -14,6 +14,7 @@ public:
 	static UiNode createNewFloat4(const int id);
 	static UiNode createRandFloat(const int id);
 	static UiNode createRandFloat3(const int id);
+	static UiNode createAddFloat(const int id);
 	static UiNode createAddFloat3(const int id);
 	static UiNode createMultiplyFloat(const int id);
 	static UiNode createMultiplyFloat3ByScalar(const int id);

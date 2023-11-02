@@ -178,6 +178,7 @@
     <ClInclude Include="Include\Core\ParticleSorter.h" />
     <ClInclude Include="Include\Core\HlslTranslatorEmit.h" />
     <ClInclude Include="Include\Core\ParticleSystemManager.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat3.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat4.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMaskY.h" />
@@ -275,6 +276,7 @@
     <ClCompile Include="Source\Core\ImguiInitializer.cpp" />
     <ClCompile Include="Source\Core\MaterialManager.cpp" />
     <ClCompile Include="Source\Core\ParticleSystemManager.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeClip.cpp" />

@@ -56,7 +56,7 @@ void ParticleSorter::sortParticles(ID3D12GraphicsCommandList* cmdList)
 			const SortConstants c =
 			{
 				sequenceSize,
-				stage
+				stage,
 			};
 
 			cmdList->SetComputeRoot32BitConstants(ROOT_SLOT_CONSTANTS_BUFFER, sizeof(SortConstants) / 4, &c, 0);

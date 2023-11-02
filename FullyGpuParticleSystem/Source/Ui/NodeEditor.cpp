@@ -37,8 +37,8 @@ void NodeEditor::show()
         {
             ImGui::Text("Create a new node");
 
-            auto [nodeNames, nodeTypes] = getCreatableNodes();
-            assert(nodeNames.size() == nodeTypes.size() && "getCreatableNodeS() didn't return parallel vectors");
+            auto [nodeNames, nodeTypes] = getCreatableNodesImpl();
+            assert(nodeNames.size() == nodeTypes.size() && "getCreatableNodes() didn't return parallel vectors");
 
             const int numNodes = nodeNames.size();
             for (int i = 0; i < numNodes; ++i)
@@ -205,6 +205,61 @@ void NodeEditor::load()
     _nodes = nodes;
     _links = links;
     _currentId = currentId;
+}
+
+std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditor::getCreatableNodesImpl() const
+{
+    static const std::vector<std::string> creatableNodeNames =
+    {
+        "NewFloat",
+        "NewFloat3",
+        "NewFloat4",
+        "AddFloat",
+        "AddFloat3",
+        "MaskX",
+        "MaskY",
+        "MaskZ",
+        "MaskW",
+        "MakeFloat3",
+        "MakeFloat4",
+        "MakeFloat4ByColorAlpha",
+        "MultiplyFloat3ByScalar",
+        "MultiplyFloat",
+        "SetColorOfFloat4",
+    };
+
+    static const std::vector<NodeType> creatableNodeTypes =
+    {
+        NodeType::NewFloat,
+        NodeType::NewFloat3,
+        NodeType::NewFloat4,
+        NodeType::AddFloat,
+        NodeType::AddFloat3,
+        NodeType::MaskX,
+        NodeType::MaskY,
+        NodeType::MaskZ,
+        NodeType::MaskW,
+        NodeType::MakeFloat3,
+        NodeType::MakeFloat4,
+        NodeType::MakeFloat4ByColorAlpha,
+        NodeType::MultiplyFloat3ByScalar,
+        NodeType::MultiplyFloat,
+        NodeType::SetColorOfFloat4,
+    };
+
+    auto [childCreatableNodeNames, childCreatableNodeTypes] = getCreatableNodes();
+
+    childCreatableNodeNames.insert(
+        childCreatableNodeNames.end(),
+        creatableNodeNames.begin(),
+        creatableNodeNames.end());
+
+    childCreatableNodeTypes.insert(
+        childCreatableNodeTypes.end(),
+        creatableNodeTypes.begin(),
+        creatableNodeTypes.end());
+        
+    return std::make_pair<>(childCreatableNodeNames, childCreatableNodeTypes);
 }
 
 void NodeEditor::nextCurrentId(UiNode createdNode)

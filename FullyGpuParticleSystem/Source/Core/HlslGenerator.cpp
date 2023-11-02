@@ -9,8 +9,9 @@
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewRandFloat3.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewRandFloat4.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeSetAlpha.h"
-#include "Core/ShaderStatementNode/ShaderStatementNodeAddFloat4.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeAddFloat.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeAddFloat3.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeAddFloat4.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeMultiplyFloat.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeMultiplyFloat3ByScalar.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeMaskX.h"
@@ -190,6 +191,20 @@ UINT HlslGenerator::addFloat4(UINT float4Index0, UINT float4Index1)
 	addNode(newNode);
 	linkNode(float4Index0, nodeIndex);
 	linkNode(float4Index1, nodeIndex);
+
+	return nodeIndex;
+}
+
+UINT HlslGenerator::addFloat(UINT floatIndex0, UINT floatIndex1)
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeAddFloat>(newLocalVariableName);
+	newNode->setInput(_nodes[floatIndex0], _nodes[floatIndex1]);
+	addNode(newNode);
+	linkNode(floatIndex0, nodeIndex);
+	linkNode(floatIndex1, nodeIndex);
 
 	return nodeIndex;
 }

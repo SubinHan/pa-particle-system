@@ -18,6 +18,7 @@ Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslator::compileShader()
 {
 	_hlslGenerator = createHlslGenerator();
 
+	removeOrphanNodes();
 	topologySort();
 	generateNodes();
 
@@ -97,6 +98,19 @@ bool HlslTranslator::translateNode(UiNode node)
 	case NodeType::RandFloat3:
 	{
 		hlslIndex = _hlslGenerator->randFloat3();
+		break;
+	}
+	case NodeType::AddFloat:
+	{
+		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+
+		if (inputNodeId0 != -1 && inputNodeId1 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			UINT input1Index = indexMap[inputNodeId1];
+			hlslIndex = _hlslGenerator->addFloat(input0Index, input1Index);
+		}
 		break;
 	}
 	case NodeType::AddFloat3:
@@ -240,6 +254,12 @@ bool HlslTranslator::translateNode(UiNode node)
 		indexMap[node.getId()] = hlslIndex;
 	
 	return hasGenerated;
+}
+
+void HlslTranslator::removeOrphanNodes()
+{
+	// TODO
+	//auto [node, numInputs] = getFinalOutputNode();
 }
 
 void HlslTranslator::topologySort()

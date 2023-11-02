@@ -26,6 +26,8 @@ protected:
 	virtual std::unique_ptr<HlslGenerator> createHlslGenerator() = 0;
 	virtual Microsoft::WRL::ComPtr<ID3DBlob> compileShaderImpl(std::wstring shaderPath) = 0;
 
+	//virtual std::pair<UiNode, int> getFinalOutputNode() = 0;
+
 	virtual bool translateNode(UiNode node);
 
 	std::vector<int> findLinkedNodesWithOutput(const int nodeIndex);
@@ -46,6 +48,7 @@ private:
 	void generateNodes();
 	void generateShaderFile(std::wstring shaderPath);
 
+	void removeOrphanNodes();
 	void topologySort();
 	void topologySort0(const int index);
 

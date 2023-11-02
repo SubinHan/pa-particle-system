@@ -75,20 +75,22 @@
 ##### Backlogs
 * Ribbon trail renderer
 * Mesh(i.e. cube) render
-* Curl Noise simulation
 * Particle에 Orientation 속성 추가
 * Opaque particles를 먼저 draw해야 함
 * 프레임 통계 모듈
 * Motion blur
 * Collision
 * Lighting
+* Curl Noise를 Perlin Noise 기반으로
 * Shader generation에서 node dependency 무결성 확인
   * i.e.) float3에 float4를 대입하지는 않는지?
   * 각 node들이 type 정보를 유지하여 적절한 input임을 검증해야 함
+* 성능 이슈:
+  * ExecuteIndirect에서 적절한 maxCommandsCount를 넘기기 (관련 일지 - 4주차 목요일)
 
 ##### 진행 중인 Task
 * Particle System 학습
-* UI 적용
+* 
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -119,6 +121,8 @@
   * Vortex Force
   * Point Attraction Force
   * Drag Force
+  * Curl Noise Force
+* 불 렌더링
 * 
 
 <hr/>
@@ -225,8 +229,25 @@
     * 적절히 연결되지 않은 노드는 컴파일되지 않음
   * 각종 노드들 추가
   * 불 렌더링 시작
-
-
+* 목요일:
+  * 불 렌더링
+  * 예시1: <img src="./img/fire_example1.webp">
+  * 예시2: <img src="./img/fire_example2.webp">
+  * 파티클이 별로 없음에도 유독 렌더링이 느려지는 현상을 경험함.
+    * 원인: ExecuteIndirect 호출 시 적절하지 않은 최대 maxCommandsCount를 정의함. (2번째 인자)
+    ``` c++
+    // TODO: Optimization - Set proper NumMaxCommands.
+    cmdList->ExecuteIndirect(
+	    _commandSignature.Get(),
+	    _resource->getMaxNumParticles(),
+	    _resource->getIndirectCommandsResource(),
+	    0,
+	    _resource->getIndirectCommandsResource(),
+	    _resource->getCommandBufferCounterOffset());
+    ```
+    * ExecuteIndirect 호출에서 commands의 수를 세는 counter buffer를 함께 넘기므로, maxCommandsCount가 실제 indirectComamnds의 개수에 비해 현저히 적더라도 별 문제 없을 것이라고 생각하였으나, 특정 GPU 드라이버들은 적절한 maxCommandsCount를 넘겨주어야만 좋은 성능을 낼 수 있음(출처: PIX 디버거 분석 도구)
+    * 이와 관련한 tasks는 차후 최적화 단계에서 해결할 예정
+  * Ribbon, Trail rendering 준비: Spline 학습
 <hr/>
 
 ### 세부 구현 설명
@@ -371,9 +392,35 @@ compileShaders();
   * 가령 EmitCS의 경우 InitalPosition, InitialVelocity 따위를 최종 출력으로 받음.
 * 생성된 Shader 파일들의 이름은 객체 생성 시점을 해싱한 값으로 구분
 * 
+
+#### 컬 노이즈
+* 3차원 노이즈 텍스처를 생성 (R32G32B32FLOAT)
+  * Perlin Noise를 이용할 예정이었으나, 그냥 단순 noise를 사용해도 나쁘지 않은 결과를 보이므로 차후로 미루었음
+  * <img src="./img/noise_texture.png">
+* 이는 벡터가 되며 파티클의 위치를 기반으로 텍스처를 linear sample해 얻은 값으로 velocity를 누적
+* <img src="./img/curl_noise.webp">
+
+
+#### 불 렌더링
+
+* 예시1: <img src="./img/fire_example1.webp">
+* 예시2: <img src="./img/fire_example2.webp">
+* 노드 에디터 예시:
+  * <img src="./img/fire_example1_ps0_emitter.png">
+  * <img src="./img/fire_example1_ps0_simulator.png">
+  * <img src="./img/fire_example1_ps0_renderer.png">
+* 구현 방법
+  * Particle systems
+    * 위로 올라가는 불꽃을 표현하는 particle system
+    * 연기를 표현하는 particle system
+    * 불씨를 표현하는 particle system
+    * 중앙 불꽃을 표현하는 particle system
+  * 불꽃과 연기는 subuv 텍스처를 이용해서 lifetime을 기반으로 애니메이팅됨.
+    * <img src="./FullyGpuParticleSystem/Textures/fire_subuv.png">
+    * 애니메이션 블렌딩은 하지 않았음!
+  * 
+
 <hr/>
-
-
 
 ### 참고문헌 및 코드
 * Particle System
