@@ -6,8 +6,11 @@
 #include "d3dx12.h"
 #include "d3d11.h"
 
-static constexpr int MAX_NUM_PARTICLES = 1'048'576 / 2;
-//static constexpr int MAX_NUM_PARTICLES = 65'536;
+// should be power of 2. (for sort)
+//static constexpr int MAX_NUM_PARTICLES = 1'048'576 / 2;
+static constexpr int MAX_NUM_PARTICLES = 65'536;
+//static constexpr int MAX_NUM_PARTICLES = 512;
+
 
 using namespace DirectX;
 
@@ -186,7 +189,8 @@ void ParticleResource::transitCommandBufferToUav(ID3D12GraphicsCommandList* cmdL
 
 int ParticleResource::getMaxNumParticles()
 {
-	return MAX_NUM_PARTICLES;
+	// index 0 is reserved. (used for sorting)
+	return MAX_NUM_PARTICLES - 1;
 }
 
 void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
@@ -194,8 +198,9 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 	std::vector<UINT> deadIndices(MAX_NUM_PARTICLES);
 	for (int i = 0; i < MAX_NUM_PARTICLES; ++i)
 	{
-		deadIndices[i] = i;
+		deadIndices[i] = i + 1;
 	}
+	deadIndices[MAX_NUM_PARTICLES - 1] = 0; // reserved.
 
 	const auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
@@ -253,7 +258,7 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 	{
 		ParticleCounters counters =
 		{
-			MAX_NUM_PARTICLES,
+			getMaxNumParticles(),
 			0,
 			0
 		};

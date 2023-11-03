@@ -146,7 +146,7 @@ void ParticleRenderer::compileShaders()
 		"ps_5_1");
 
 	_shaderIndirectCommand = DxUtil::compileShader(
-		L"ParticleApp\\Shaders\\ParticleComputeIndirectCommands.hlsl",
+		L"ParticleSystemShaders\\ParticleComputeIndirectCommands.hlsl",
 		nullptr,
 		"ComputeIndirectCommandsCS",
 		"cs_5_1");

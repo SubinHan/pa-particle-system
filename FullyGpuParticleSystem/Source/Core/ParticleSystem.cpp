@@ -73,7 +73,7 @@ void ParticleSystem::onDraw(
 			commandList,
 			objConstants,
 			numSpawn,
-			gt.deltaTime());
+			gt);
 	}
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 1);

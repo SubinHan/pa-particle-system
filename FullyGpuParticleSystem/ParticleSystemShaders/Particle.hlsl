@@ -16,6 +16,8 @@ struct Particle
 	float EndSize;
 
 	float EndOpacity;
+	float SpawnTime;
+	uint SpawnOrderInFrame;
 };
 
 static const uint PARTICLECOUNTER_OFFSET_NUMDEADS = 0;

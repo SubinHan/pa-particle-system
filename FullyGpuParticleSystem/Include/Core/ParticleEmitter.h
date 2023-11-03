@@ -2,6 +2,7 @@
 
 #include "Core/ParticlePass.h"
 #include "Util/DxUtil.h"
+#include "Util/GameTimer.h"
 
 #include <wrl.h>
 
@@ -17,9 +18,12 @@ struct EmitConstants
 {
 	UINT EmitCount;
 	DirectX::XMFLOAT3 Position;
+
 	DirectX::XMFLOAT2 Orientation;
 	float DeltaTime;
 	UINT MaxNumParticles;
+
+	float TotalTime;
 };
 
 class ParticleEmitter : public ParticlePass
@@ -32,7 +36,7 @@ public:
 		ID3D12GraphicsCommandList* cmdList,
 		const ObjectConstants& objectConstants,
 		int numParticlesToEmit, 
-		float deltaTime);
+		const GameTimer& gt);
 
 protected:
 	virtual std::vector<CD3DX12_ROOT_PARAMETER> buildRootParameter() override;

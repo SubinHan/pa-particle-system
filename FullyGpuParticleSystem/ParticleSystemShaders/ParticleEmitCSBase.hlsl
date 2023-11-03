@@ -10,6 +10,8 @@ cbuffer cbEmitConstants : register(b1)
 	float2 Orientation;
 	float DeltaTime;
 	uint MaxNumParticles;
+
+	float TotalTime;
 }
 
 RWStructuredBuffer<Particle> particles	: register(u0);
@@ -29,7 +31,6 @@ void EmitCS(
 {
 	// should not emit if num of particles reached max.
 	uint numAlivesBeforeEmit = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
-	DeviceMemoryBarrierWithGroupSync();
 
 	bool willOver = numAlivesBeforeEmit + EmitCount > MaxNumParticles;
 	if (willOver)
@@ -54,6 +55,8 @@ void EmitCS(
 	newParticle.EndColor = float3(1.0f, 1.0f, 1.0f);
 	newParticle.EndSize = 0.01f;
 	newParticle.EndOpacity = 0.0f;
+	newParticle.SpawnTime = TotalTime;
+	newParticle.SpawnOrderInFrame = dispatchThreadId.x;
 
 	%s
 

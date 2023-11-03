@@ -33,14 +33,16 @@ void ParticleEmitter::emitParticles(
 	ID3D12GraphicsCommandList* cmdList,
 	const ObjectConstants& objectConstants,
 	int numParticlesToEmit, 
-	float deltaTime)
+	const GameTimer& gt)
 {
 	EmitConstants c = { 
 		numParticlesToEmit, 
 		DirectX::XMFLOAT3{0.0f, 0.0f, 0.0f}, 
 		DirectX::XMFLOAT2{0.0f, 0.0f},
-		deltaTime,
-		_resource->getMaxNumParticles()};
+		gt.deltaTime(),
+		_resource->getMaxNumParticles(),
+		gt.totalTime(),
+	};
 
 	cmdList->SetComputeRootSignature(_rootSignature.Get());
 

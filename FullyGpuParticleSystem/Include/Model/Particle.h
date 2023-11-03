@@ -20,4 +20,6 @@ struct Particle
 	float EndSize;
 
 	float EndOpacity;
+	float SpawnTime;
+	UINT SpawnOrderInFrame;
 };

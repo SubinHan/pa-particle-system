@@ -77,6 +77,7 @@
 * Mesh(i.e. cube) render
 * Particle에 Orientation 속성 추가
 * Opaque particles를 먼저 draw해야 함
+* Angular Velocity, Orientation 개념
 * 프레임 통계 모듈
 * Motion blur
 * Collision
@@ -99,6 +100,7 @@
     * 이들을 지나는 spline 렌더링
       * Bezier curve
       * Catmull-rom spline?
+      * Cardinal Spline
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -258,7 +260,13 @@
     * 이와 관련한 tasks는 차후 최적화 단계에서 해결할 예정
   * Ribbon, Trail rendering 준비: Spline 학습
 * 금요일:
-  * 
+  * Bitonic Sort의 동작을 PIX Debugger로 확인하는데 자꾸 이상한 결과가 나옴
+    * 시각적으로는 괜찮아 보이는데, 디버거로 직접 값들을 보면 정렬이 제대로 안 되어 있는 것
+    * 알고보니 GPU와 관련해서 Nvidia Control Panel을 통해 권한 설정을 해주어야 하는 것이 있었고, 이것이 제대로 이루어지지 않아 디버거의 초기화에 문제가 생겨서 발생한 현상으로 추측됨.
+  * Bitonic Sort는 2의 n승 꼴로만 수행이 되어서, 이를 임의의 n 크기에서 수행할 수 있는 방법을 찾아보았으나, [임의의 n 크기, parallel 수행에서 유리] 둘 다 갖춘 bitonic sort 알고리즘을 찾을 수는 없었음..
+    * [Arbitrary n size bitonic sort](https://hwlang.de/algorithmen/sortieren/bitonic/oddn.html) => 이걸 응용해볼 수 있을까? 머리가 아파서 생각을 그만두었음.
+  * 어쨌거나 Bitonic sort를 만들어놨으니 이를 활용하기로 함
+    * 2^n에서 남는 자리들은 정렬의 최후순위 값으로 padding
 <hr/>
 
 ### 세부 구현 설명
@@ -430,6 +438,25 @@ compileShaders();
     * <img src="./FullyGpuParticleSystem/Textures/fire_subuv.png">
     * 애니메이션 블렌딩은 하지 않았음!
   * 
+
+
+#### 리본 렌더링
+* 1차적 구현 목표:
+  * https://youtu.be/Zn9-U5vQl3g?si=OwzghEU3Dq-Bh-fX&t=155
+  * Spawntime 기반으로 particle 정렬 후
+  * 이들을 지나는 spline(Catmull-rom) 렌더링
+  * 적절한 레퍼런스를 찾지 못했으므로, 내 맘대로 구현한다.
+* 정렬
+  * Spawntime으로 하려고 했으나, 추가적인 인자가 필요함. 왜냐하면:
+    * 한 프레임에서 같은 spawntime을 가진 여러 파티클들이 생성됨
+    * Bitonic sort는 stable한 sort가 아닐 것이므로, spawntime이 같은 파티클들의 상대적 순서가 보존된다는 보장이 없음
+    * 따라서 spawn 시 해당 dispatch thread id를 기록하고 이 역시 정렬에 관여하도록 설정
+* Ribbon 생성
+  * 1차적으로는 particle의 위치를 기준으로 위아래로 두 개의 정점을 만들고, 인접 particle들 간 그 정점끼리 이어서 삼각형을 만드는 것으로 목표
+  * 차후:
+    * Tessellation을 이용해서 삼각형들을 쪼개 곡선을 생성
+    * particle 회전 값, 혹은 카메라 기반으로 정점의 위치를 조정
+
 
 <hr/>
 

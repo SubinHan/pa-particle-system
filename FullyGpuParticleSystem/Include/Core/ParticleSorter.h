@@ -17,6 +17,12 @@ struct SortConstants
 	UINT Stage;
 };
 
+struct PreSortConstants
+{
+	UINT fillEndIndex;
+	UINT FillNumber;
+};
+
 class ParticleSorter
 {
 public:
@@ -44,4 +50,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shader;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature;
+
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _prePso;
+	Microsoft::WRL::ComPtr<ID3DBlob> _preShader;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> _preRootSignature;
+
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _prePso0;
+	Microsoft::WRL::ComPtr<ID3DBlob> _preShader0;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> _preRootSignature0;
 };
