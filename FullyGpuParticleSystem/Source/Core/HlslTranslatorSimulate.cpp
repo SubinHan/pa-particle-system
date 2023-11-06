@@ -60,7 +60,7 @@ bool HlslTranslatorSimulate::translateNode(UiNode node)
 		const float radius = node.getConstantInputValue(3);
 		const float strength = node.getConstantInputValue(4);
 
-		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
 		if (inputNodeId != -1)
 		{
 			UINT inputIndex = indexMap[inputNodeId];
@@ -74,7 +74,7 @@ bool HlslTranslatorSimulate::translateNode(UiNode node)
 	{
 		const float dragCoefficient = node.getConstantInputValue(0);
 
-		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
 		if (inputNodeId != -1)
 		{
 			UINT inputIndex = indexMap[inputNodeId];
@@ -94,7 +94,7 @@ bool HlslTranslatorSimulate::translateNode(UiNode node)
 		const float magnitude = node.getConstantInputValue(6);
 		const float tightness = node.getConstantInputValue(7);
 
-		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
 		if (inputNodeId != -1)
 		{
 			UINT inputIndex = indexMap[inputNodeId];
@@ -117,7 +117,7 @@ bool HlslTranslatorSimulate::translateNode(UiNode node)
 		const float amplitude = node.getConstantInputValue(0);
 		const float frequency = node.getConstantInputValue(1);
 
-		const int inputNodeId = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
 		if (inputNodeId != -1)
 		{
 			UINT inputIndex = indexMap[inputNodeId];

@@ -6,7 +6,7 @@
 #include "Core/ParticleRenderer.h"
 #include "Core/HlslTranslatorEmit.h"
 #include "Core/HlslTranslatorSimulate.h"
-#include "Core/HlslTranslatorRender.h"
+#include "Core/HlslTranslatorRenderPs.h"
 #include "Io/NodeEditorIo.h"
 
 #include <fstream>
@@ -100,7 +100,7 @@ void ParticleSystemIo::loadInto(std::string filePath, ParticleSystem* particleSy
 			}
 			else if (!foundRendererEditorSaveFile && endsWith(filenameWithoutExtension, "Renderer"))
 			{
-				HlslTranslatorRender translator(nodes, links);
+				HlslTranslatorRenderPs translator(nodes, links);
 				// TODO: change to translateTo()
 				auto renderer = particleSystem->getRenderer();
 				renderer->clearRegisteredShaderStatementNodes();

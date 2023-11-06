@@ -3,6 +3,7 @@
 #include "Core/ParticleSystem.h"
 #include "Core/ParticleSystemManager.h"
 #include "Core/ParticleRenderer.h"
+#include "Model/RendererType.h"
 #include "Ui/NodeEditorEmit.h"
 #include "Ui/NodeEditorSimulate.h"
 #include "Ui/NodeEditorRender.h"
@@ -40,6 +41,7 @@ void ParticleSystemController::show()
 
 		std::string particleSystemName = particleSystem->getName();
 		bool isAlive = true;
+
 		if (ImGui::CollapsingHeader(particleSystemName.c_str(), &isAlive))
 		{
 			if (ImGui::TreeNode("Particle Emitter"))
@@ -82,7 +84,7 @@ void ParticleSystemController::show()
 				ImGui::Checkbox("isOpaque", &isOpaque);
 				particleSystem->getRenderer()->setOpaque(isOpaque);
 
-				const char* items[] = { "Sprite", "Quad", "Mesh", "RibbonTrail" };
+				const char* items[] = { "Sprite", "Ribbon" };
 				static int item_current_idx = 0; // Here we store our selection data as an index.
 				const char* combo_preview_value = items[item_current_idx];  // Pass in the preview value visible before opening the combo (it could be anything)
 
@@ -95,7 +97,19 @@ void ParticleSystemController::show()
 					{
 						const bool is_selected = (item_current_idx == n);
 						if (ImGui::Selectable(items[n], is_selected))
+						{
 							item_current_idx = n;
+							if (item_current_idx == 0)
+							{
+								particleSystem->getRenderer()->setRendererType(RendererType::Sprite);
+							}
+							if (item_current_idx == 1)
+							{
+								particleSystem->getRenderer()->setRendererType(RendererType::Ribbon);
+							}
+						}
+
+						showConfigWidgetsOfRenderer(static_cast<RendererType>(item_current_idx));
 
 						// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
 						if (is_selected)
@@ -200,4 +214,21 @@ void ParticleSystemController::deleteParticleSystemAndSaveFiles(int index)
 
 
 	// TODO
+}
+
+void ParticleSystemController::showConfigWidgetsOfRenderer(RendererType rendererType)
+{
+	switch (rendererType)
+	{
+	case RendererType::Sprite:
+	{
+		
+		break;
+	}
+	case RendererType::Ribbon:
+	{
+
+		break;
+	}
+	}
 }

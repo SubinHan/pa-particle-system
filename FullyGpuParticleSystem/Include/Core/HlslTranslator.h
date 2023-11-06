@@ -30,9 +30,10 @@ protected:
 
 	virtual bool translateNode(UiNode node);
 
-	std::vector<int> findLinkedNodesWithOutput(const int nodeIndex);
+	std::vector<int> findLinkedNodesWithOutputOf(const int nodeIndex);
+	std::vector<int> findLinkedNodesWithInputOf(const int nodeIndex);
 	int findNodeIdLinkedAsOutput(UiLink link);
-	int findOppositeNodeByInputAttrbuteId(int inputId);
+	int findOppositeNodeIdByInputAttrbuteId(int inputId);
 
 protected:
 	std::vector<UiNode> _nodes;
@@ -49,11 +50,15 @@ private:
 	void generateShaderFile(std::wstring shaderPath);
 
 	void removeOrphanNodes();
+	void removeOrphanNodes0(const int nodeIndex);
 	void topologySort();
 	void topologySort0(const int index);
+
+	int getIndex(int nodeId);
 
 private:
 
 	std::vector<bool> _visited;
+	std::vector<bool> _isOrphan;
 	std::deque<int> _topologicalOrder;
 };

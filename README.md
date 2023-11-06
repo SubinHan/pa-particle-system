@@ -83,7 +83,6 @@
 * Collision
 * Lighting
 * Curl Noise를 Perlin Noise 기반으로
-* Orphan node들을 shader code로 변환하지 않아야 함
 * Shader generation에서 node dependency 무결성 확인
   * i.e.) float3에 float4를 대입하지는 않는지?
   * 각 node들이 type 정보를 유지하여 적절한 input임을 검증해야 함
@@ -134,7 +133,9 @@
   * Drag Force
   * Curl Noise Force
 * 불 렌더링
-* 
+* Orphan node들을 shader code로 변환하지 않음
+* Ribbon 렌더링
+  * 
 
 <hr/>
 
@@ -263,10 +264,19 @@
   * Bitonic Sort의 동작을 PIX Debugger로 확인하는데 자꾸 이상한 결과가 나옴
     * 시각적으로는 괜찮아 보이는데, 디버거로 직접 값들을 보면 정렬이 제대로 안 되어 있는 것
     * 알고보니 GPU와 관련해서 Nvidia Control Panel을 통해 권한 설정을 해주어야 하는 것이 있었고, 이것이 제대로 이루어지지 않아 디버거의 초기화에 문제가 생겨서 발생한 현상으로 추측됨.
-  * Bitonic Sort는 2의 n승 꼴로만 수행이 되어서, 이를 임의의 n 크기에서 수행할 수 있는 방법을 찾아보았으나, [임의의 n 크기, parallel 수행에서 유리] 둘 다 갖춘 bitonic sort 알고리즘을 찾을 수는 없었음..
+  * Bitonic Sort는 2의 n승 꼴로만 수행이 되어서, 이를 임의의 n 크기에서 수행할 수 있는 방법을 찾아보았으나..
     * [Arbitrary n size bitonic sort](https://hwlang.de/algorithmen/sortieren/bitonic/oddn.html) => 이걸 응용해볼 수 있을까? 머리가 아파서 생각을 그만두었음.
-  * 어쨌거나 Bitonic sort를 만들어놨으니 이를 활용하기로 함
+  * 어쨌거나 Bitonic sort를 만들어놨으니 이를 일단 활용하기로 함
     * 2^n에서 남는 자리들은 정렬의 최후순위 값으로 padding
+
+
+##### 5주차: Ribbon 렌더링 (2023.11.06. ~ 2023.11.10.)
+* 월요일:
+  + 간단한 리본 렌더링 수행
+  + <img src="./img/20231106_ribbon.png">
+  + 이제 Orphan nodes를 shader statements로 변환하지 않음
+* 화요일:
+
 <hr/>
 
 ### 세부 구현 설명
@@ -452,7 +462,9 @@ compileShaders();
     * Bitonic sort는 stable한 sort가 아닐 것이므로, spawntime이 같은 파티클들의 상대적 순서가 보존된다는 보장이 없음
     * 따라서 spawn 시 해당 dispatch thread id를 기록하고 이 역시 정렬에 관여하도록 설정
 * Ribbon 생성
-  * 1차적으로는 particle의 위치를 기준으로 위아래로 두 개의 정점을 만들고, 인접 particle들 간 그 정점끼리 이어서 삼각형을 만드는 것으로 목표
+  * Tessellation을 이용해 적절한 quad들을 생성
+    * 입력: 4개의 Control points C0, C1, C2, C3
+    * C1과 C2가 이어짐
   * 차후:
     * Tessellation을 이용해서 삼각형들을 쪼개 곡선을 생성
     * particle 회전 값, 혹은 카메라 기반으로 정점의 위치를 조정
@@ -474,10 +486,12 @@ compileShaders();
 
 * Ribbon Trail
   * [Ribbon and Trail](https://doc.stride3d.net/4.0/en/manual/particles/ribbons-and-trails.html)
+  * [Smooth Particle Ribbons Through Hardware Accelerated Tessellation](https://www.diva-portal.org/smash/get/diva2:1692949/FULLTEXT01.pdf) - 여기에 나온 방법론을 활용하지는 않았음.
 
 * Perlin Noise
   * [Perlin Noise](https://en.wikipedia.org/wiki/Perlin_noise)
 
-* Bezier Curve(spline)
+* Splines
   * [Bezier Curve](https://www.particleincell.com/2012/bezier-splines/)
+  * [Catmull-Rom Curve](https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline)
 

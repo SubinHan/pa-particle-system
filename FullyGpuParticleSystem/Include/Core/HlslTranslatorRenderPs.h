@@ -2,11 +2,11 @@
 
 #include "Core/HlslTranslator.h"
 
-class HlslTranslatorRender : public HlslTranslator
+class HlslTranslatorRenderPs : public HlslTranslator
 {
 public:
-	HlslTranslatorRender(std::vector<UiNode> nodes, std::vector<UiLink> links);
-	virtual ~HlslTranslatorRender();
+	HlslTranslatorRenderPs(std::vector<UiNode> nodes, std::vector<UiLink> links);
+	virtual ~HlslTranslatorRenderPs();
 
 protected:
 	virtual std::unique_ptr<HlslGenerator> createHlslGenerator() override;

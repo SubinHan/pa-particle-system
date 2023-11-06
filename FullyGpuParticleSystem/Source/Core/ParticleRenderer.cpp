@@ -8,6 +8,7 @@
 #include "Core/TextureManager.h"
 #include "Model/Material.h"
 #include "Model/ObjectConstants.h"
+#include "Model/RendererType.h"
 #include "Util/DxDebug.h"
 
 #include "d3dx12.h"
@@ -41,13 +42,18 @@ void ParticleRenderer::setMaterialName(std::string materialName)
 	_materialName = materialName;
 }
 
+void ParticleRenderer::setRendererType(RendererType type)
+{
+	_currentRenderType = type;
+}
+
 void ParticleRenderer::render(
 	ID3D12GraphicsCommandList* cmdList,
 	const ObjectConstants& objectConstants,
 	const PassConstantBuffer& passCb)
 {
 	cmdList->SetComputeRootSignature(_computeRootSignature.Get());
-	cmdList->SetPipelineState(_psoCompute.Get());
+	cmdList->SetPipelineState(getCurrentComputePso());
 
 	cmdList->SetComputeRootDescriptorTable(
 		0,
@@ -92,9 +98,9 @@ void ParticleRenderer::render(
 	cmdList->IASetVertexBuffers(0, 1, &vertexBuffers);
 	cmdList->IASetIndexBuffer(&indexBuffer);
 
-	cmdList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_POINTLIST);
+	cmdList->IASetPrimitiveTopology(getCurrentPrimitiveTopology());
 
-	cmdList->SetPipelineState(_isOpaque ? _psoOpaque.Get() : _psoTransparency.Get());
+	cmdList->SetPipelineState(getCurrentPso());
 	cmdList->SetGraphicsRoot32BitConstants(ROOT_SLOT_OBJECT_CONSTANTS_BUFFER, sizeof(ObjectConstants) / 4, &objectConstants, 0);
 	cmdList->SetGraphicsRootDescriptorTable(
 		ROOT_SLOT_PASS_CONSTANTS_BUFFER, passCb.getGpuHandle());
@@ -130,14 +136,32 @@ void ParticleRenderer::compileShaders()
 	_shaderVs = DxUtil::compileShader(
 		shaderPath,
 		nullptr,
-		"ParticleVS",
+		"SpriteParticleVS",
 		"vs_5_1");
 
 	_shaderGs = DxUtil::compileShader(
 		shaderPath,
 		nullptr,
-		"ParticleGS",
+		"SpriteParticleGS",
 		"gs_5_1");
+
+	_shaderVsRibbon = DxUtil::compileShader(
+		shaderPath,
+		nullptr,
+		"RibbonParticleVS",
+		"vs_5_1");
+
+	_shaderHsRibbon = DxUtil::compileShader(
+		shaderPath,
+		nullptr,
+		"RibbonParticleHS",
+		"hs_5_1");
+
+	_shaderDsRibbon = DxUtil::compileShader(
+		shaderPath,
+		nullptr,
+		"RibbonParticleDS",
+		"ds_5_1");
 
 	_shaderPs = DxUtil::compileShader(
 		shaderPath,
@@ -149,6 +173,12 @@ void ParticleRenderer::compileShaders()
 		L"ParticleSystemShaders\\ParticleComputeIndirectCommands.hlsl",
 		nullptr,
 		"ComputeIndirectCommandsCS",
+		"cs_5_1");
+
+	_shaderIndirectCommandRibbon = DxUtil::compileShader(
+		L"ParticleSystemShaders\\ParticleComputeIndirectCommands.hlsl",
+		nullptr,
+		"RibbonComputeIndirectCommandsCS",
 		"cs_5_1");
 }
 
@@ -180,7 +210,7 @@ std::vector<CD3DX12_ROOT_PARAMETER> ParticleRenderer::buildRootParameter()
 	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER].InitAsShaderResourceView(0); // particles
 	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER].InitAsShaderResourceView(1); // aliveIndices
 
-	// build compute root signature
+	// build compute root signature for sprite
 	{
 		CD3DX12_ROOT_PARAMETER slotRootParameter[2];
 
@@ -229,7 +259,7 @@ std::vector<CD3DX12_ROOT_PARAMETER> ParticleRenderer::buildRootParameter()
 			serializedRootSig->GetBufferSize(),
 			IID_PPV_ARGS(&_computeRootSignature)));
 	}
-	
+
 	return slotRootParameter;
 }
 
@@ -304,6 +334,7 @@ void ParticleRenderer::buildPsos()
 		_shaderPs->GetBufferSize()
 	};
 	opaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	opaquePsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 	opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	opaquePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	opaquePsoDesc.SampleMask = UINT_MAX;
@@ -315,7 +346,6 @@ void ParticleRenderer::buildPsos()
 	opaquePsoDesc.SampleDesc.Quality = msaaState ? device.getMsaaQuality() - 1 : 0;
 	opaquePsoDesc.DSVFormat = device.getDepthStencilFormat();
 	ThrowIfFailed(device.getD3dDevice()->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&_psoOpaque)));
-
 
 	auto transparentPsoDesc = opaquePsoDesc;
 
@@ -340,6 +370,36 @@ void ParticleRenderer::buildPsos()
 		)
 	);
 
+	//////////////// Ribbon
+	auto ribbonPsoDesc = transparentPsoDesc;
+	ribbonPsoDesc.VS =
+	{
+		reinterpret_cast<BYTE*>(_shaderVsRibbon->GetBufferPointer()),
+		_shaderVsRibbon->GetBufferSize()
+	};
+	ribbonPsoDesc.HS =
+	{
+		reinterpret_cast<BYTE*>(_shaderHsRibbon->GetBufferPointer()),
+		_shaderHsRibbon->GetBufferSize()
+	};
+	ribbonPsoDesc.DS =
+	{
+		reinterpret_cast<BYTE*>(_shaderDsRibbon->GetBufferPointer()),
+		_shaderDsRibbon->GetBufferSize()
+	};
+	ribbonPsoDesc.GS =
+	{
+		nullptr,
+		0
+	};
+	ribbonPsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
+	ThrowIfFailed(
+		device.getD3dDevice()->CreateGraphicsPipelineState(
+			&ribbonPsoDesc, IID_PPV_ARGS(&_psoRibbon)
+		)
+	);
+
+	//////////////// ComputePso
 	D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.pRootSignature = _computeRootSignature.Get();
 	psoDesc.CS =
@@ -350,6 +410,16 @@ void ParticleRenderer::buildPsos()
 	ThrowIfFailed(
 		device.getD3dDevice()->CreateComputePipelineState(
 			&psoDesc, IID_PPV_ARGS(&_psoCompute)));
+
+	//////////////// ComputePso for Ribbon
+	psoDesc.CS =
+	{
+		reinterpret_cast<BYTE*>(_shaderIndirectCommandRibbon->GetBufferPointer()),
+		_shaderIndirectCommandRibbon->GetBufferSize()
+	};
+	ThrowIfFailed(
+		device.getD3dDevice()->CreateComputePipelineState(
+			&psoDesc, IID_PPV_ARGS(&_psoComputeRibbon)));
 }
 
 void ParticleRenderer::generateEmptyGeometry()
@@ -407,4 +477,23 @@ void ParticleRenderer::generateEmptyGeometry()
 	submesh.BaseVertexLocation = 0;
 
 	_emptyGeometry->DrawArgs["empty"] = submesh;
+}
+
+ID3D12PipelineState* ParticleRenderer::getCurrentPso()
+{
+	if (_currentRenderType == RendererType::Ribbon)
+		return _psoRibbon.Get();
+
+	if (_currentRenderType == RendererType::Sprite)
+		return _isOpaque ? _psoOpaque.Get() : _psoTransparency.Get();
+}
+
+ID3D12PipelineState* ParticleRenderer::getCurrentComputePso()
+{
+	return _currentRenderType == RendererType::Sprite ? _psoCompute.Get() : _psoComputeRibbon.Get();
+}
+
+D3D12_PRIMITIVE_TOPOLOGY ParticleRenderer::getCurrentPrimitiveTopology()
+{
+	return _currentRenderType == RendererType::Sprite ? D3D11_PRIMITIVE_TOPOLOGY_POINTLIST : D3D_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST;
 }

@@ -1,7 +1,7 @@
 #include "Ui/NodeEditorRender.h"
 
 #include "Core/ParticleRenderer.h"
-#include "Core/HlslTranslatorRender.h"
+#include "Core/HlslTranslatorRenderPs.h"
 #include "Ui/UiNodeFactory.h"
 #include "Ui/NodeType.h"
 
@@ -20,7 +20,7 @@ std::string NodeEditorRender::getName() const
 
 void NodeEditorRender::onCompileButtonClicked()
 {
-	HlslTranslatorRender translator(_nodes, _links);
+	HlslTranslatorRenderPs translator(_nodes, _links);
 
 	// TODO: change to translateTo
 	_renderer->clearRegisteredShaderStatementNodes();

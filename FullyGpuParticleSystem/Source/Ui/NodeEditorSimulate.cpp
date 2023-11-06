@@ -51,8 +51,9 @@ void NodeEditorSimulate::load()
 
 	if (_nodes.empty())
 	{
-		createInputNode();
+		// Output node should be 0 id, so create first.
 		createOutputNode();
+		createInputNode();
 	}
 }
 

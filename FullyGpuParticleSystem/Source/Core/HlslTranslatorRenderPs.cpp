@@ -1,23 +1,23 @@
-#include "Core/HlslTranslatorRender.h"
+#include "Core/HlslTranslatorRenderPs.h"
 
 #include "Core/HlslGeneratorRender.h"
 #include "Ui/NodeType.h"
 
 static const std::wstring BASE_RENDERER_SHADER_PATH = L"ParticleSystemShaders/ParticleRenderBase.hlsl";
 
-HlslTranslatorRender::HlslTranslatorRender(std::vector<UiNode> nodes, std::vector<UiLink> links) :
+HlslTranslatorRenderPs::HlslTranslatorRenderPs(std::vector<UiNode> nodes, std::vector<UiLink> links) :
 	HlslTranslator(nodes, links)
 {
 }
 
-HlslTranslatorRender::~HlslTranslatorRender() = default;
+HlslTranslatorRenderPs::~HlslTranslatorRenderPs() = default;
 
-std::unique_ptr<HlslGenerator> HlslTranslatorRender::createHlslGenerator()
+std::unique_ptr<HlslGenerator> HlslTranslatorRenderPs::createHlslGenerator()
 {
 	return std::make_unique<HlslGeneratorRender>(BASE_RENDERER_SHADER_PATH);
 }
 
-Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslatorRender::compileShaderImpl(std::wstring shaderPath)
+Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslatorRenderPs::compileShaderImpl(std::wstring shaderPath)
 {
 	return DxUtil::compileShader(
 		shaderPath,
@@ -26,7 +26,7 @@ Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslatorRender::compileShaderImpl(std::ws
 		"ps_5_1");
 }
 
-bool HlslTranslatorRender::translateNode(UiNode node)
+bool HlslTranslatorRenderPs::translateNode(UiNode node)
 {
 	if (HlslTranslator::translateNode(node))
 		return true;
@@ -42,7 +42,7 @@ bool HlslTranslatorRender::translateNode(UiNode node)
 	{
 	case NodeType::RendererOutput:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
 		if (inputNodeId0 != -1)
 		{
 			UINT input0Index = indexMap[inputNodeId0];
@@ -58,7 +58,7 @@ bool HlslTranslatorRender::translateNode(UiNode node)
 	}
 	case NodeType::GrayscaleToTranslucent:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
 		if (inputNodeId0 != -1)
 		{
 			UINT input0Index = indexMap[inputNodeId0];

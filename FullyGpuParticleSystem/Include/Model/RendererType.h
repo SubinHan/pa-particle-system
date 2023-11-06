@@ -3,7 +3,5 @@
 enum class RendererType
 {
 	Sprite,
-	Quad,
-	Mesh,
-	RibbonTrail,
+	Ribbon,
 };

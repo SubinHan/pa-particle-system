@@ -32,3 +32,25 @@ void ComputeIndirectCommandsCS(int3 dispatchThreadId : SV_DispatchThreadID)
 
 	outputCommands.Append(command);
 }
+
+
+[numthreads(256, 1, 1)]
+void RibbonComputeIndirectCommandsCS(int3 dispatchThreadId : SV_DispatchThreadID)
+{
+	uint id = dispatchThreadId.x;
+	uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
+
+	if (id >= numAlives || numAlives <= 3)
+	{
+		return;
+	}
+
+	IndirectCommand command;
+	command.IndexCountPerInstance = 4;
+	command.InstanceCount = 1;
+	command.StartIndexLocation = id;
+	command.BaseVertexLocation = 0;
+	command.StartInstanceLocation = 0;
+
+	outputCommands.Append(command);
+}

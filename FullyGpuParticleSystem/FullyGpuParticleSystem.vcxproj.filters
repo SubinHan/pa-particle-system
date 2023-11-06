@@ -210,7 +210,7 @@
     <ClInclude Include="Include\Ui\NodeEditorSimulate.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Core\HlslTranslatorRender.h">
+    <ClInclude Include="Include\Core\HlslTranslatorRenderPs.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Include\Ui\NodeEditorRender.h">
@@ -482,7 +482,7 @@
     <ClCompile Include="Source\Ui\NodeEditorSimulate.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\HlslTranslatorRender.cpp">
+    <ClCompile Include="Source\Core\HlslTranslatorRenderPs.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Ui\NodeEditorRender.cpp">
@@ -581,8 +581,6 @@
     <FxCompile Include="ParticleApp\Shaders\ParticlePostSimulateCS.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleSortByIndexCS.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleComputeIndirectCommands.hlsl" />
-    <FxCompile Include="ParticleSystemShaders\ParticleRenderVSBase.hlsl" />
-    <FxCompile Include="ParticleSystemShaders\ParticleRenderGSBase.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleRenderBase.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleSimulateUtil.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticlePreSortCS.hlsl" />

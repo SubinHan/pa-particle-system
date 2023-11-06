@@ -43,7 +43,7 @@ bool HlslTranslatorEmit::translateNode(UiNode node)
 	case NodeType::EmitterOutput:
 	{
 		// initial position
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
 		if (inputNodeId0 != -1)
 		{
 			UINT input0Index = indexMap[inputNodeId0];
@@ -51,7 +51,7 @@ bool HlslTranslatorEmit::translateNode(UiNode node)
 		}
 
 		// initial velocity
-		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		const int inputNodeId1 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(1));
 		if (inputNodeId1 != -1)
 		{
 			UINT input1Index = indexMap[inputNodeId1];
@@ -59,7 +59,7 @@ bool HlslTranslatorEmit::translateNode(UiNode node)
 		}
 
 		// initial acceleration
-		const int inputNodeId2 = findOppositeNodeByInputAttrbuteId(node.getInputId(2));
+		const int inputNodeId2 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(2));
 		if (inputNodeId2 != -1)
 		{
 			UINT input2Index = indexMap[inputNodeId2];
@@ -67,7 +67,7 @@ bool HlslTranslatorEmit::translateNode(UiNode node)
 		}
 
 		// initial lifetime
-		const int inputNodeId3 = findOppositeNodeByInputAttrbuteId(node.getInputId(3));
+		const int inputNodeId3 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(3));
 		if (inputNodeId3 != -1)
 		{
 			UINT input3Index = indexMap[inputNodeId3];
@@ -75,7 +75,7 @@ bool HlslTranslatorEmit::translateNode(UiNode node)
 		}
 
 		// initial size
-		const int inputNodeId4 = findOppositeNodeByInputAttrbuteId(node.getInputId(4));
+		const int inputNodeId4 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(4));
 		if (inputNodeId4 != -1)
 		{
 			UINT input4Index = indexMap[inputNodeId4];
@@ -83,7 +83,7 @@ bool HlslTranslatorEmit::translateNode(UiNode node)
 		}
 
 		// initial opacity
-		const int inputNodeId5 = findOppositeNodeByInputAttrbuteId(node.getInputId(5));
+		const int inputNodeId5 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(5));
 		if (inputNodeId5 != -1)
 		{
 			UINT input5Index = indexMap[inputNodeId5];
@@ -91,7 +91,7 @@ bool HlslTranslatorEmit::translateNode(UiNode node)
 		}
 		
 		// initial color
-		const int inputNodeId6 = findOppositeNodeByInputAttrbuteId(node.getInputId(6));
+		const int inputNodeId6 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(6));
 		if (inputNodeId6 != -1)
 		{
 			UINT initialColorIndex = indexMap[inputNodeId6];
@@ -99,7 +99,7 @@ bool HlslTranslatorEmit::translateNode(UiNode node)
 		}
 
 		// end size
-		const int inputNodeId7 = findOppositeNodeByInputAttrbuteId(node.getInputId(7));
+		const int inputNodeId7 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(7));
 		if (inputNodeId7 != -1)
 		{
 			UINT endSizeIndex = indexMap[inputNodeId7];
@@ -107,7 +107,7 @@ bool HlslTranslatorEmit::translateNode(UiNode node)
 		}
 
 		// end opacity
-		const int inputNodeId8 = findOppositeNodeByInputAttrbuteId(node.getInputId(8));
+		const int inputNodeId8 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(8));
 		if (inputNodeId8 != -1)
 		{
 			UINT endOpacityIndex = indexMap[inputNodeId8];
@@ -115,7 +115,7 @@ bool HlslTranslatorEmit::translateNode(UiNode node)
 		}
 	
 		// end color
-		const int inputNodeId9 = findOppositeNodeByInputAttrbuteId(node.getInputId(9));
+		const int inputNodeId9 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(9));
 		if (inputNodeId9 != -1)
 		{
 			UINT endColorIndex = indexMap[inputNodeId9];

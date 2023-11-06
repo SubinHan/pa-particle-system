@@ -166,7 +166,7 @@
     <ClInclude Include="Include\Core\HlslGeneratorRender.h" />
     <ClInclude Include="Include\Core\HlslGeneratorSimulate.h" />
     <ClInclude Include="Include\Core\HlslTranslator.h" />
-    <ClInclude Include="Include\Core\HlslTranslatorRender.h" />
+    <ClInclude Include="Include\Core\HlslTranslatorRenderPs.h" />
     <ClInclude Include="Include\Core\HlslTranslatorSimulate.h" />
     <ClInclude Include="Include\Core\ICbvSrvUavDemander.h" />
     <ClInclude Include="Include\Core\ImguiInitializer.h" />
@@ -272,7 +272,7 @@
     <ClCompile Include="Source\Core\HlslGeneratorSimulate.cpp" />
     <ClCompile Include="Source\Core\HlslTranslator.cpp" />
     <ClCompile Include="Source\Core\HlslTranslatorEmit.cpp" />
-    <ClCompile Include="Source\Core\HlslTranslatorRender.cpp" />
+    <ClCompile Include="Source\Core\HlslTranslatorRenderPs.cpp" />
     <ClCompile Include="Source\Core\ImguiInitializer.cpp" />
     <ClCompile Include="Source\Core\MaterialManager.cpp" />
     <ClCompile Include="Source\Core\ParticleSystemManager.cpp" />
@@ -406,18 +406,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleSystemShaders\ParticleRenderBase.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="ParticleSystemShaders\ParticleRenderGSBase.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="ParticleSystemShaders\ParticleRenderVSBase.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

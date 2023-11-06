@@ -48,7 +48,7 @@ void HlslTranslator::registerTranslatedShaderNodesInto(ParticlePass* pass)
 
 void HlslTranslator::generateNodes()
 {
-	for (int i = 0; i < _nodes.size(); ++i)
+	for (int i = 0; i < _topologicalOrder.size(); ++i)
 	{
 		translateNode(_nodes[_topologicalOrder[i]]);
 	}
@@ -102,8 +102,8 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::AddFloat:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(1));
 
 		if (inputNodeId0 != -1 && inputNodeId1 != -1)
 		{
@@ -115,8 +115,8 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::AddFloat3:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(1));
 
 		if (inputNodeId0 != -1 && inputNodeId1 != -1)
 		{
@@ -128,8 +128,8 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::MultiplyFloat:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(1));
 
 		if (inputNodeId0 != -1 && inputNodeId1 != -1)
 		{
@@ -141,8 +141,8 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::MultiplyFloat3ByScalar:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(1));
 		if (inputNodeId0 != -1 && inputNodeId1 != -1)
 		{
 			UINT input0Index = indexMap[inputNodeId0];
@@ -153,7 +153,7 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::MaskX:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
 		if (inputNodeId0 != -1 )
 		{
 			UINT input0Index = indexMap[inputNodeId0];
@@ -163,7 +163,7 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::MaskY:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
 		if (inputNodeId0 != -1)
 		{
 			UINT input0Index = indexMap[inputNodeId0];
@@ -173,7 +173,7 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::MaskZ:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
 		if (inputNodeId0 != -1)
 		{
 			UINT input0Index = indexMap[inputNodeId0];
@@ -183,7 +183,7 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::MaskW:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
 		if (inputNodeId0 != -1)
 		{
 			UINT input0Index = indexMap[inputNodeId0];
@@ -193,8 +193,8 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::SetColorOfFloat4:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(1));
 		if (inputNodeId0 != -1 && inputNodeId1 != -1)
 		{
 			UINT input0Index = indexMap[inputNodeId0];
@@ -205,8 +205,8 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::MakeFloat4ByColorAlpha:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(1));
 		if (inputNodeId0 != -1 && inputNodeId1 != -1)
 		{
 			UINT input0Index = indexMap[inputNodeId0];
@@ -217,9 +217,9 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::MakeFloat3:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
-		const int inputNodeId2 = findOppositeNodeByInputAttrbuteId(node.getInputId(2));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(1));
+		const int inputNodeId2 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(2));
 		if (inputNodeId0 != -1 && inputNodeId1 != -1 && inputNodeId2 != -1)
 		{
 			UINT input0Index = indexMap[inputNodeId0];
@@ -231,10 +231,10 @@ bool HlslTranslator::translateNode(UiNode node)
 	}
 	case NodeType::MakeFloat4:
 	{
-		const int inputNodeId0 = findOppositeNodeByInputAttrbuteId(node.getInputId(0));
-		const int inputNodeId1 = findOppositeNodeByInputAttrbuteId(node.getInputId(1));
-		const int inputNodeId2 = findOppositeNodeByInputAttrbuteId(node.getInputId(2));
-		const int inputNodeId3 = findOppositeNodeByInputAttrbuteId(node.getInputId(3));
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
+		const int inputNodeId1 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(1));
+		const int inputNodeId2 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(2));
+		const int inputNodeId3 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(3));
 		if (inputNodeId0 != -1 && inputNodeId1 != -1 && inputNodeId2 != -1 && inputNodeId3 != -1)
 		{
 			UINT input0Index = indexMap[inputNodeId0];
@@ -258,8 +258,26 @@ bool HlslTranslator::translateNode(UiNode node)
 
 void HlslTranslator::removeOrphanNodes()
 {
-	// TODO
-	//auto [node, numInputs] = getFinalOutputNode();
+	_isOrphan.resize(_nodes.size(), true);
+	// IMPORTANT: 0 id node is always output node.
+	removeOrphanNodes0(0);
+}
+
+void HlslTranslator::removeOrphanNodes0(const int nodeIndex)
+{
+	auto node = _nodes[nodeIndex];
+	for (int i = 0; i < node.getNumInputs(); ++i)
+	{
+		const int inputNodeId = findOppositeNodeIdByInputAttrbuteId(node.getInputId(i));
+
+		if (inputNodeId == -1)
+			continue;
+
+		int index = getIndex(inputNodeId);
+
+		_isOrphan[index] = false;
+		removeOrphanNodes0(index);
+	}
 }
 
 void HlslTranslator::topologySort()
@@ -271,6 +289,9 @@ void HlslTranslator::topologySort()
 		if (_visited[i])
 			continue;
 
+		if (_isOrphan[i])
+			continue;
+
 		topologySort0(i);
 	}
 }
@@ -279,7 +300,7 @@ void HlslTranslator::topologySort0(const int index)
 {
 	_visited[index] = true;
 
-	for (auto linkedNodeIndex : findLinkedNodesWithOutput(index))
+	for (auto linkedNodeIndex : findLinkedNodesWithOutputOf(index))
 	{
 		if (_visited[linkedNodeIndex])
 			continue;
@@ -288,7 +309,18 @@ void HlslTranslator::topologySort0(const int index)
 	_topologicalOrder.push_front(index);
 }
 
-std::vector<int> HlslTranslator::findLinkedNodesWithOutput(const int nodeIndex)
+int HlslTranslator::getIndex(int nodeId)
+{
+	for (int i = 0; i < _nodes.size(); ++i)
+	{
+		if (nodeId == _nodes[i].getId())
+			return i;
+	}
+
+	return -1;
+}
+
+std::vector<int> HlslTranslator::findLinkedNodesWithOutputOf(const int nodeIndex)
 {
 	std::vector<int> result;
 
@@ -313,6 +345,38 @@ std::vector<int> HlslTranslator::findLinkedNodesWithOutput(const int nodeIndex)
 	return result;
 }
 
+std::vector<int> HlslTranslator::findLinkedNodesWithInputOf(const int nodeIndex)
+{
+	std::vector<int> result;
+
+	const int numInputs = _nodes[nodeIndex].getNumInputs();
+	
+	for (int i = 0; i < numInputs; ++i)
+	{
+		const int inputId = _nodes[nodeIndex].getInputId(i);
+
+		for (auto link : _links)
+		{
+			if (link.getFromId() != inputId && link.getToId() != inputId)
+				continue;
+
+			const int outputId = link.getOther(inputId);
+
+			for (int i = 0; i < _nodes.size(); ++i)
+			{
+				if (!_nodes[i].containsAttributeAsOutput(outputId))
+					continue;
+
+				result.push_back(i);
+				break;
+			}
+			break;
+		}
+	}
+
+	return result;
+}
+
 int HlslTranslator::findNodeIdLinkedAsOutput(UiLink link)
 {
 	for (auto node : _nodes)
@@ -327,7 +391,7 @@ int HlslTranslator::findNodeIdLinkedAsOutput(UiLink link)
 	return -1;
 }
 
-int HlslTranslator::findOppositeNodeByInputAttrbuteId(int inputId)
+int HlslTranslator::findOppositeNodeIdByInputAttrbuteId(int inputId)
 {
 	for (auto link : _links)
 	{
