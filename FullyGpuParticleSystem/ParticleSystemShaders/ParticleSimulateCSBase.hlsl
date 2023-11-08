@@ -51,6 +51,9 @@ void SimulateCS(
 			counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMDEADS, 1, numDeads);
 
 			deadIndices[numDeads] = particleIndex;
+			
+			particles[particleIndex] = (Particle)0;
+
 		}
 		else
 		{

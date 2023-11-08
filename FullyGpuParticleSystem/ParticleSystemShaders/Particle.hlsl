@@ -18,6 +18,9 @@ struct Particle
 	float EndOpacity;
 	float SpawnTime;
 	uint SpawnOrderInFrame;
+	float DistanceFromPrevious;
+
+	float DistanceFromStart;
 };
 
 static const uint PARTICLECOUNTER_OFFSET_NUMDEADS = 0;

@@ -30,6 +30,22 @@ Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslator::compileShader()
 	return shaderBlob;
 }
 
+Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslator::compileShader(ShaderCompileFunction f)
+{
+	_hlslGenerator = createHlslGenerator();
+
+	removeOrphanNodes();
+	topologySort();
+	generateNodes();
+
+	const std::wstring shaderPath = SHADER_ROOT_PATH + std::to_wstring(_hash) + L".hlsl";
+	generateShaderFile(shaderPath);
+
+	auto shaderBlob = f(shaderPath);
+
+	return shaderBlob;
+}
+
 void HlslTranslator::translateTo(ParticlePass* pass)
 {
 	pass->clearRegisteredShaderStatementNodes();

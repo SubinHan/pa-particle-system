@@ -8,8 +8,8 @@
 
 // should be power of 2. (for sort)
 //static constexpr int MAX_NUM_PARTICLES = 1'048'576 / 2;
-static constexpr int MAX_NUM_PARTICLES = 65'536;
-//static constexpr int MAX_NUM_PARTICLES = 512;
+//static constexpr int MAX_NUM_PARTICLES = 65'536;
+static constexpr int MAX_NUM_PARTICLES = 256;
 
 
 using namespace DirectX;

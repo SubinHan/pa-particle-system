@@ -586,6 +586,8 @@
     <FxCompile Include="ParticleSystemShaders\ParticlePreSortCS.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleSortBySpawnOrderCS.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticlePreSortCS0.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleRibbonDistanceCS.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticlePreRibbonDistanceCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

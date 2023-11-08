@@ -247,11 +247,13 @@ void ParticleApp::loadTextures(ID3D12GraphicsCommandList* commandList)
 	const std::vector<std::string> texturesName = {
 		"default",
 		"fire",
+		"uv_mapper"
 	};
 
 	const std::vector<std::wstring> texturesPath = {
 		L"textures/circle_05.dds",
 		L"textures/fire_subuv.dds",
+		L"textures/uv_mapper.dds",
 	};
 
 	assert(texturesName.size() == texturesPath.size());

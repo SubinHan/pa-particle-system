@@ -26,7 +26,7 @@ void ComputeIndirectCommandsCS(int3 dispatchThreadId : SV_DispatchThreadID)
 	IndirectCommand command;
 	command.IndexCountPerInstance = 1;
 	command.InstanceCount = 1;
-	command.StartIndexLocation = id;
+	command.StartIndexLocation = id + 1;
 	command.BaseVertexLocation = 0;
 	command.StartInstanceLocation = 0;
 
@@ -40,7 +40,7 @@ void RibbonComputeIndirectCommandsCS(int3 dispatchThreadId : SV_DispatchThreadID
 	uint id = dispatchThreadId.x;
 	uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
 
-	if (id >= numAlives || numAlives <= 3)
+	if (id >= numAlives - 1 || numAlives <= 1)
 	{
 		return;
 	}

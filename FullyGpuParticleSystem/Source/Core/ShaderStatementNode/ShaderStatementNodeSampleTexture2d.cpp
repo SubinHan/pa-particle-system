@@ -11,7 +11,7 @@ ShaderStatementNodeSampleTexture2d::ShaderStatementNodeSampleTexture2d(std::stri
 
 std::string ShaderStatementNodeSampleTexture2d::generateStatements() const
 {
-	return "float4 " + _variableName + " = " + _textureVariableName +".Sample(gsamPointWrap, pin.TexC);";
+	return "float4 " + _variableName + " = " + _textureVariableName +".Sample(gsamAnisotropicWrap, pin.TexC);";
 }
 
 int ShaderStatementNodeSampleTexture2d::getNumResourcesToBind() const

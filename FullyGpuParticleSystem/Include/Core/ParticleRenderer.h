@@ -35,7 +35,8 @@ public:
 		const PassConstantBuffer& passCb);
 
 	void compileShaders();
-	void setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader);
+	void setSpritePixelShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
+	void setRibbonPixelShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
 
 	bool isOpaque();
 	void setOpaque(bool newIsOpaque);
@@ -64,30 +65,41 @@ private:
 
 	// for compute indirect commands.
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> _computeRootSignature;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> _ribbonDistanceRootSignature;
 	Microsoft::WRL::ComPtr<ID3D12CommandSignature> _commandSignature;
 
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderIndirectCommand;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderIndirectCommandRibbon;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderVs;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderGs;
+	Microsoft::WRL::ComPtr<ID3DBlob> _shaderPs;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderVsRibbon;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderHsRibbon;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderDsRibbon;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderGsRibbon;
-	Microsoft::WRL::ComPtr<ID3DBlob> _shaderPs;
+	Microsoft::WRL::ComPtr<ID3DBlob> _shaderPsRibbon;
+	Microsoft::WRL::ComPtr<ID3DBlob> _shaderPreRibbonDistance;
+	Microsoft::WRL::ComPtr<ID3DBlob> _shaderRibbonDistance;
+
+
 	std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoOpaque;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoTransparency;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoRibbon;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoCompute;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoComputeRibbon;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoComputeIndirect;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoComputeIndirectRibbon;
+
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoPreRibbonDistance;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoRibbonDistance;
+
 
 	std::unique_ptr<MeshGeometry> _emptyGeometry = nullptr;
 
 	bool _isOpaque;
 
 	CD3DX12_DESCRIPTOR_RANGE _passCbvTable;
+	CD3DX12_DESCRIPTOR_RANGE _counterTable;
 	CD3DX12_DESCRIPTOR_RANGE _texSrvTable;
 
-	RendererType _currentRenderType;
+	RendererType _currentRendererType;
 };

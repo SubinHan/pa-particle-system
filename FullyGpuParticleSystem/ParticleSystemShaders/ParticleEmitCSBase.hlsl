@@ -57,6 +57,8 @@ void EmitCS(
 	newParticle.EndOpacity = 0.0f;
 	newParticle.SpawnTime = TotalTime;
 	newParticle.SpawnOrderInFrame = dispatchThreadId.x;
+	newParticle.DistanceFromPrevious = 0.0f;
+	newParticle.DistanceFromStart = 0.0f;
 
 	%s
 

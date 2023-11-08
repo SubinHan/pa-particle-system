@@ -9,16 +9,20 @@
 #include <vector>
 #include <deque>
 #include <unordered_map>
+#include <functional>
 
 class HlslGenerator;
 
 class HlslTranslator : public Hashable
 {
 public:
+	using ShaderCompileFunction = std::function<Microsoft::WRL::ComPtr<ID3DBlob>(std::wstring)>;
+
 	HlslTranslator(std::vector<UiNode> nodes, std::vector<UiLink> links);
 	virtual ~HlslTranslator();
 
 	Microsoft::WRL::ComPtr<ID3DBlob> compileShader();
+	Microsoft::WRL::ComPtr<ID3DBlob> compileShader(ShaderCompileFunction f);
 	void translateTo(ParticlePass* pass);
 	void registerTranslatedShaderNodesInto(ParticlePass* pass);
 

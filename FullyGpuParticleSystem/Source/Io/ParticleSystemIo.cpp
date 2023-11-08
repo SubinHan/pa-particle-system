@@ -106,7 +106,7 @@ void ParticleSystemIo::loadInto(std::string filePath, ParticleSystem* particleSy
 				renderer->clearRegisteredShaderStatementNodes();
 				auto blob = translator.compileShader();
 				translator.registerTranslatedShaderNodesInto(renderer);
-				renderer->setShaderPs(blob);
+				renderer->setSpritePixelShader(blob);
 				foundRendererEditorSaveFile = true;
 			}
 		}

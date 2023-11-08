@@ -30,7 +30,7 @@ struct SpriteVertexOut
 	uint ThreadId : THREADID;
 };
 
-struct PixelIn
+struct SpritePixelIn
 {
 	float4 PosH : SV_POSITION;
 	float3 PosW : POSITION;
@@ -43,6 +43,8 @@ StructuredBuffer<Particle> particles : register(t0);
 StructuredBuffer<uint> aliveIndices : register(t1);
 
 %t
+
+RWByteAddressBuffer counters			: register(u0);
 
 %u
 
@@ -83,13 +85,14 @@ SpriteVertexOut SpriteParticleVS(
 [maxvertexcount(4)]
 void SpriteParticleGS(
 	point SpriteVertexOut gin[1],
-	inout TriangleStream<PixelIn> triStream)
+	inout TriangleStream<SpritePixelIn> triStream)
 {
-	float3 up = float3(0.0f, 1.0f, 0.0f);
-	float3 look = gEyePosW - gin[0].CenterW;
-
-	float3 u = normalize(cross(look, up));
-	float3 v = normalize(cross(look, u));
+	float3 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
+	float3 up = mul(upView, gInvView).xyz;
+	float3 look = normalize(gEyePosW - gin[0].CenterW);
+	
+	float3 u = cross(look, up);
+	float3 v = cross(look, u);
 
 	float halfWidth = 0.5f * gin[0].Size;
 	float halfHeight = 0.5f * gin[0].Size;
@@ -108,7 +111,7 @@ void SpriteParticleGS(
 		float2(1.0f, 0.0f)
 	};
 
-	PixelIn geoOut;
+	SpritePixelIn geoOut;
 	[unroll]
 	for (int i = 0; i < 4; ++i)
 	{
@@ -120,6 +123,31 @@ void SpriteParticleGS(
 
 		triStream.Append(geoOut);
 	}
+}
+
+float4 ParticlePS(SpritePixelIn pin) : SV_Target
+{
+	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	const uint particleIndex = aliveIndices[pin.ThreadId];
+	Particle particle = particles[particleIndex];
+
+	float initialLifetime = particle.InitialLifetime;
+	float remainLifetime = particle.RemainLifetime;
+	float normalizedLifetimeInv = (initialLifetime - remainLifetime) / initialLifetime;
+
+	float3 initialColor = particle.InitialColor;
+	float3 endColor = particle.EndColor;
+	float3 interpolatedColor = lerp(initialColor, endColor, normalizedLifetimeInv);
+
+	float initialOpacity = particle.InitialOpacity;
+	float endOpacity = particle.EndOpacity;
+	float interpolatedOpacity = lerp(initialOpacity, endOpacity, normalizedLifetimeInv);
+
+	color = float4(interpolatedColor, interpolatedOpacity);
+
+	%s
+
+	return color;
 }
 
 struct RibbonVertexOut
@@ -134,7 +162,9 @@ RibbonVertexOut RibbonParticleVS(
 {
 	RibbonVertexOut vertexOut;
 
-	const uint threadId = vid;
+	uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
+
+	const uint threadId = min(vid, numAlives - 1);
 	const uint particleIndex = aliveIndices[threadId];
 	Particle particle = particles[particleIndex];
 
@@ -199,62 +229,79 @@ RibbonHullOut RibbonParticleHS(InputPatch<RibbonVertexOut, 4> p,
 {
 	RibbonHullOut hout;
 
-	const float3 up = float3(0.0f, 1.0f, 0.0f);
-	
+	float3 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
+	float3 up = mul(upView, gInvView).xyz;
+
+	const float3 offset0 = up * p[0].Size;
+	const float3 offset1 = up * p[1].Size;
+	const float3 offset2 = up * p[2].Size;
+	const float3 offset3 = up * p[3].Size;
+
+	uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
+
+	float texU0 = float(p[1].ThreadId) / float(numAlives);
+	float texU1 = float(p[2].ThreadId) / float(numAlives);
+
 	if (i == 0)
 	{
-		const float3 offset = up * p[1].Size;
-		hout.PosL = p[1].PosL + offset;
-		hout.TexC = float2(0.0f, 1.0f);
-		hout.ControlPoint0 = p[0].PosL + offset;
-		hout.ControlPoint1 = p[1].PosL + offset;
-		hout.ControlPoint2 = p[2].PosL + offset;
-		hout.ControlPoint3 = p[3].PosL + offset;
+		hout.PosL = p[1].PosL + offset1;
+		hout.TexC = float2(texU0, 1.0f);
+		hout.ControlPoint0 = p[0].PosL + offset0;
+		hout.ControlPoint1 = p[1].PosL + offset1;
+		hout.ControlPoint2 = p[2].PosL + offset2;
+		hout.ControlPoint3 = p[3].PosL + offset3;
 		hout.ThreadId = p[1].ThreadId;
 	}
 	else if (i == 1)
 	{
-		const float3 offset = up * p[1].Size;
-		hout.PosL = p[1].PosL - offset;
-		hout.TexC = float2(0.0f, 0.0f);
-		hout.ControlPoint0 = p[0].PosL - offset;
-		hout.ControlPoint1 = p[1].PosL - offset;
-		hout.ControlPoint2 = p[2].PosL - offset;
-		hout.ControlPoint3 = p[3].PosL - offset;
+		hout.PosL = p[1].PosL - offset1;
+		hout.TexC = float2(texU0, 0.0f);
+		hout.ControlPoint0 = p[0].PosL - offset0;
+		hout.ControlPoint1 = p[1].PosL - offset1;
+		hout.ControlPoint2 = p[2].PosL - offset2;
+		hout.ControlPoint3 = p[3].PosL - offset3;
 		hout.ThreadId = p[1].ThreadId;
 	}
 	else if (i == 2)
 	{
-		const float3 offset = up * p[2].Size;
-		hout.PosL = p[2].PosL + offset;
-		hout.TexC = float2(1.0f, 1.0f);
-		hout.ControlPoint0 = p[0].PosL + offset;
-		hout.ControlPoint1 = p[1].PosL + offset;
-		hout.ControlPoint2 = p[2].PosL + offset;
-		hout.ControlPoint3 = p[3].PosL + offset;
+		hout.PosL = p[2].PosL + offset2;
+		hout.TexC = float2(texU1, 1.0f);
+		hout.ControlPoint0 = p[0].PosL + offset0;
+		hout.ControlPoint1 = p[1].PosL + offset1;
+		hout.ControlPoint2 = p[2].PosL + offset2;
+		hout.ControlPoint3 = p[3].PosL + offset3;
 		hout.ThreadId = p[2].ThreadId;
 	}
 	else
 	{
-		const float3 offset = up * p[2].Size;
-		hout.PosL = p[2].PosL - offset;
-		hout.TexC = float2(1.0f, 0.0f);
-		hout.ControlPoint0 = p[0].PosL - offset;
-		hout.ControlPoint1 = p[1].PosL - offset;
-		hout.ControlPoint2 = p[2].PosL - offset;
-		hout.ControlPoint3 = p[3].PosL - offset;
+		hout.PosL = p[2].PosL - offset2;
+		hout.TexC = float2(texU1, 0.0f);
+		hout.ControlPoint0 = p[0].PosL - offset0;
+		hout.ControlPoint1 = p[1].PosL - offset1;
+		hout.ControlPoint2 = p[2].PosL - offset2;
+		hout.ControlPoint3 = p[3].PosL - offset3;
 		hout.ThreadId = p[2].ThreadId;
 	}
 
 	return hout;
 }
 
+struct RibbonPixelIn
+{
+	float4 PosH : SV_POSITION;
+	float3 PosW : POSITION;
+	float3 NormalW : NORMAL;
+	float2 TexC : TEXCOORD;
+	float2 LocalTexC : LOCALTEXCOORD;
+	uint ThreadId : THREADID;
+};
+
 [domain("quad")]
-PixelIn RibbonParticleDS(PatchTess patchTess,
+RibbonPixelIn RibbonParticleDS(PatchTess patchTess,
 	float2 uv : SV_DomainLocation,
 	const OutputPatch<RibbonHullOut, 4> ribbonPatch)
 {
-	PixelIn dout;
+	RibbonPixelIn dout;
 
 	float t = uv.x;
 
@@ -283,12 +330,13 @@ PixelIn RibbonParticleDS(PatchTess patchTess,
 	float2 downTexU = lerp(ribbonPatch[1].TexC, ribbonPatch[3].TexC, uv.x);
 	float2 texC = lerp(upTexU, downTexU, uv.y);
 	dout.TexC = texC;
+	dout.LocalTexC = uv;
 	dout.ThreadId = ribbonPatch[0].ThreadId;
 
 	return dout;
 }
 
-float4 ParticlePS(PixelIn pin) : SV_Target
+float4 RibbonParticlePS(RibbonPixelIn pin) : SV_Target
 {
 	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	const uint particleIndex = aliveIndices[pin.ThreadId];
@@ -305,6 +353,31 @@ float4 ParticlePS(PixelIn pin) : SV_Target
 	float initialOpacity = particle.InitialOpacity;
 	float endOpacity = particle.EndOpacity;
 	float interpolatedOpacity = lerp(initialOpacity, endOpacity, normalizedLifetimeInv);
+
+	// previous particle
+	uint previousThreadId = pin.ThreadId - 1;
+	if (pin.ThreadId == 0)
+	{
+		previousThreadId = 0;
+	}
+
+	const uint previousParticleIndex = aliveIndices[previousThreadId];
+	Particle previousParticle = particles[previousParticleIndex];
+
+	float previousInitialLifetime = previousParticle.InitialLifetime;
+	float previousRemainLifetime = previousParticle.RemainLifetime;
+	float previousNormalizedLifetimeInv = (previousInitialLifetime - previousRemainLifetime) / previousInitialLifetime;
+
+	float3 previousInitialColor = previousParticle.InitialColor;
+	float3 previousEndColor = previousParticle.EndColor;
+	float3 previousInterpolatedColor = lerp(previousInitialColor, previousEndColor, previousNormalizedLifetimeInv);
+
+	float previousInitialOpacity = previousParticle.InitialOpacity;
+	float previousEndOpacity = previousParticle.EndOpacity;
+	float previousInterpolatedOpacity = lerp(previousInitialOpacity, previousEndOpacity, previousNormalizedLifetimeInv);
+
+	interpolatedColor = lerp(previousInterpolatedColor, interpolatedColor, pin.LocalTexC.x);
+	interpolatedOpacity = lerp(previousInterpolatedOpacity, interpolatedOpacity, pin.LocalTexC.x);
 
 	color = float4(interpolatedColor, interpolatedOpacity);
 

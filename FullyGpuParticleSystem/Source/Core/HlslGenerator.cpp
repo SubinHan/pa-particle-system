@@ -54,6 +54,19 @@ void HlslGenerator::generateShaderFile(const std::wstring& outputPath)
 	fout.open(outputPath);
 	assert(fout.is_open());
 
+	// topology sort
+	const UINT numNodes = _graph.size();
+	_visited.resize(numNodes);
+	std::fill(_visited.begin(), _visited.end(), false);
+
+	for (int i = 0; i < numNodes; ++i)
+	{
+		if (_visited[i])
+			continue;
+
+		topologySort(i);
+	}
+
 	constexpr UINT BUFFER_SIZE = 512;
 	char buffer[BUFFER_SIZE];
 
@@ -422,17 +435,6 @@ int HlslGenerator::parseNumBetween(std::string str, std::string prefix, std::str
 void HlslGenerator::insertStatements(std::ofstream& fout)
 {
 	const UINT numNodes = _graph.size();
-	_visited.resize(numNodes);
-	std::fill(_visited.begin(), _visited.end(), false);
-
-	for (int i = 0; i < numNodes; ++i)
-	{
-		if (_visited[i])
-			continue;
-
-		topologySort(i);
-	}
-
 	for (int i = 0; i < numNodes; ++i)
 	{
 		UINT nodeIndex = _topologicalOrder[i];

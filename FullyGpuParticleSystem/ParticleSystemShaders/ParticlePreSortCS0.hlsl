@@ -41,6 +41,8 @@ void PreSortCS(
 		newParticle.EndOpacity = 0.0f;
 		newParticle.SpawnTime = 10000.0f;
 		newParticle.SpawnOrderInFrame = 0;
+		newParticle.DistanceFromPrevious = 0.0f;
+		newParticle.DistanceFromStart = 0.0f;
 
 		particles[fillNumber] = newParticle;
 	}

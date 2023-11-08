@@ -276,6 +276,9 @@
   + <img src="./img/20231106_ribbon.png">
   + 이제 Orphan nodes를 shader statements로 변환하지 않음
 * 화요일:
+  * 연차
+* 수요일:
+  * 
 
 <hr/>
 
@@ -462,12 +465,43 @@ compileShaders();
     * Bitonic sort는 stable한 sort가 아닐 것이므로, spawntime이 같은 파티클들의 상대적 순서가 보존된다는 보장이 없음
     * 따라서 spawn 시 해당 dispatch thread id를 기록하고 이 역시 정렬에 관여하도록 설정
 * Ribbon 생성
-  * Tessellation을 이용해 적절한 quad들을 생성
+  * Tessellation을 이용
     * 입력: 4개의 Control points C0, C1, C2, C3
-    * C1과 C2가 이어짐
-  * 차후:
-    * Tessellation을 이용해서 삼각형들을 쪼개 곡선을 생성
-    * particle 회전 값, 혹은 카메라 기반으로 정점의 위치를 조정
+    * C1과 C2 위 아래로 점을 생성해 quad 구성 후 tessellation
+    * Catmull-rom spline을 이용해 C1과 C2 사이 세분된 점들의 위치를 조정
+  * Control Points 입력 방식
+    * Index View Buffer는 0부터 maxParticleCount까지 채워져 있음
+    * Indirect dispatch를 이용해 control points를 입력 조립기에 넣음
+        ``` C++
+        [numthreads(256, 1, 1)]
+        void RibbonComputeIndirectCommandsCS(int3 dispatchThreadId : SV_DispatchThreadID)
+        {
+	        uint id = dispatchThreadId.x;
+	        uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
+
+	        if (id >= numAlives - 3 || numAlives <= 3)
+	        {
+		        return;
+	        }
+
+	        IndirectCommand command;
+	        command.IndexCountPerInstance = 4;
+	        command.InstanceCount = 1;
+	        command.StartIndexLocation = id;
+	        command.BaseVertexLocation = 0;
+	        command.StartInstanceLocation = 0;
+
+	        outputCommands.Append(command);
+        }
+        ```
+    * 문제점: 0\~1과 n-1\~n의 ribbon이 연결되지 않음.
+    * 따라서 index buffer의 앞 부분에 0을 추가로 삽입하여 첫 번째 ribbon의 경우 control point가 0, 0, 1, 2로 입력되게 하여 0~1의 ribbon을 잇게 함.
+    * 마찬가지로 마지막 ribbon의 경우 numAlives를 확인해서 해당 index를 보정하게끔 함 (n-2, n-1, n, n+1) => (n-2, n-1, n, n)
+  * Texture Coordinate
+    * 
+  * Color, Opacity interpolation
+    * 
+  * 
 
 
 <hr/>
@@ -494,4 +528,5 @@ compileShaders();
 * Splines
   * [Bezier Curve](https://www.particleincell.com/2012/bezier-splines/)
   * [Catmull-Rom Curve](https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline)
+  * [Catmull-Rom Spline](https://www.mvps.org/directx/articles/catmull/)
 

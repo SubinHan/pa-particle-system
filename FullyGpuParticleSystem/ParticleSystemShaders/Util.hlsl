@@ -44,10 +44,9 @@ float2 subUv(float2 texC, uint subUvDimensionX, uint subUvDimensionY, uint index
 float3 catmullRom(float3 p0, float3 p1, float3 p2, float3 p3, float t)
 {
 	float3 result;
-	float tension = 0.5f;
 
-	float t2 = t * t;
-	float t3 = t2 * t;
+	const float t2 = t * t;
+	const float t3 = t2 * t;
 	
 	result =
 		0.5f * (
@@ -56,4 +55,14 @@ float3 catmullRom(float3 p0, float3 p1, float3 p2, float3 p3, float t)
 			(-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3);
 
 	return result;
+}
+
+float3 dCatmullRom(float3 p0, float3 p1, float p2, float3 p3, float t)
+{
+	const float t2 = t * t;
+
+	return 0.5f * (
+		(-p1 + p2) +
+		(4.0f * p0 - 10.0f * p1 + 8.0f * p2 - 2.0f * p3) * t +
+		(-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t2);
 }

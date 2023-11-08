@@ -22,7 +22,7 @@ constexpr int ROOT_SLOT_OBJECT_CONSTANTS_BUFFER = 0;
 constexpr int ROOT_SLOT_PASS_CONSTANTS_BUFFER = ROOT_SLOT_OBJECT_CONSTANTS_BUFFER + 1;
 constexpr int ROOT_SLOT_PARTICLES_BUFFER = ROOT_SLOT_PASS_CONSTANTS_BUFFER + 1;
 constexpr int ROOT_SLOT_ALIVES_INDICES_BUFFER = ROOT_SLOT_PARTICLES_BUFFER + 1;
-constexpr int ROOT_SLOT_DIFFUSE_MAP_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER + 1;
+constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER + 1;
 
 constexpr int ROOT_SLOT_SRV_UAV_TABLE = 0;
 
@@ -44,7 +44,7 @@ void ParticleRenderer::setMaterialName(std::string materialName)
 
 void ParticleRenderer::setRendererType(RendererType type)
 {
-	_currentRenderType = type;
+	_currentRendererType = type;
 }
 
 void ParticleRenderer::render(
@@ -52,6 +52,39 @@ void ParticleRenderer::render(
 	const ObjectConstants& objectConstants,
 	const PassConstantBuffer& passCb)
 {
+	if (_currentRendererType == RendererType::Ribbon)
+	{
+		// calculate ribbon distance from start
+
+		cmdList->SetComputeRootSignature(_ribbonDistanceRootSignature.Get());
+		cmdList->SetPipelineState(_psoPreRibbonDistance.Get());
+		cmdList->SetComputeRootUnorderedAccessView(
+			1,
+			_resource->getParticlesResource()->GetGPUVirtualAddress());
+		cmdList->SetComputeRootUnorderedAccessView(
+			2,
+			_resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
+
+		cmdList->Dispatch(static_cast<UINT>(ceil(static_cast<float>(_resource->getMaxNumParticles()) / 256.0f)), 1, 1);
+
+		UINT numParticles = _resource->getMaxNumParticles() + 1;
+
+		cmdList->SetPipelineState(_psoRibbonDistance.Get());
+		cmdList->SetComputeRoot32BitConstants(
+			0,
+			1,
+			&numParticles,
+			0
+		);
+		cmdList->SetComputeRootUnorderedAccessView(
+			1,
+			_resource->getParticlesResource()->GetGPUVirtualAddress());
+		cmdList->SetComputeRootUnorderedAccessView(
+			2,
+			_resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
+		cmdList->Dispatch(static_cast<UINT>(ceil(static_cast<float>(_resource->getMaxNumParticles()) / 256.0f)), 1, 1);
+	}
+
 	cmdList->SetComputeRootSignature(_computeRootSignature.Get());
 	cmdList->SetPipelineState(getCurrentComputePso());
 
@@ -108,8 +141,10 @@ void ParticleRenderer::render(
 		ROOT_SLOT_PARTICLES_BUFFER, _resource->getParticlesResource()->GetGPUVirtualAddress());
 	cmdList->SetGraphicsRootShaderResourceView(
 		ROOT_SLOT_ALIVES_INDICES_BUFFER, _resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootDescriptorTable(
+		ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersUavGpuHandle());
 
-	bindGraphicsResourcesOfRegisteredNodes(cmdList, 4);
+	bindGraphicsResourcesOfRegisteredNodes(cmdList, 5);
 
 	_resource->transitCommandBufferToIndirectArgument(cmdList);
 
@@ -180,11 +215,30 @@ void ParticleRenderer::compileShaders()
 		nullptr,
 		"RibbonComputeIndirectCommandsCS",
 		"cs_5_1");
+
+	_shaderPreRibbonDistance = DxUtil::compileShader(
+		L"ParticleSystemShaders\\ParticlePreRibbonDistanceCS.hlsl",
+		nullptr,
+		"PreRibbonDistanceCS",
+		"cs_5_1");
+
+	_shaderRibbonDistance = DxUtil::compileShader(
+		L"ParticleSystemShaders\\ParticleRibbonDistanceCS.hlsl",
+		nullptr,
+		"BrentKung",
+		"cs_5_1");
 }
 
-void ParticleRenderer::setShaderPs(Microsoft::WRL::ComPtr<ID3DBlob> shader)
+void ParticleRenderer::setSpritePixelShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 {
 	_shaderPs = shader;
+	buildRootSignature();
+	buildPsos();
+}
+
+void ParticleRenderer::setRibbonPixelShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
+{
+	_shaderPsRibbon = shader;
 	buildRootSignature();
 	buildPsos();
 }
@@ -201,14 +255,7 @@ void ParticleRenderer::setOpaque(bool newIsOpaque)
 
 std::vector<CD3DX12_ROOT_PARAMETER> ParticleRenderer::buildRootParameter()
 {
-	std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter(4);
-	slotRootParameter[ROOT_SLOT_OBJECT_CONSTANTS_BUFFER].InitAsConstants(sizeof(ObjectConstants) / 4, 0);
-
-	_passCbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-	slotRootParameter[ROOT_SLOT_PASS_CONSTANTS_BUFFER].InitAsDescriptorTable(1, &_passCbvTable);
-
-	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER].InitAsShaderResourceView(0); // particles
-	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER].InitAsShaderResourceView(1); // aliveIndices
+	auto device = DxDevice::getInstance().getD3dDevice();
 
 	// build compute root signature for sprite
 	{
@@ -251,14 +298,67 @@ std::vector<CD3DX12_ROOT_PARAMETER> ParticleRenderer::buildRootParameter()
 		}
 		ThrowIfFailed(hr);
 
-		auto device = DxDevice::getInstance().getD3dDevice();
-
 		ThrowIfFailed(device->CreateRootSignature(
 			0,
 			serializedRootSig->GetBufferPointer(),
 			serializedRootSig->GetBufferSize(),
 			IID_PPV_ARGS(&_computeRootSignature)));
 	}
+
+	// build compute root signature for ribbon distance
+	{
+		CD3DX12_ROOT_PARAMETER slotRootParameter[3];
+
+		slotRootParameter[0]
+			.InitAsConstants(1, 0);
+		slotRootParameter[1]
+			.InitAsUnorderedAccessView(0);
+		slotRootParameter[2]
+			.InitAsUnorderedAccessView(1);
+
+		//CD3DX12_DESCRIPTOR_RANGE uavTable;
+		//uavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
+		//slotRootParameter[SPAWN_ROOT_SLOT_COUNTERS_BUFFER]
+		//	.InitAsDescriptorTable(1, &uavTable);
+
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
+			_countof(slotRootParameter),
+			slotRootParameter,
+			0,
+			nullptr,
+			D3D12_ROOT_SIGNATURE_FLAG_NONE);
+
+		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
+		ComPtr<ID3DBlob> serializedRootSig = nullptr;
+		ComPtr<ID3DBlob> errorBlob = nullptr;
+		HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+			serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+		if (errorBlob != nullptr)
+		{
+			::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+		}
+		ThrowIfFailed(hr);
+
+		ThrowIfFailed(device->CreateRootSignature(
+			0,
+			serializedRootSig->GetBufferPointer(),
+			serializedRootSig->GetBufferSize(),
+			IID_PPV_ARGS(_ribbonDistanceRootSignature.GetAddressOf())));
+	}
+
+	// root parameter for renderbase
+	std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter(5);
+	slotRootParameter[ROOT_SLOT_OBJECT_CONSTANTS_BUFFER].InitAsConstants(sizeof(ObjectConstants) / 4, 0);
+
+	_passCbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+	slotRootParameter[ROOT_SLOT_PASS_CONSTANTS_BUFFER].InitAsDescriptorTable(1, &_passCbvTable);
+
+	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER].InitAsShaderResourceView(0); // particles
+	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER].InitAsShaderResourceView(1); // aliveIndices
+
+	_counterTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+	slotRootParameter[ROOT_SLOT_COUNTERS_BUFFER].InitAsDescriptorTable(1, &_counterTable);
 
 	return slotRootParameter;
 }
@@ -300,7 +400,7 @@ void ParticleRenderer::buildDefaultShader()
 	_hlslGenerator->setOutputColor(outputColorIndex);
 
 	compileShaders();
-	setShaderPs(_shaderPs);
+	setSpritePixelShader(_shaderPs);
 }
 
 void ParticleRenderer::buildInputLayout()
@@ -392,6 +492,23 @@ void ParticleRenderer::buildPsos()
 		nullptr,
 		0
 	};
+
+	if (_shaderPsRibbon)
+	{
+		ribbonPsoDesc.PS =
+		{
+			reinterpret_cast<BYTE*>(_shaderPsRibbon->GetBufferPointer()),
+			_shaderPsRibbon->GetBufferSize()
+		};
+	}
+	else
+	{
+		ribbonPsoDesc.PS =
+		{
+			reinterpret_cast<BYTE*>(_shaderPs->GetBufferPointer()),
+			_shaderPs->GetBufferSize()
+		};
+	}
 	ribbonPsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
 	ThrowIfFailed(
 		device.getD3dDevice()->CreateGraphicsPipelineState(
@@ -409,7 +526,7 @@ void ParticleRenderer::buildPsos()
 	};
 	ThrowIfFailed(
 		device.getD3dDevice()->CreateComputePipelineState(
-			&psoDesc, IID_PPV_ARGS(&_psoCompute)));
+			&psoDesc, IID_PPV_ARGS(&_psoComputeIndirect)));
 
 	//////////////// ComputePso for Ribbon
 	psoDesc.CS =
@@ -419,7 +536,26 @@ void ParticleRenderer::buildPsos()
 	};
 	ThrowIfFailed(
 		device.getD3dDevice()->CreateComputePipelineState(
-			&psoDesc, IID_PPV_ARGS(&_psoComputeRibbon)));
+			&psoDesc, IID_PPV_ARGS(&_psoComputeIndirectRibbon)));
+
+	psoDesc.pRootSignature = _ribbonDistanceRootSignature.Get();
+	psoDesc.CS =
+	{
+		reinterpret_cast<BYTE*>(_shaderPreRibbonDistance->GetBufferPointer()),
+		_shaderPreRibbonDistance->GetBufferSize()
+	};
+	ThrowIfFailed(
+		device.getD3dDevice()->CreateComputePipelineState(
+			&psoDesc, IID_PPV_ARGS(&_psoPreRibbonDistance)));
+
+	psoDesc.CS =
+	{
+		reinterpret_cast<BYTE*>(_shaderRibbonDistance->GetBufferPointer()),
+		_shaderRibbonDistance->GetBufferSize()
+	};
+	ThrowIfFailed(
+		device.getD3dDevice()->CreateComputePipelineState(
+			&psoDesc, IID_PPV_ARGS(&_psoRibbonDistance)));
 }
 
 void ParticleRenderer::generateEmptyGeometry()
@@ -429,13 +565,14 @@ void ParticleRenderer::generateEmptyGeometry()
 	using VertexType = DirectX::XMFLOAT3;
 	using IndexType = std::uint32_t;
 
-	auto maxNumParticles = _resource->getMaxNumParticles();
+	auto maxNumParticles = _resource->getMaxNumParticles() + 1;
 	std::vector<VertexType> vertices(1);
 	std::vector<IndexType> indices(maxNumParticles);
 
-	for (int i = 0; i < indices.size(); ++i)
+	indices[0] = 0;
+	for (int i = 1; i < indices.size(); ++i)
 	{
-		indices[i] = i;
+		indices[i] = i - 1;
 	}
 
 	const UINT vbByteSize = (UINT)vertices.size() * sizeof(VertexType);
@@ -481,19 +618,19 @@ void ParticleRenderer::generateEmptyGeometry()
 
 ID3D12PipelineState* ParticleRenderer::getCurrentPso()
 {
-	if (_currentRenderType == RendererType::Ribbon)
+	if (_currentRendererType == RendererType::Ribbon)
 		return _psoRibbon.Get();
 
-	if (_currentRenderType == RendererType::Sprite)
+	if (_currentRendererType == RendererType::Sprite)
 		return _isOpaque ? _psoOpaque.Get() : _psoTransparency.Get();
 }
 
 ID3D12PipelineState* ParticleRenderer::getCurrentComputePso()
 {
-	return _currentRenderType == RendererType::Sprite ? _psoCompute.Get() : _psoComputeRibbon.Get();
+	return _currentRendererType == RendererType::Sprite ? _psoComputeIndirect.Get() : _psoComputeIndirectRibbon.Get();
 }
 
 D3D12_PRIMITIVE_TOPOLOGY ParticleRenderer::getCurrentPrimitiveTopology()
 {
-	return _currentRenderType == RendererType::Sprite ? D3D11_PRIMITIVE_TOPOLOGY_POINTLIST : D3D_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST;
+	return _currentRendererType == RendererType::Sprite ? D3D11_PRIMITIVE_TOPOLOGY_POINTLIST : D3D_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST;
 }

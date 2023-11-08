@@ -22,4 +22,7 @@ struct Particle
 	float EndOpacity;
 	float SpawnTime;
 	UINT SpawnOrderInFrame;
+	float DistanceFromPrevious;
+
+	float DistanceFromStart;
 };
