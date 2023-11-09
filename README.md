@@ -278,6 +278,11 @@
 * 화요일:
   * 연차
 * 수요일:
+  * 리본 렌더링 텍스처 매핑 공부
+* 목요일:
+  * 리본 렌더링에서 distance based texture mapping 수행
+  * brent-kung parallel prefix sum 학습 및 적용
+* 금요일:
   * 
 
 <hr/>
@@ -458,7 +463,7 @@ compileShaders();
   * https://youtu.be/Zn9-U5vQl3g?si=OwzghEU3Dq-Bh-fX&t=155
   * Spawntime 기반으로 particle 정렬 후
   * 이들을 지나는 spline(Catmull-rom) 렌더링
-  * 적절한 레퍼런스를 찾지 못했으므로, 내 맘대로 구현한다.
+  * 적절한 레퍼런스를 찾지 못했으므로, 내 맘대로 구현한다!
 * 정렬
   * Spawntime으로 하려고 했으나, 추가적인 인자가 필요함. 왜냐하면:
     * 한 프레임에서 같은 spawntime을 가진 여러 파티클들이 생성됨
@@ -495,12 +500,29 @@ compileShaders();
         }
         ```
     * 문제점: 0\~1과 n-1\~n의 ribbon이 연결되지 않음.
-    * 따라서 index buffer의 앞 부분에 0을 추가로 삽입하여 첫 번째 ribbon의 경우 control point가 0, 0, 1, 2로 입력되게 하여 0~1의 ribbon을 잇게 함.
+    * 따라서 index buffer의 앞 부분에 0을 추가로 삽입하여 첫 번째 ribbon의 경우 control point가 0, 0, 1, 2로 입력되게 하여 0~1의 파티클을 잇게 함.
     * 마찬가지로 마지막 ribbon의 경우 numAlives를 확인해서 해당 index를 보정하게끔 함 (n-2, n-1, n, n+1) => (n-2, n-1, n, n)
-  * Texture Coordinate
-    * 
   * Color, Opacity interpolation
-    * 
+    * Pixel shader까지 각 segment의 uv값을 전달하며, 이를 이용해 spline 보간한 것과 같은 방식으로 보간.
+  * Texture Coordinate
+    * 3가지 형태로 Texture mapping을 해보았음: Segment based, Stretched, Distance based
+    * Segment based
+      * 각 파티클들을 잇는 하나의 segment가 0~1의 Texture Coordinate를 가짐
+      * <img src="./img/ribbon_texture_segment.webp">
+    * Stretched
+      * 시작 파티클부터 끝 파티클까지 0~1의 Texture Coordinate를 가짐
+      * <img src="./img/ribbon_texture_stretched.webp">
+    * Distance based
+      * 세계 좌표 기준으로 파티클 사이의 거리를 근사해 거리를 기준으로 texture coordinate를 부여해 tiling함
+      * <img src="./img/ribbon_texture_distancebased.webp">
+      * Catmull-rom spline이 이루는 호의 길이를 구해보려 했으나 이는 어려움
+      * 만들어지는 spline의 곡률이 생각보다 크지 않고 방향 전환도 급격하게 이루어지므로, 단순히 직선 거리를 이용해서 근사해도 적절한 결과물이 나올 것이라고 생각하였음
+      * i번째 파티클과 i-1번째 파티클 사이의 거리를 전부 구하고 이를 각각의 파티클들이 정보를 유지하지만, 이것만으로는 부족함
+        * 왜냐하면 tiling이 자연스럽게 이루어지게 하기 위해서는 이전 segment의 텍스처 좌표값을 알아야 하기 때문!
+        * 즉, "누적합"이 필요함
+      * 누적합은 Brent-kung adder를 이용해 병렬적으로 연산하였음
+        * <img src="./img/brent_kung_adder.png">
+      * 이를 통해 첫 파티클로부터 각 파티클까지의 거리를 계산할 수 있으며, 이 값을 그대로(혹은 scaling하여) texture coordinate로 활용함
   * 
 
 
@@ -521,12 +543,12 @@ compileShaders();
 * Ribbon Trail
   * [Ribbon and Trail](https://doc.stride3d.net/4.0/en/manual/particles/ribbons-and-trails.html)
   * [Smooth Particle Ribbons Through Hardware Accelerated Tessellation](https://www.diva-portal.org/smash/get/diva2:1692949/FULLTEXT01.pdf) - 여기에 나온 방법론을 활용하지는 않았음.
-
-* Perlin Noise
-  * [Perlin Noise](https://en.wikipedia.org/wiki/Perlin_noise)
-
-* Splines
   * [Bezier Curve](https://www.particleincell.com/2012/bezier-splines/)
   * [Catmull-Rom Curve](https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline)
   * [Catmull-Rom Spline](https://www.mvps.org/directx/articles/catmull/)
+  * [Parallel Prefix Sum - Nvidia](https://developer.nvidia.com/gpugems/gpugems3/part-vi-gpu-computing/chapter-39-parallel-prefix-sum-scan-cuda)
+  * [Parallel Prefix Sum - Open Source in Github](https://github.com/b0nes164/GPUPrefixSums/tree/main)
+
+* Perlin Noise
+  * [Perlin Noise](https://en.wikipedia.org/wiki/Perlin_noise)
 

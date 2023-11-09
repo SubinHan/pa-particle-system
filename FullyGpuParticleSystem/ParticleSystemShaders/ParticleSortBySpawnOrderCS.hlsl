@@ -3,6 +3,7 @@
 
 cbuffer cbSortConstants : register(b0)
 {
+	uint particlesBufferSize;
 	uint sequenceSize;
 	uint stage;
 }
@@ -30,6 +31,7 @@ void BitonicSortCS(
 	int3 dispatchThreadId : SV_DispatchThreadID)
 {
 	uint id = dispatchThreadId.x;
+
 	uint compareIndex = id ^ stage;
 
 	uint numAlives =

@@ -261,6 +261,11 @@ bool HlslTranslator::translateNode(UiNode node)
 		}
 		break;
 	}
+	case NodeType::SinTime:
+	{
+		hlslIndex = _hlslGenerator->sinByTime();
+		break;
+	}
 	default:
 		hasGenerated = false;
 		break;

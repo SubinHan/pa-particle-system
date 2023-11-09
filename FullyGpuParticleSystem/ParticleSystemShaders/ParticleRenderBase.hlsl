@@ -154,6 +154,7 @@ struct RibbonVertexOut
 {
 	float3 PosL : POSITION;
 	float Size : SIZE;
+	float DistanceFromStart : DISTANCE;
 	uint ThreadId : THREADID;
 };
 
@@ -170,6 +171,7 @@ RibbonVertexOut RibbonParticleVS(
 
 	vertexOut.PosL = particle.Position;
 	vertexOut.ThreadId = threadId;
+	vertexOut.DistanceFromStart = particle.DistanceFromStart;
 
 	float initialLifetime = particle.InitialLifetime;
 	float remainLifetime = particle.RemainLifetime;
@@ -223,7 +225,74 @@ struct RibbonHullOut
 [outputcontrolpoints(4)]
 [patchconstantfunc("ConstantHS")]
 [maxtessfactor(64.0f)]
-RibbonHullOut RibbonParticleHS(InputPatch<RibbonVertexOut, 4> p,
+RibbonHullOut RibbonParticleHS_SegmentBased(InputPatch<RibbonVertexOut, 4> p,
+	uint i : SV_OutputControlPointID,
+	uint patchId : SV_PrimitiveID)
+{
+	RibbonHullOut hout;
+
+	float3 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
+	float3 up = mul(upView, gInvView).xyz;
+
+	const float3 offset0 = up * p[0].Size;
+	const float3 offset1 = up * p[1].Size;
+	const float3 offset2 = up * p[2].Size;
+	const float3 offset3 = up * p[3].Size;
+
+	uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
+
+	if (i == 0)
+	{
+		hout.PosL = p[1].PosL + offset1;
+		hout.TexC = float2(0.0f, 0.0f);
+		hout.ControlPoint0 = p[0].PosL + offset0;
+		hout.ControlPoint1 = p[1].PosL + offset1;
+		hout.ControlPoint2 = p[2].PosL + offset2;
+		hout.ControlPoint3 = p[3].PosL + offset3;
+		hout.ThreadId = p[1].ThreadId;
+	}
+	else if (i == 1)
+	{
+		hout.PosL = p[1].PosL - offset1;
+		hout.TexC = float2(0.0f, 1.0f);
+		hout.ControlPoint0 = p[0].PosL - offset0;
+		hout.ControlPoint1 = p[1].PosL - offset1;
+		hout.ControlPoint2 = p[2].PosL - offset2;
+		hout.ControlPoint3 = p[3].PosL - offset3;
+		hout.ThreadId = p[1].ThreadId;
+	}
+	else if (i == 2)
+	{
+		hout.PosL = p[2].PosL + offset2;
+		hout.TexC = float2(1.0f, 0.0f);
+		hout.ControlPoint0 = p[0].PosL + offset0;
+		hout.ControlPoint1 = p[1].PosL + offset1;
+		hout.ControlPoint2 = p[2].PosL + offset2;
+		hout.ControlPoint3 = p[3].PosL + offset3;
+		hout.ThreadId = p[2].ThreadId;
+	}
+	else
+	{
+		hout.PosL = p[2].PosL - offset2;
+		hout.TexC = float2(1.0f, 1.0f);
+		hout.ControlPoint0 = p[0].PosL - offset0;
+		hout.ControlPoint1 = p[1].PosL - offset1;
+		hout.ControlPoint2 = p[2].PosL - offset2;
+		hout.ControlPoint3 = p[3].PosL - offset3;
+		hout.ThreadId = p[2].ThreadId;
+	}
+
+	return hout;
+}
+
+
+[domain("quad")]
+[partitioning("integer")]
+[outputtopology("triangle_cw")]
+[outputcontrolpoints(4)]
+[patchconstantfunc("ConstantHS")]
+[maxtessfactor(64.0f)]
+RibbonHullOut RibbonParticleHS_Stretched(InputPatch<RibbonVertexOut, 4> p,
 	uint i : SV_OutputControlPointID,
 	uint patchId : SV_PrimitiveID)
 {
@@ -241,6 +310,75 @@ RibbonHullOut RibbonParticleHS(InputPatch<RibbonVertexOut, 4> p,
 
 	float texU0 = float(p[1].ThreadId) / float(numAlives);
 	float texU1 = float(p[2].ThreadId) / float(numAlives);
+
+	if (i == 0)
+	{
+		hout.PosL = p[1].PosL + offset1;
+		hout.TexC = float2(texU0, 1.0f);
+		hout.ControlPoint0 = p[0].PosL + offset0;
+		hout.ControlPoint1 = p[1].PosL + offset1;
+		hout.ControlPoint2 = p[2].PosL + offset2;
+		hout.ControlPoint3 = p[3].PosL + offset3;
+		hout.ThreadId = p[1].ThreadId;
+	}
+	else if (i == 1)
+	{
+		hout.PosL = p[1].PosL - offset1;
+		hout.TexC = float2(texU0, 0.0f);
+		hout.ControlPoint0 = p[0].PosL - offset0;
+		hout.ControlPoint1 = p[1].PosL - offset1;
+		hout.ControlPoint2 = p[2].PosL - offset2;
+		hout.ControlPoint3 = p[3].PosL - offset3;
+		hout.ThreadId = p[1].ThreadId;
+	}
+	else if (i == 2)
+	{
+		hout.PosL = p[2].PosL + offset2;
+		hout.TexC = float2(texU1, 1.0f);
+		hout.ControlPoint0 = p[0].PosL + offset0;
+		hout.ControlPoint1 = p[1].PosL + offset1;
+		hout.ControlPoint2 = p[2].PosL + offset2;
+		hout.ControlPoint3 = p[3].PosL + offset3;
+		hout.ThreadId = p[2].ThreadId;
+	}
+	else
+	{
+		hout.PosL = p[2].PosL - offset2;
+		hout.TexC = float2(texU1, 0.0f);
+		hout.ControlPoint0 = p[0].PosL - offset0;
+		hout.ControlPoint1 = p[1].PosL - offset1;
+		hout.ControlPoint2 = p[2].PosL - offset2;
+		hout.ControlPoint3 = p[3].PosL - offset3;
+		hout.ThreadId = p[2].ThreadId;
+	}
+
+	return hout;
+}
+
+[domain("quad")]
+[partitioning("integer")]
+[outputtopology("triangle_cw")]
+[outputcontrolpoints(4)]
+[patchconstantfunc("ConstantHS")]
+[maxtessfactor(64.0f)]
+RibbonHullOut RibbonParticleHS_DistanceBased(InputPatch<RibbonVertexOut, 4> p,
+	uint i : SV_OutputControlPointID,
+	uint patchId : SV_PrimitiveID)
+{
+	RibbonHullOut hout;
+
+	float3 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
+	float3 up = mul(upView, gInvView).xyz;
+
+	const float3 offset0 = up * p[0].Size;
+	const float3 offset1 = up * p[1].Size;
+	const float3 offset2 = up * p[2].Size;
+	const float3 offset3 = up * p[3].Size;
+
+	uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
+
+	float texU0 = p[1].DistanceFromStart * 1.0f;
+	float texU1 = p[2].DistanceFromStart * 1.0f;
 
 	if (i == 0)
 	{

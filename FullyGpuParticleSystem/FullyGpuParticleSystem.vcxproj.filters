@@ -300,6 +300,12 @@
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSinByTime.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Model\RibbonTextureUvType.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -555,6 +561,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSinByTime.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

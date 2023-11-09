@@ -2,54 +2,36 @@
 
 cbuffer cbPreRibbonDistanceConstants : register(b0)
 {
-    uint NumParticles;
+    uint NumWorker;
+    uint IndexOffsetFrom;
+    uint IndexOffsetTo;
+    uint ShiftOffset;
 }
 
 RWStructuredBuffer<Particle> particles : register(u0);
 RWStructuredBuffer<uint> aliveIndices : register(u1);
+RWByteAddressBuffer counters			: register(u2);
 
 void addFromTo(uint from, uint to)
 {
-    //if (from >= NumParticles || to >= NumParticles)
-    //    return;
+    if (aliveIndices[from] == 0 || aliveIndices[to] == 0)
+        return;
+
+    uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
+
+    if (from >= numAlives || to >= numAlives)
+        return;
 
     particles[aliveIndices[to]].DistanceFromStart += particles[aliveIndices[from]].DistanceFromStart;
 }
 
-[numthreads(256, 1, 1)]
-void BrentKung(int3 dispatchThreadId : SV_GroupThreadID)
+[numthreads(1024, 1, 1)]
+void BrentKung(uint3 dispatchThreadId : SV_DispatchThreadID)
 {
-    //Upsweep
-    if (dispatchThreadId.x < (NumParticles >> 1))
+    if (dispatchThreadId.x < NumWorker)
     {
-        addFromTo(dispatchThreadId.x << 1, (dispatchThreadId.x << 1) + 1);
-    }
-
-    int offset = 1;
-    for (int j = NumParticles >> 2; j > 0; j >>= 1)
-    {
-        DeviceMemoryBarrierWithGroupSync();
-        if (dispatchThreadId.x < j)
-        {
-            addFromTo(
-                (((dispatchThreadId.x << 1) + 1) << offset) - 1,
-                (((dispatchThreadId.x << 1) + 2) << offset) - 1);
-        }
-        ++offset;
-    }
-
-    --offset;
-
-    //Downsweep
-    for (j = 2; j < NumParticles; j <<= 1)
-    {
-        --offset;
-        DeviceMemoryBarrierWithGroupSync();
-        if (dispatchThreadId.x < j - 1)
-        {
-            addFromTo(
-                (((dispatchThreadId.x << 1) + 2) << offset) - 1,
-                (((dispatchThreadId.x << 1) + 3) << offset) - 1);
-        }
+        addFromTo(
+            (((dispatchThreadId.x << 1) + IndexOffsetFrom) << ShiftOffset) - 1,
+            (((dispatchThreadId.x << 1) + IndexOffsetTo) << ShiftOffset) - 1);
     }
 }

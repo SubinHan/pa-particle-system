@@ -40,6 +40,7 @@ enum class NodeType
 	MakeFloat4,
 	MakeFloat3,
 	AddFloat,
+	SinTime,
 	Size
 };
 
@@ -79,6 +80,7 @@ const std::array<NodeType, static_cast<size_t>(NodeType::Size)> nodeTypes =
 	NodeType::MakeFloat4,
 	NodeType::MakeFloat3,
 	NodeType::AddFloat,
+	NodeType::SinTime,
 };
 
 const std::array<std::string, static_cast<size_t>(NodeType::Size)> nodeNames =
@@ -117,4 +119,5 @@ const std::array<std::string, static_cast<size_t>(NodeType::Size)> nodeNames =
 	"MakeFloat4",
 	"MakeFloat3",
 	"AddFloat",
+	"SinByTime",
 };

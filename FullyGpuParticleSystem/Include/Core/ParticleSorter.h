@@ -13,6 +13,7 @@ struct ObjectConstants;
 
 struct SortConstants
 {
+	UINT ParticlesBufferSize;
 	UINT SequenceSize;
 	UINT Stage;
 };
@@ -47,15 +48,17 @@ private:
 
 	std::string _name;
 
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
-	Microsoft::WRL::ComPtr<ID3DBlob> _shader;
+
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoBySpawnOrder;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _psoByIndex;
+	Microsoft::WRL::ComPtr<ID3DBlob> _shaderBySpawnOrder;
+	Microsoft::WRL::ComPtr<ID3DBlob> _shaderByIndex;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature;
 
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> _prePso;
-	Microsoft::WRL::ComPtr<ID3DBlob> _preShader;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> _preRootSignature;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _prePsoByIndex;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _prePsoBySpawnOrder;
+	Microsoft::WRL::ComPtr<ID3DBlob> _preShaderByIndex;
+	Microsoft::WRL::ComPtr<ID3DBlob> _preShaderBySpawnOrder;
 
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> _prePso0;
-	Microsoft::WRL::ComPtr<ID3DBlob> _preShader0;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> _preRootSignature0;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> _preRootSignature;
 };

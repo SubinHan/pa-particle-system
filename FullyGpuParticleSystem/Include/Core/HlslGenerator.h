@@ -43,6 +43,7 @@ public:
 	UINT makeFloat4ByColorAlpha(UINT float3Index, UINT floatIndex);
 	UINT makeFloat3(UINT floatXIndex, UINT floatYIndex, UINT floatZIndex);
 	UINT makeFloat4(UINT floatXIndex, UINT floatYIndex, UINT floatZIndex, UINT floatWIndex);
+	UINT sinByTime();
 
 protected:
 	std::string getNewLocalVariableName();

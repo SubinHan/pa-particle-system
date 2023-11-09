@@ -9,6 +9,7 @@
 #include "Model/Material.h"
 #include "Model/ObjectConstants.h"
 #include "Model/RendererType.h"
+#include "Model/RibbonTextureUvType.h"
 #include "Util/DxDebug.h"
 
 #include "d3dx12.h"
@@ -29,7 +30,9 @@ constexpr int ROOT_SLOT_SRV_UAV_TABLE = 0;
 ParticleRenderer::ParticleRenderer(ParticleResource* resource, std::string name) :
 	ParticlePass(resource, name),
 	_materialName("default"),
-	_hlslGenerator(std::make_unique<HlslGeneratorRender>(BASE_RENDER_SHADER_PATH))
+	_hlslGenerator(std::make_unique<HlslGeneratorRender>(BASE_RENDER_SHADER_PATH)),
+	_currentRendererType(RendererType::Sprite),
+	_currentRibbonTextureUvType(RibbonTextureUvType::SegmentBased)
 {
 	buildCommandSignature();
 	buildInputLayout();
@@ -47,6 +50,11 @@ void ParticleRenderer::setRendererType(RendererType type)
 	_currentRendererType = type;
 }
 
+void ParticleRenderer::setRibbonTextureUvType(RibbonTextureUvType type)
+{
+	_currentRibbonTextureUvType = type;
+}
+
 void ParticleRenderer::render(
 	ID3D12GraphicsCommandList* cmdList,
 	const ObjectConstants& objectConstants,
@@ -54,35 +62,7 @@ void ParticleRenderer::render(
 {
 	if (_currentRendererType == RendererType::Ribbon)
 	{
-		// calculate ribbon distance from start
-
-		cmdList->SetComputeRootSignature(_ribbonDistanceRootSignature.Get());
-		cmdList->SetPipelineState(_psoPreRibbonDistance.Get());
-		cmdList->SetComputeRootUnorderedAccessView(
-			1,
-			_resource->getParticlesResource()->GetGPUVirtualAddress());
-		cmdList->SetComputeRootUnorderedAccessView(
-			2,
-			_resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
-
-		cmdList->Dispatch(static_cast<UINT>(ceil(static_cast<float>(_resource->getMaxNumParticles()) / 256.0f)), 1, 1);
-
-		UINT numParticles = _resource->getMaxNumParticles() + 1;
-
-		cmdList->SetPipelineState(_psoRibbonDistance.Get());
-		cmdList->SetComputeRoot32BitConstants(
-			0,
-			1,
-			&numParticles,
-			0
-		);
-		cmdList->SetComputeRootUnorderedAccessView(
-			1,
-			_resource->getParticlesResource()->GetGPUVirtualAddress());
-		cmdList->SetComputeRootUnorderedAccessView(
-			2,
-			_resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
-		cmdList->Dispatch(static_cast<UINT>(ceil(static_cast<float>(_resource->getMaxNumParticles()) / 256.0f)), 1, 1);
+		calculateRibbonDistanceFromStart(cmdList);
 	}
 
 	cmdList->SetComputeRootSignature(_computeRootSignature.Get());
@@ -186,10 +166,22 @@ void ParticleRenderer::compileShaders()
 		"RibbonParticleVS",
 		"vs_5_1");
 
-	_shaderHsRibbon = DxUtil::compileShader(
+	_shaderHsRibbonSegmentBased = DxUtil::compileShader(
 		shaderPath,
 		nullptr,
-		"RibbonParticleHS",
+		"RibbonParticleHS_SegmentBased",
+		"hs_5_1");
+
+	_shaderHsRibbonStretched = DxUtil::compileShader(
+		shaderPath,
+		nullptr,
+		"RibbonParticleHS_Stretched",
+		"hs_5_1");
+
+	_shaderHsRibbonDistanceBased = DxUtil::compileShader(
+		shaderPath,
+		nullptr,
+		"RibbonParticleHS_DistanceBased",
 		"hs_5_1");
 
 	_shaderDsRibbon = DxUtil::compileShader(
@@ -307,19 +299,18 @@ std::vector<CD3DX12_ROOT_PARAMETER> ParticleRenderer::buildRootParameter()
 
 	// build compute root signature for ribbon distance
 	{
-		CD3DX12_ROOT_PARAMETER slotRootParameter[3];
+		CD3DX12_ROOT_PARAMETER slotRootParameter[4];
 
 		slotRootParameter[0]
-			.InitAsConstants(1, 0);
+			.InitAsConstants(sizeof(RibbonDistanceConstants) / 4, 0);
 		slotRootParameter[1]
 			.InitAsUnorderedAccessView(0);
 		slotRootParameter[2]
 			.InitAsUnorderedAccessView(1);
-
-		//CD3DX12_DESCRIPTOR_RANGE uavTable;
-		//uavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
-		//slotRootParameter[SPAWN_ROOT_SLOT_COUNTERS_BUFFER]
-		//	.InitAsDescriptorTable(1, &uavTable);
+		CD3DX12_DESCRIPTOR_RANGE uavTable;
+		uavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
+		slotRootParameter[3]
+			.InitAsDescriptorTable(1, &uavTable);
 
 		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
 			_countof(slotRootParameter),
@@ -410,6 +401,70 @@ void ParticleRenderer::buildInputLayout()
 	};
 }
 
+void ParticleRenderer::buildRibbonPso()
+{
+	auto device = DxDevice::getInstance();
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC ribbonPsoDesc;
+	ZeroMemory(&ribbonPsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+	ribbonPsoDesc.InputLayout = { _inputLayout.data(), static_cast<UINT>(_inputLayout.size()) };
+	ribbonPsoDesc.pRootSignature = _rootSignature.Get();
+	ribbonPsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	ribbonPsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	ribbonPsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	ribbonPsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	ribbonPsoDesc.SampleMask = UINT_MAX;
+	ribbonPsoDesc.NumRenderTargets = 1;
+	ribbonPsoDesc.RTVFormats[0] = device.getBackBufferFormat();
+	bool msaaState = device.getMsaaState();
+	ribbonPsoDesc.SampleDesc.Count = msaaState ? 4 : 1;
+	ribbonPsoDesc.SampleDesc.Quality = msaaState ? device.getMsaaQuality() - 1 : 0;
+	ribbonPsoDesc.DSVFormat = device.getDepthStencilFormat();
+	ribbonPsoDesc.VS =
+	{
+		reinterpret_cast<BYTE*>(_shaderVsRibbon->GetBufferPointer()),
+		_shaderVsRibbon->GetBufferSize()
+	};
+	ribbonPsoDesc.HS =
+	{
+		reinterpret_cast<BYTE*>(getCurrentHsRibbon()->GetBufferPointer()),
+		getCurrentHsRibbon()->GetBufferSize()
+	};
+	ribbonPsoDesc.DS =
+	{
+		reinterpret_cast<BYTE*>(_shaderDsRibbon->GetBufferPointer()),
+		_shaderDsRibbon->GetBufferSize()
+	};
+	ribbonPsoDesc.GS =
+	{
+		nullptr,
+		0
+	};
+	if (_shaderPsRibbon)
+	{
+		ribbonPsoDesc.PS =
+		{
+			reinterpret_cast<BYTE*>(_shaderPsRibbon->GetBufferPointer()),
+			_shaderPsRibbon->GetBufferSize()
+		};
+	}
+	else
+	{
+		ribbonPsoDesc.PS =
+		{
+			reinterpret_cast<BYTE*>(_shaderPs->GetBufferPointer()),
+			_shaderPs->GetBufferSize()
+		};
+	}
+
+	ribbonPsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
+	ThrowIfFailed(
+		device.getD3dDevice()->CreateGraphicsPipelineState(
+			&ribbonPsoDesc, IID_PPV_ARGS(&_psoRibbon)
+		)
+	);
+}
+
 void ParticleRenderer::buildPsos()
 {
 	auto device = DxDevice::getInstance();
@@ -471,50 +526,8 @@ void ParticleRenderer::buildPsos()
 	);
 
 	//////////////// Ribbon
-	auto ribbonPsoDesc = transparentPsoDesc;
-	ribbonPsoDesc.VS =
-	{
-		reinterpret_cast<BYTE*>(_shaderVsRibbon->GetBufferPointer()),
-		_shaderVsRibbon->GetBufferSize()
-	};
-	ribbonPsoDesc.HS =
-	{
-		reinterpret_cast<BYTE*>(_shaderHsRibbon->GetBufferPointer()),
-		_shaderHsRibbon->GetBufferSize()
-	};
-	ribbonPsoDesc.DS =
-	{
-		reinterpret_cast<BYTE*>(_shaderDsRibbon->GetBufferPointer()),
-		_shaderDsRibbon->GetBufferSize()
-	};
-	ribbonPsoDesc.GS =
-	{
-		nullptr,
-		0
-	};
 
-	if (_shaderPsRibbon)
-	{
-		ribbonPsoDesc.PS =
-		{
-			reinterpret_cast<BYTE*>(_shaderPsRibbon->GetBufferPointer()),
-			_shaderPsRibbon->GetBufferSize()
-		};
-	}
-	else
-	{
-		ribbonPsoDesc.PS =
-		{
-			reinterpret_cast<BYTE*>(_shaderPs->GetBufferPointer()),
-			_shaderPs->GetBufferSize()
-		};
-	}
-	ribbonPsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
-	ThrowIfFailed(
-		device.getD3dDevice()->CreateGraphicsPipelineState(
-			&ribbonPsoDesc, IID_PPV_ARGS(&_psoRibbon)
-		)
-	);
+	buildRibbonPso();
 
 	//////////////// ComputePso
 	D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
@@ -616,6 +629,72 @@ void ParticleRenderer::generateEmptyGeometry()
 	_emptyGeometry->DrawArgs["empty"] = submesh;
 }
 
+void ParticleRenderer::calculateRibbonDistanceFromStart(ID3D12GraphicsCommandList* cmdList)
+{
+	// calculate ribbon distance from start
+
+	cmdList->SetComputeRootSignature(_ribbonDistanceRootSignature.Get());
+	cmdList->SetPipelineState(_psoPreRibbonDistance.Get());
+	cmdList->SetComputeRootUnorderedAccessView(
+		1,
+		_resource->getParticlesResource()->GetGPUVirtualAddress());
+	cmdList->SetComputeRootUnorderedAccessView(
+		2,
+		_resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
+	cmdList->SetComputeRootDescriptorTable(
+		3,
+		_resource->getCountersUavGpuHandle());
+
+	UINT groupSizeX = static_cast<UINT>(ceil(static_cast<float>(_resource->getMaxNumParticles()) / 256.0f));
+
+	cmdList->Dispatch(groupSizeX, 1, 1);
+
+	groupSizeX = static_cast<UINT>(ceil(static_cast<float>(_resource->getMaxNumParticles()) / 1024.0f)) / 2;
+	
+	cmdList->SetPipelineState(_psoRibbonDistance.Get());
+	RibbonDistanceConstants c;
+
+	UINT numParticles = _resource->getReservedParticlesBufferSize();
+
+	c.IndexOffsetFrom = 1;
+	c.IndexOffsetTo = 2;
+	UINT shiftOffset = 0;
+	// up sweep
+	for (int i = numParticles >> 1; i > 0; i >>= 1)
+	{
+		c.NumWorkers = i;
+		c.ShiftOffset = shiftOffset;
+		cmdList->SetComputeRoot32BitConstants(
+			0,
+			sizeof(RibbonDistanceConstants) / 4,
+			&c,
+			0
+		);
+		cmdList->Dispatch(groupSizeX, 1, 1);
+		++shiftOffset;
+	}
+
+	--shiftOffset;
+
+	c.IndexOffsetFrom = 2;
+	c.IndexOffsetTo = 3;
+	// down sweep
+	for (int i = 2; i < numParticles; i <<= 1)
+	{
+		--shiftOffset;
+		c.NumWorkers = i - 1;
+		c.ShiftOffset = shiftOffset;
+		cmdList->SetComputeRoot32BitConstants(
+			0,
+			sizeof(RibbonDistanceConstants) / 4,
+			&c,
+			0
+		);
+		cmdList->Dispatch(groupSizeX, 1, 1);
+	}
+
+}
+
 ID3D12PipelineState* ParticleRenderer::getCurrentPso()
 {
 	if (_currentRendererType == RendererType::Ribbon)
@@ -628,6 +707,31 @@ ID3D12PipelineState* ParticleRenderer::getCurrentPso()
 ID3D12PipelineState* ParticleRenderer::getCurrentComputePso()
 {
 	return _currentRendererType == RendererType::Sprite ? _psoComputeIndirect.Get() : _psoComputeIndirectRibbon.Get();
+}
+
+Microsoft::WRL::ComPtr<ID3DBlob> ParticleRenderer::getCurrentHsRibbon()
+{
+	switch (_currentRibbonTextureUvType)
+	{
+	case RibbonTextureUvType::SegmentBased:
+	{
+		return _shaderHsRibbonSegmentBased;
+	}
+
+	case RibbonTextureUvType::Stretched:
+	{
+		return _shaderHsRibbonStretched;
+	}
+
+	case RibbonTextureUvType::DistanceBased:
+	{
+		return _shaderHsRibbonDistanceBased;
+	}
+	default:
+		assert(0 && "Unknown RibbonTextureUvType");
+	}
+
+	return nullptr;
 }
 
 D3D12_PRIMITIVE_TOPOLOGY ParticleRenderer::getCurrentPrimitiveTopology()

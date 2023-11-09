@@ -9,6 +9,7 @@
 #include <wrl.h>
 
 enum class RendererType;
+enum class RibbonTextureUvType;
 
 struct ID3D12Device;
 struct ID3D12PipelineState;
@@ -21,6 +22,14 @@ class HlslGeneratorRender;
 struct ObjectConstants;
 struct Material;
 
+struct RibbonDistanceConstants
+{
+	UINT NumWorkers;
+	UINT IndexOffsetFrom;
+	UINT IndexOffsetTo;
+	UINT ShiftOffset;
+};
+
 class ParticleRenderer : public ParticlePass
 {
 public:
@@ -28,6 +37,7 @@ public:
 
 	void setMaterialName(std::string material);
 	void setRendererType(RendererType type);
+	void setRibbonTextureUvType(RibbonTextureUvType type);
 
 	void render(
 		ID3D12GraphicsCommandList* cmdList,
@@ -53,10 +63,14 @@ private:
 	void buildCommandSignature();
 	void buildDefaultShader();
 	void buildInputLayout();
+	void buildRibbonPso();
 	void generateEmptyGeometry();
+
+	void calculateRibbonDistanceFromStart(ID3D12GraphicsCommandList* cmdList);
 
 	ID3D12PipelineState* getCurrentPso();
 	ID3D12PipelineState* getCurrentComputePso();
+	Microsoft::WRL::ComPtr<ID3DBlob> getCurrentHsRibbon();
 	D3D12_PRIMITIVE_TOPOLOGY getCurrentPrimitiveTopology();
 
 	std::unique_ptr<HlslGeneratorRender> _hlslGenerator;
@@ -75,6 +89,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderPs;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderVsRibbon;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderHsRibbon;
+	Microsoft::WRL::ComPtr<ID3DBlob> _shaderHsRibbonSegmentBased;
+	Microsoft::WRL::ComPtr<ID3DBlob> _shaderHsRibbonStretched;
+	Microsoft::WRL::ComPtr<ID3DBlob> _shaderHsRibbonDistanceBased;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderDsRibbon;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderGsRibbon;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderPsRibbon;
@@ -102,4 +119,5 @@ private:
 	CD3DX12_DESCRIPTOR_RANGE _texSrvTable;
 
 	RendererType _currentRendererType;
+	RibbonTextureUvType _currentRibbonTextureUvType;
 };

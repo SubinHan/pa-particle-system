@@ -226,6 +226,7 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditor::getCreata
         "MultiplyFloat3ByScalar",
         "MultiplyFloat",
         "SetColorOfFloat4",
+        "SinTime",
     };
 
     static const std::vector<NodeType> creatableNodeTypes =
@@ -245,6 +246,7 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditor::getCreata
         NodeType::MultiplyFloat3ByScalar,
         NodeType::MultiplyFloat,
         NodeType::SetColorOfFloat4,
+        NodeType::SinTime,
     };
 
     auto [childCreatableNodeNames, childCreatableNodeTypes] = getCreatableNodes();

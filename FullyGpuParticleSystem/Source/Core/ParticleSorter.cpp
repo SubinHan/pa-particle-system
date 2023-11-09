@@ -31,24 +31,24 @@ ID3D12RootSignature* ParticleSorter::getRootSignature()
 
 ID3DBlob* ParticleSorter::getShader()
 {
-	return _shader.Get();
+	return _shaderBySpawnOrder.Get();
 }
 
 ID3D12PipelineState* ParticleSorter::getPipelineStateObject()
 {
-	return _pso.Get();
+	return _psoBySpawnOrder.Get();
 }
 
 void ParticleSorter::sortParticles(ID3D12GraphicsCommandList* cmdList)
 {
 	{
 		// pre sort
-		cmdList->SetComputeRootSignature(_preRootSignature0.Get());
-		cmdList->SetPipelineState(_prePso0.Get());
+		cmdList->SetComputeRootSignature(_preRootSignature.Get());
+		cmdList->SetPipelineState(_prePsoBySpawnOrder.Get());
 
 		const PreSortConstants c =
 		{
-			_resource->getMaxNumParticles(),
+			_resource->getReservedParticlesBufferSize(),
 			0,
 		};
 
@@ -78,7 +78,7 @@ void ParticleSorter::sortParticles(ID3D12GraphicsCommandList* cmdList)
 	{
 		// sort
 		cmdList->SetComputeRootSignature(_rootSignature.Get());
-		cmdList->SetPipelineState(_pso.Get());
+		cmdList->SetPipelineState(_psoBySpawnOrder.Get());
 
 		cmdList->SetComputeRootUnorderedAccessView(
 			SPAWN_ROOT_SLOT_PARTICLES_BUFFER,
@@ -92,7 +92,7 @@ void ParticleSorter::sortParticles(ID3D12GraphicsCommandList* cmdList)
 			SPAWN_ROOT_SLOT_COUNTERS_BUFFER,
 			_resource->getCountersUavGpuHandle());
 
-		const auto maxNumParticles = _resource->getMaxNumParticles();
+		const auto maxNumParticles = _resource->getReservedParticlesBufferSize();
 
 		const auto numGroupsX = static_cast<UINT>(ceilf(maxNumParticles / 256.0f));
 		const auto numGroupsY = 1;
@@ -104,6 +104,7 @@ void ParticleSorter::sortParticles(ID3D12GraphicsCommandList* cmdList)
 			{
 				const SortConstants c =
 				{
+					maxNumParticles,
 					sequenceSize,
 					stage,
 				};
@@ -161,46 +162,6 @@ void ParticleSorter::buildRootSignature()
 	}
 
 	{
-		// presort
-		CD3DX12_ROOT_PARAMETER slotRootParameter[3];
-
-		slotRootParameter[PRE_ROOT_SLOT_CONSTANTS_BUFFER]
-			.InitAsConstants(sizeof(PreSortConstants) / 4, 0);
-		slotRootParameter[PRE_ROOT_SLOT_ALIVE_INDICES_BUFFER]
-			.InitAsUnorderedAccessView(0);
-
-		CD3DX12_DESCRIPTOR_RANGE uavTable;
-		uavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
-		slotRootParameter[PRE_ROOT_SLOT_COUNTERS_BUFFER]
-			.InitAsDescriptorTable(1, &uavTable);
-
-		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
-			_countof(slotRootParameter),
-			slotRootParameter,
-			0,
-			nullptr,
-			D3D12_ROOT_SIGNATURE_FLAG_NONE);
-
-		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
-		ComPtr<ID3DBlob> serializedRootSig = nullptr;
-		ComPtr<ID3DBlob> errorBlob = nullptr;
-		HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-			serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
-
-		if (errorBlob != nullptr)
-		{
-			::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-		}
-		ThrowIfFailed(hr);
-
-		ThrowIfFailed(_device->CreateRootSignature(
-			0,
-			serializedRootSig->GetBufferPointer(),
-			serializedRootSig->GetBufferSize(),
-			IID_PPV_ARGS(_preRootSignature.GetAddressOf())));
-	}
-
-	{
 		CD3DX12_ROOT_PARAMETER slotRootParameter[4];
 
 		slotRootParameter[SPAWN_ROOT_SLOT_CONSTANTS_BUFFER]
@@ -238,25 +199,31 @@ void ParticleSorter::buildRootSignature()
 			0,
 			serializedRootSig->GetBufferPointer(),
 			serializedRootSig->GetBufferSize(),
-			IID_PPV_ARGS(_preRootSignature0.GetAddressOf())));
+			IID_PPV_ARGS(_preRootSignature.GetAddressOf())));
 	}
 }
 
 void ParticleSorter::buildShaders()
 {
-	_shader = DxUtil::compileShader(
+	_shaderByIndex = DxUtil::compileShader(
+		L"ParticleSystemShaders\\ParticleSortByIndexCS.hlsl",
+		nullptr,
+		"BitonicSortCS",
+		"cs_5_1");
+
+	_shaderBySpawnOrder = DxUtil::compileShader(
 		L"ParticleSystemShaders\\ParticleSortBySpawnOrderCS.hlsl",
 		nullptr,
 		"BitonicSortCS",
 		"cs_5_1");
 
-	_preShader = DxUtil::compileShader(
+	_preShaderByIndex = DxUtil::compileShader(
 		L"ParticleSystemShaders\\ParticlePreSortCS.hlsl",
 		nullptr,
 		"PreSortCS",
 		"cs_5_1");
 
-	_preShader0 = DxUtil::compileShader(
+	_preShaderBySpawnOrder = DxUtil::compileShader(
 		L"ParticleSystemShaders\\ParticlePreSortCS0.hlsl",
 		nullptr,
 		"PreSortCS",
@@ -270,13 +237,27 @@ void ParticleSorter::buildPsos()
 		psoDesc.pRootSignature = _rootSignature.Get();
 		psoDesc.CS =
 		{
-			reinterpret_cast<BYTE*>(_shader->GetBufferPointer()),
-			_shader->GetBufferSize()
+			reinterpret_cast<BYTE*>(_shaderBySpawnOrder->GetBufferPointer()),
+			_shaderBySpawnOrder->GetBufferSize()
 		};
 		psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 		ThrowIfFailed(
 			_device->CreateComputePipelineState(
-				&psoDesc, IID_PPV_ARGS(&_pso)));
+				&psoDesc, IID_PPV_ARGS(&_psoBySpawnOrder)));
+	}
+
+	{
+		D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
+		psoDesc.pRootSignature = _rootSignature.Get();
+		psoDesc.CS =
+		{
+			reinterpret_cast<BYTE*>(_shaderByIndex->GetBufferPointer()),
+			_shaderByIndex->GetBufferSize()
+		};
+		psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+		ThrowIfFailed(
+			_device->CreateComputePipelineState(
+				&psoDesc, IID_PPV_ARGS(&_psoByIndex)));
 	}
 
 	{
@@ -284,26 +265,26 @@ void ParticleSorter::buildPsos()
 		psoDesc.pRootSignature = _preRootSignature.Get();
 		psoDesc.CS =
 		{
-			reinterpret_cast<BYTE*>(_preShader->GetBufferPointer()),
-			_preShader->GetBufferSize()
+			reinterpret_cast<BYTE*>(_preShaderByIndex->GetBufferPointer()),
+			_preShaderByIndex->GetBufferSize()
 		};
 		psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 		ThrowIfFailed(
 			_device->CreateComputePipelineState(
-				&psoDesc, IID_PPV_ARGS(&_prePso)));
+				&psoDesc, IID_PPV_ARGS(&_prePsoByIndex)));
 	}
 
 	{
 		D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
-		psoDesc.pRootSignature = _preRootSignature0.Get();
+		psoDesc.pRootSignature = _preRootSignature.Get();
 		psoDesc.CS =
 		{
-			reinterpret_cast<BYTE*>(_preShader0->GetBufferPointer()),
-			_preShader0->GetBufferSize()
+			reinterpret_cast<BYTE*>(_preShaderBySpawnOrder->GetBufferPointer()),
+			_preShaderBySpawnOrder->GetBufferSize()
 		};
 		psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 		ThrowIfFailed(
 			_device->CreateComputePipelineState(
-				&psoDesc, IID_PPV_ARGS(&_prePso0)));
+				&psoDesc, IID_PPV_ARGS(&_prePsoBySpawnOrder)));
 	}
 }

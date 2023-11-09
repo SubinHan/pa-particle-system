@@ -23,6 +23,7 @@
 #include "Core/ShaderStatementNode/ShaderStatementNodeMakeFloat4ByColorAlpha.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeMakeFloat3.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeMakeFloat4.h"
+#include "Core/ShaderStatementNode/ShaderStatementNodeSinByTime.h"
 #include "Model/ResourceViewType.h"
 #include "Util/DxUtil.h"
 
@@ -384,6 +385,17 @@ UINT HlslGenerator::makeFloat4(UINT floatXIndex, UINT floatYIndex, UINT floatZIn
 	linkNode(floatYIndex, nodeIndex);
 	linkNode(floatZIndex, nodeIndex);
 	linkNode(floatWIndex, nodeIndex);
+
+	return nodeIndex;
+}
+
+UINT HlslGenerator::sinByTime()
+{
+	std::string newLocalVariableName = getNewLocalVariableName();
+	const UINT nodeIndex = _nodes.size();
+	auto newNode =
+		std::make_shared<ShaderStatementNodeSinByTime>(newLocalVariableName);
+	addNode(newNode);
 
 	return nodeIndex;
 }

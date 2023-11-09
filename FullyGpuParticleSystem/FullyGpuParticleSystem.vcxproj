@@ -178,6 +178,7 @@
     <ClInclude Include="Include\Core\ParticleSorter.h" />
     <ClInclude Include="Include\Core\HlslTranslatorEmit.h" />
     <ClInclude Include="Include\Core\ParticleSystemManager.h" />
+    <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSinByTime.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat3.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat4.h" />
@@ -227,6 +228,7 @@
     <ClInclude Include="Include\Model\ResourceRequest.h" />
     <ClInclude Include="Include\Model\ResourceType.h" />
     <ClInclude Include="Include\Model\ResourceViewType.h" />
+    <ClInclude Include="Include\Model\RibbonTextureUvType.h" />
     <ClInclude Include="Include\Model\Texture.h" />
     <ClInclude Include="Include\Ui\IWindow.h" />
     <ClInclude Include="Include\Ui\NodeEditor.h" />
@@ -321,6 +323,7 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetAlpha.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetColorOfFloat4.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSetValueByVariableName.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSinByTime.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeVortexForce.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeWindForce.cpp" />
     <ClCompile Include="Source\Core\TextureBuffer.cpp" />

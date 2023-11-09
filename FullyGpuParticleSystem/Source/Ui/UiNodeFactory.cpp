@@ -37,6 +37,8 @@ UiNode UiNodeFactory::createNode(const int id, NodeType nodeType)
 		return createMaskZ(id);
 	case NodeType::MaskW:
 		return createMaskW(id);
+	case NodeType::SinTime:
+		return createSinByTime(id);
 	case NodeType::GetParticlePosition:
 		return createGetParticlePosition(id);
 	case NodeType::GetParticleVelocity:
@@ -697,4 +699,18 @@ UiNode UiNodeFactory::createMaskW(const int id)
 
 	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
 	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createSinByTime(const int id)
+{
+	constexpr auto nodeType = NodeType::SinTime;
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+	std::vector<std::string> outputNames =
+	{
+		"float"
+	};
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, emptyVector, emptyVector, emptyValueType, outputNames, nodeType);
 }

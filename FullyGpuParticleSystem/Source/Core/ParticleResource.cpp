@@ -7,9 +7,9 @@
 #include "d3d11.h"
 
 // should be power of 2. (for sort)
-//static constexpr int MAX_NUM_PARTICLES = 1'048'576 / 2;
-//static constexpr int MAX_NUM_PARTICLES = 65'536;
-static constexpr int MAX_NUM_PARTICLES = 256;
+//static constexpr int PARTICLES_BUFFER_SIZE = 1'048'576 / 2;
+//static constexpr int PARTICLES_BUFFER_SIZE = 65'536;
+static constexpr int PARTICLES_BUFFER_SIZE = 16384;
 
 
 using namespace DirectX;
@@ -190,22 +190,28 @@ void ParticleResource::transitCommandBufferToUav(ID3D12GraphicsCommandList* cmdL
 int ParticleResource::getMaxNumParticles()
 {
 	// index 0 is reserved. (used for sorting)
-	return MAX_NUM_PARTICLES - 1;
+	return PARTICLES_BUFFER_SIZE - 1;
+}
+
+int ParticleResource::getReservedParticlesBufferSize()
+{
+	// index 0 is reserved. (used for sorting)
+	return PARTICLES_BUFFER_SIZE;
 }
 
 void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 {
-	std::vector<UINT> deadIndices(MAX_NUM_PARTICLES);
-	for (int i = 0; i < MAX_NUM_PARTICLES; ++i)
+	std::vector<UINT> deadIndices(PARTICLES_BUFFER_SIZE);
+	for (int i = 0; i < PARTICLES_BUFFER_SIZE; ++i)
 	{
 		deadIndices[i] = i + 1;
 	}
-	deadIndices[MAX_NUM_PARTICLES - 1] = 0; // reserved.
+	deadIndices[PARTICLES_BUFFER_SIZE - 1] = 0; // reserved.
 
 	const auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
 	{
-		const UINT64 particlesByteSize = MAX_NUM_PARTICLES * sizeof(Particle);
+		const UINT64 particlesByteSize = PARTICLES_BUFFER_SIZE * sizeof(Particle);
 		const auto buffer =
 			CD3DX12_RESOURCE_DESC::Buffer(particlesByteSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 		ThrowIfFailed(
@@ -221,7 +227,7 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 	}
 
 	{
-		const UINT64 aliveIndicesByteSize = MAX_NUM_PARTICLES * sizeof(UINT);
+		const UINT64 aliveIndicesByteSize = PARTICLES_BUFFER_SIZE * sizeof(UINT);
 		const auto buffer =
 			CD3DX12_RESOURCE_DESC::Buffer(aliveIndicesByteSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 		ThrowIfFailed(
@@ -246,7 +252,7 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 		);
 	}
 
-	const UINT64 deadIndicesByteSize = MAX_NUM_PARTICLES * sizeof(UINT);
+	const UINT64 deadIndicesByteSize = PARTICLES_BUFFER_SIZE * sizeof(UINT);
 	_deadIndicesBuffer = DxUtil::createDefaultBuffer(
 		_device.Get(),
 		cmdList,
@@ -325,7 +331,7 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 	cmdList->ResourceBarrier(1, &deadIndicesToUav);
 
 	{
-		const UINT64 particlesByteSize = MAX_NUM_PARTICLES * sizeof(Particle);
+		const UINT64 particlesByteSize = PARTICLES_BUFFER_SIZE * sizeof(Particle);
 		const auto buffer =
 			CD3DX12_RESOURCE_DESC::Buffer(particlesByteSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 		ThrowIfFailed(

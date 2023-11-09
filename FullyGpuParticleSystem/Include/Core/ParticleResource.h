@@ -55,6 +55,7 @@ public:
 	void transitCommandBufferToUav(ID3D12GraphicsCommandList* cmdList);
 
 	int getMaxNumParticles();
+	int getReservedParticlesBufferSize();
 
 private:
 	void buildResources(ID3D12GraphicsCommandList* cmdList);

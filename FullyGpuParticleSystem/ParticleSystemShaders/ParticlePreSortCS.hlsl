@@ -6,8 +6,10 @@ cbuffer cbPreSortConstants : register(b0)
 	uint fillNumber;
 }
 
-RWStructuredBuffer<uint> aliveIndices	: register(u0);
-RWByteAddressBuffer counters			: register(u1);
+RWStructuredBuffer<Particle> particles		: register(u0);
+
+RWStructuredBuffer<uint> aliveIndices	: register(u1);
+RWByteAddressBuffer counters			: register(u2);
 
 [numthreads(256, 1, 1)]
 void PreSortCS(
