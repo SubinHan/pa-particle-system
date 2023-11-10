@@ -15,6 +15,7 @@ constexpr int PRE_ROOT_SLOT_COUNTERS_BUFFER = PRE_ROOT_SLOT_ALIVE_INDICES_BUFFER
 
 
 ParticleSorter::ParticleSorter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource, std::string name) :
+	ParticleComputePass(resource, name),
 	_device(device),
 	_resource(resource),
 	_name(name)

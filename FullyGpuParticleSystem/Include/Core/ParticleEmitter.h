@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/ParticlePass.h"
+#include "Core/ParticleComputePass.h"
 #include "Util/DxUtil.h"
 #include "Util/GameTimer.h"
 
@@ -26,7 +26,7 @@ struct EmitConstants
 	float TotalTime;
 };
 
-class ParticleEmitter : public ParticlePass
+class ParticleEmitter : public ParticleComputePass
 {
 public:
 	ParticleEmitter(ParticleResource* resource, std::string name);

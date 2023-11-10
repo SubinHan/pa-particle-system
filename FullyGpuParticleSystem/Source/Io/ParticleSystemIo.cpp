@@ -101,12 +101,8 @@ void ParticleSystemIo::loadInto(std::string filePath, ParticleSystem* particleSy
 			else if (!foundRendererEditorSaveFile && endsWith(filenameWithoutExtension, "Renderer"))
 			{
 				HlslTranslatorRenderPs translator(nodes, links);
-				// TODO: change to translateTo()
 				auto renderer = particleSystem->getRenderer();
-				renderer->clearRegisteredShaderStatementNodes();
-				auto blob = translator.compileShader();
-				translator.registerTranslatedShaderNodesInto(renderer);
-				renderer->setSpritePixelShader(blob);
+				translator.translateTo(renderer);
 				foundRendererEditorSaveFile = true;
 			}
 		}

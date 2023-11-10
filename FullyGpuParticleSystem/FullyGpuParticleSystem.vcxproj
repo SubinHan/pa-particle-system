@@ -174,10 +174,16 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="FullyGpuParticleSystem.h" />
     <ClInclude Include="Include\Core\MaterialManager.h" />
+    <ClInclude Include="Include\Core\ParticleComputePass.h" />
     <ClInclude Include="Include\Core\ParticlePass.h" />
+    <ClInclude Include="Include\Core\ParticleRenderPass.h" />
+    <ClInclude Include="Include\Core\ParticleRibbonRenderer.h" />
     <ClInclude Include="Include\Core\ParticleSorter.h" />
     <ClInclude Include="Include\Core\HlslTranslatorEmit.h" />
+    <ClInclude Include="Include\Core\ParticleSpriteRenderer.h" />
     <ClInclude Include="Include\Core\ParticleSystemManager.h" />
+    <ClInclude Include="Include\Core\ParticleDistanceCalculator.h" />
+    <ClInclude Include="Include\Core\ShaderStatementGraph.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeSinByTime.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeAddFloat.h" />
     <ClInclude Include="Include\Core\ShaderStatementNode\ShaderStatementNodeMakeFloat3.h" />
@@ -267,6 +273,7 @@
     <ClCompile Include="..\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\include\imgui\imnodes.cpp" />
+    <ClCompile Include="Source\Core\ParticleComputePass.cpp" />
     <ClCompile Include="Source\Core\ParticlePass.cpp" />
     <ClCompile Include="Source\Core\Hashable.cpp" />
     <ClCompile Include="Source\Core\HlslGeneratorEmit.cpp" />
@@ -277,7 +284,11 @@
     <ClCompile Include="Source\Core\HlslTranslatorRenderPs.cpp" />
     <ClCompile Include="Source\Core\ImguiInitializer.cpp" />
     <ClCompile Include="Source\Core\MaterialManager.cpp" />
+    <ClCompile Include="Source\Core\ParticleRenderPass.cpp" />
+    <ClCompile Include="Source\Core\ParticleRibbonRenderer.cpp" />
+    <ClCompile Include="Source\Core\ParticleSpriteRenderer.cpp" />
     <ClCompile Include="Source\Core\ParticleSystemManager.cpp" />
+    <ClCompile Include="Source\Core\ShaderStatementGraph.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat3.cpp" />
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeAddFloat4.cpp" />
@@ -384,6 +395,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="ParticleSystemShaders\ParticleRenderPass.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleSystemShaders\ParticleRibbon.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="ParticleSystemShaders\ParticleRibbonDistanceCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -406,6 +429,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleSystemShaders\ParticleSortBySpawnOrderCS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleSystemShaders\ParticleSprite.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/ParticlePass.h"
+#include "Core/ParticleComputePass.h"
 #include "Util/DxUtil.h"
 
 #include <memory>
@@ -19,7 +19,7 @@ struct ParticleSimulateConstants
 	float DeltaTime;
 };
 
-class ParticleSimulator : public ParticlePass
+class ParticleSimulator : public ParticleComputePass
 {
 public:
 	ParticleSimulator(ParticleResource* resource, std::string name);
@@ -31,8 +31,6 @@ protected:
 	virtual int getNumSrvUsing() override;
 	virtual int getNumUavUsing() override;
 	virtual bool needsStaticSampler() override;
-
-	virtual void buildPsos() override;
 
 private:
 	void setDefaultShader();

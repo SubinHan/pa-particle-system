@@ -21,7 +21,7 @@ constexpr int ROOT_SLOT_DEADS_INDICES_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER +
 constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_DEADS_INDICES_BUFFER + 1;
 
 ParticleEmitter::ParticleEmitter(ParticleResource* resource, std::string name) :
-	ParticlePass(resource, name),
+	ParticleComputePass(resource, name),
 	_hlslGenerator(std::make_unique<HlslGeneratorEmit>(BASE_EMITTER_SHADER_PATH))
 {
 	initDefault();

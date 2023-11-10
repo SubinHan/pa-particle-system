@@ -306,6 +306,24 @@
     <ClInclude Include="Include\Model\RibbonTextureUvType.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Core\ParticleRenderPass.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ParticleComputePass.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ParticleDistanceCalculator.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ParticleRibbonRenderer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ParticleSpriteRenderer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ShaderStatementGraph.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -566,6 +584,21 @@
     <ClCompile Include="Source\Core\ShaderStatementNode\ShaderStatementNodeSinByTime.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Core\ParticleRenderPass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ParticleRibbonRenderer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ParticleSpriteRenderer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ShaderStatementGraph.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ParticleComputePass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FullyGpuParticleSystem.rc">
@@ -597,6 +630,9 @@
     <FxCompile Include="ParticleSystemShaders\ParticlePreSortCS0.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleRibbonDistanceCS.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticlePreRibbonDistanceCS.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleRibbon.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleRenderPass.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleSprite.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

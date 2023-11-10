@@ -21,22 +21,22 @@ std::string NodeEditorRender::getName() const
 void NodeEditorRender::onCompileButtonClicked()
 {
 	HlslTranslatorRenderPs translator(_nodes, _links);
+	translator.translateTo(_renderer);
 
 	// TODO: change to translateTo
-	_renderer->clearRegisteredShaderStatementNodes();
-	auto blob = translator.compileShader();
-	translator.registerTranslatedShaderNodesInto(_renderer);
-	_renderer->setSpritePixelShader(blob);
+	//auto blob = translator.compileShader();
 
-	blob = translator.compileShader([](std::wstring path)
-		{
-			return DxUtil::compileShader(
-				path,
-				nullptr,
-				"RibbonParticlePS",
-				"ps_5_1");
-		});
-	_renderer->setRibbonPixelShader(blob);
+	//_renderer->setSpritePixelShader(blob);
+
+	//blob = translator.compileShader([](std::wstring path)
+	//	{
+	//		return DxUtil::compileShader(
+	//			path,
+	//			nullptr,
+	//			"RibbonParticlePS",
+	//			"ps_5_1");
+	//	});
+	//_renderer->setRibbonPixelShader(blob);
 }
 
 std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorRender::getCreatableNodes() const

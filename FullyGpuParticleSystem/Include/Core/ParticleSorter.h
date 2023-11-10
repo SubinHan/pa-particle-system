@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/ParticleComputePass.h"
 #include "Util/DxUtil.h"
 
 #include <wrl.h>
@@ -24,7 +25,7 @@ struct PreSortConstants
 	UINT FillNumber;
 };
 
-class ParticleSorter
+class ParticleSorter : public ParticleComputePass
 {
 public:
 	ParticleSorter(Microsoft::WRL::ComPtr<ID3D12Device> device, ParticleResource* resource, std::string name);

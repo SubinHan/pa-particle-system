@@ -1,6 +1,7 @@
 #include "Core/ParticlePass.h"
 
 #include "Core/DxDevice.h"
+#include "Core/ShaderStatementGraph.h"
 #include "Core/ShaderStatementNode/ShaderStatementNode.h"
 #include "Model/ResourceViewType.h"
 
@@ -21,69 +22,15 @@ ID3D12RootSignature* ParticlePass::getRootSignature()
 	return _rootSignature.Get();
 }
 
-ID3DBlob* ParticlePass::getShader()
+void ParticlePass::setShaderStatementGraph(std::shared_ptr<ShaderStatementGraph> graph)
 {
-	return _shader.Get();
+	_shaderStatementGraph = graph;
 }
 
-ID3D12PipelineState* ParticlePass::getPipelineStateObject()
+std::shared_ptr<ShaderStatementGraph> ParticlePass::getShaderStatementGraph()
 {
-	return _pso.Get();
+	return _shaderStatementGraph;
 }
-
-void ParticlePass::registerShaderStatementNode(std::shared_ptr<ShaderStatementNode> node)
-{
-	_registeredNodes.push_back(node);
-}
-
-void ParticlePass::clearRegisteredShaderStatementNodes()
-{
-	_registeredNodes.clear();
-}
-
-void ParticlePass::setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
-{
-	_shader = shader;
-	buildRootSignature();
-	buildPsos();
-}
-
-void ParticlePass::bindComputeResourcesOfRegisteredNodes(ID3D12GraphicsCommandList* commandList, int startRootSlot)
-{
-	for (int i = 0; i < _registeredNodes.size(); ++i)
-	{
-		int numResourcesToBind = _registeredNodes[i]->getNumResourcesToBind();
-
-		if (numResourcesToBind == 0)
-			continue;
-
-		for (int j = 0; j < numResourcesToBind; ++j)
-		{
-			if (_registeredNodes[i]->isResourceViewCreated(j))
-				commandList->SetComputeRootDescriptorTable(startRootSlot, _registeredNodes[i]->getResourceGpuHandle(j));
-			startRootSlot++;
-		}
-	}
-}
-
-void ParticlePass::bindGraphicsResourcesOfRegisteredNodes(ID3D12GraphicsCommandList* commandList, int startRootSlot)
-{
-	for (int i = 0; i < _registeredNodes.size(); ++i)
-	{
-		int numResourcesToBind = _registeredNodes[i]->getNumResourcesToBind();
-
-		if (numResourcesToBind == 0)
-			continue;
-
-		for (int j = 0; j < numResourcesToBind; ++j)
-		{
-			if (_registeredNodes[i]->isResourceViewCreated(j))
-				commandList->SetGraphicsRootDescriptorTable(startRootSlot, _registeredNodes[i]->getResourceGpuHandle(j));
-			startRootSlot++;
-		}
-	}
-}
-
 
 void ParticlePass::buildRootSignature()
 {
@@ -94,16 +41,16 @@ void ParticlePass::buildRootSignature()
 	int curSrvRegister = getNumSrvUsing();
 	int curUavRegister = getNumUavUsing();
 
-	for (int i = 0; i < _registeredNodes.size(); ++i)
+	for (int i = 0; i < _shaderStatementGraph->getSize(); ++i)
 	{
-		const int numResourceToBind = _registeredNodes[i]->getNumResourcesToBind();
+		const int numResourceToBind = _shaderStatementGraph->getNode(i)->getNumResourcesToBind();
 
 		if (numResourceToBind == 0)
 			continue;
 
 		for (int j = 0; j < numResourceToBind; ++j)
 		{
-			if (_registeredNodes[i]->getResourceViewType(j) == ResourceViewType::Srv)
+			if (_shaderStatementGraph->getNode(i)->getResourceViewType(j) == ResourceViewType::Srv)
 			{
 				tables.emplace_back();
 
@@ -154,7 +101,7 @@ void ParticlePass::buildRootSignature()
 	}
 	ThrowIfFailed(hr);
 
-	auto device = DxDevice::getInstance();
+	auto& device = DxDevice::getInstance();
 
 	ThrowIfFailed(device.getD3dDevice()->CreateRootSignature(
 		0,

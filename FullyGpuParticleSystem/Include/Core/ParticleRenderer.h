@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/ParticlePass.h"
+#include "Core/ParticleRenderPass.h"
 #include "Core/Hashable.h"
 #include "Util/DxUtil.h"
 #include "Model/Geometry.h"
@@ -30,7 +30,7 @@ struct RibbonDistanceConstants
 	UINT ShiftOffset;
 };
 
-class ParticleRenderer : public ParticlePass
+class ParticleRenderer : public ParticleRenderPass
 {
 public:
 	ParticleRenderer(ParticleResource* resource, std::string name);

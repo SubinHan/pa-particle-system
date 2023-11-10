@@ -13,7 +13,7 @@ static const std::wstring BASE_SIMULATOR_SHADER_PATH = L"ParticleSystemShaders/P
 using Microsoft::WRL::ComPtr;
 
 ParticleSimulator::ParticleSimulator(ParticleResource* resource, std::string name) :
-	ParticlePass(resource, name),
+	ParticleComputePass(resource, name),
 	_hlslGenerator(std::make_unique<HlslGeneratorSimulate>(BASE_SIMULATOR_SHADER_PATH))
 {
 	buildPostSimulationShader();
@@ -69,7 +69,7 @@ void ParticleSimulator::setDefaultShader()
 	_hlslGenerator->setPosition(positionResult);
 
 	_hlslGenerator->generateShaderFile(SHADER_ROOT_PATH + L"temp.hlsl");
-	setShader(DxUtil::compileShader(SHADER_ROOT_PATH + L"temp.hlsl", nullptr, "SimulateCS", "cs_5_1"));
+	setComputeShader(DxUtil::compileShader(SHADER_ROOT_PATH + L"temp.hlsl", nullptr, "SimulateCS", "cs_5_1"));
 }
 
 std::vector<CD3DX12_ROOT_PARAMETER> ParticleSimulator::buildRootParameter()
@@ -118,7 +118,7 @@ std::vector<CD3DX12_ROOT_PARAMETER> ParticleSimulator::buildRootParameter()
 		}
 		ThrowIfFailed(hr);
 
-		auto device = DxDevice::getInstance();
+		auto& device = DxDevice::getInstance();
 
 		ThrowIfFailed(device.getD3dDevice()->CreateRootSignature(
 			0,

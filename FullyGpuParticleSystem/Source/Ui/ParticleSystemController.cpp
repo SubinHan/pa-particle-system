@@ -82,7 +82,7 @@ void ParticleSystemController::show()
 			{
 				bool isOpaque = particleSystem->getRenderer()->isOpaque();
 				ImGui::Checkbox("isOpaque", &isOpaque);
-				particleSystem->getRenderer()->setOpaque(isOpaque);
+				particleSystem->getRenderer()->setOpaqueness(isOpaque);
 
 				const char* items[] = { "Sprite", "Ribbon" };
 				static int item_current_idx = 0; // Here we store our selection data as an index.
@@ -101,11 +101,11 @@ void ParticleSystemController::show()
 							item_current_idx = n;
 							if (item_current_idx == 0)
 							{
-								particleSystem->getRenderer()->setRendererType(RendererType::Sprite);
+								particleSystem->setRendererType(RendererType::Sprite);
 							}
 							if (item_current_idx == 1)
 							{
-								particleSystem->getRenderer()->setRendererType(RendererType::Ribbon);
+								particleSystem->setRendererType(RendererType::Ribbon);
 							}
 						}
 

@@ -10,6 +10,7 @@
 #include <wrl.h>
 
 class ShaderStatementNode;
+class ShaderStatementGraph;
 
 class HlslGenerator
 {
@@ -18,7 +19,7 @@ public:
 	virtual ~HlslGenerator();
 
 	void generateShaderFile(const std::wstring& outputPath);
-	std::vector<std::shared_ptr<ShaderStatementNode>> getNodes();
+	std::shared_ptr<ShaderStatementGraph> getShaderStatementGraph();
 
 	UINT empty();
 	UINT newFloat(float x);
@@ -48,19 +49,13 @@ public:
 protected:
 	std::string getNewLocalVariableName();
 
-	void addNode(std::shared_ptr<ShaderStatementNode> node);
-	void linkNode(UINT from, UINT to);
-
-protected:
-	std::vector<std::shared_ptr<ShaderStatementNode>> _nodes;
-	std::vector<std::vector<UINT>> _graph;
+	std::shared_ptr<ShaderStatementGraph> _graph;
 
 private:
 	void findNumRegisters();
 	int parseNumBetween(std::string str, std::string prefix, std::string postfix);
 
 	void insertStatements(std::ofstream& fout);
-	void topologySort(UINT index);
 
 	std::vector<ResourceRequest> collectSrvRequests();
 
@@ -70,9 +65,6 @@ private:
 private:
 	std::wstring _baseShaderPath;
 
-	// for topological sort
-	std::vector<bool> _visited;
-	std::deque<UINT> _topologicalOrder;
 
 	int _numSrvInBaseShader;
 	int _numUavInBaseShader;

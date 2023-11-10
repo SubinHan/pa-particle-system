@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/ParticlePass.h"
 #include "Core/Hashable.h"
 #include "Ui/UiNode.h"
 #include "Ui/UiLink.h"
@@ -12,6 +11,8 @@
 #include <functional>
 
 class HlslGenerator;
+class ParticleComputePass;
+class ParticleRenderPass;
 
 class HlslTranslator : public Hashable
 {
@@ -23,8 +24,8 @@ public:
 
 	Microsoft::WRL::ComPtr<ID3DBlob> compileShader();
 	Microsoft::WRL::ComPtr<ID3DBlob> compileShader(ShaderCompileFunction f);
-	void translateTo(ParticlePass* pass);
-	void registerTranslatedShaderNodesInto(ParticlePass* pass);
+	void translateTo(ParticleComputePass* pass);
+	void translateTo(ParticleRenderPass* pass);
 
 protected:
 	virtual std::unique_ptr<HlslGenerator> createHlslGenerator() = 0;

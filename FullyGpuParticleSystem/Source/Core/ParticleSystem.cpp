@@ -7,8 +7,11 @@
 #include "Core/ParticleSorter.h"
 #include "Core/ParticleSimulator.h"
 #include "Core/ParticleRenderer.h"
+#include "Core/ParticleSpriteRenderer.h"
+#include "Core/ParticleRibbonRenderer.h"
 #include "Model/ObjectConstants.h"
 #include "Model/Material.h"
+#include "Model/RendererType.h"
 
 #include <iostream>
 
@@ -137,16 +140,44 @@ void ParticleSystem::setWorldTransform(const DirectX::XMFLOAT4X4& newWorldTransf
 	_world = newWorldTransform;
 }
 
-void ParticleSystem::setRenderMaterialName(std::string materialName)
-{
-	_renderer->setMaterialName(materialName);
-}
-
 void ParticleSystem::setSpawnRate(float spawnRate)
 {
 	_spawnRate = spawnRate;
 
 	_spawnRateInv = 1.0f / _spawnRate;
+}
+
+void ParticleSystem::setRendererType(RendererType type)
+{
+	if (_currentRendererType == type)
+		return;
+
+	auto graph = _renderer->getShaderStatementGraph();
+
+	switch (type)
+	{
+	case RendererType::Sprite:
+	{
+		_renderer = std::make_unique<ParticleSpriteRenderer>(
+			_resource.get(),
+			_name + "_Renderer");
+		break;
+	}
+	case RendererType::Ribbon:
+	{
+		_renderer = std::make_unique<ParticleRibbonRenderer>(
+			_resource.get(),
+			_name + "_Renderer");
+		break;
+	}
+	default:
+	{
+		assert(0 && "Unknown RendererType was given.");
+		break;
+	}
+	}
+
+	_renderer->setShaderStatementGraph(graph);
 }
 
 ParticleEmitter* ParticleSystem::getEmitter()
@@ -159,7 +190,7 @@ ParticleSimulator* ParticleSystem::getSimulator()
 	return _simulator.get();
 }
 
-ParticleRenderer* ParticleSystem::getRenderer()
+ParticleRenderPass* ParticleSystem::getRenderer()
 {
 	return _renderer.get();
 }

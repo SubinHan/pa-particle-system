@@ -1,5 +1,6 @@
 #include "Core/HlslGenerator.h"
 
+#include "Core/ShaderStatementGraph.h"
 #include "Core/ShaderStatementNode/ShaderStatementNode.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeEmpty.h"
 #include "Core/ShaderStatementNode/ShaderStatementNodeNewFloat.h"
@@ -35,6 +36,7 @@ static const std::wstring SHADER_TEMP_PATH = L"ParticleSystemShaders/Generated/t
 
 HlslGenerator::HlslGenerator(std::wstring baseShaderPath) :
 	_baseShaderPath(baseShaderPath),
+	_graph(std::make_shared<ShaderStatementGraph>()),
 	_numSrvInBaseShader(0),
 	_numUavInBaseShader(0)
 {
@@ -54,19 +56,6 @@ void HlslGenerator::generateShaderFile(const std::wstring& outputPath)
 	std::ofstream fout;
 	fout.open(outputPath);
 	assert(fout.is_open());
-
-	// topology sort
-	const UINT numNodes = _graph.size();
-	_visited.resize(numNodes);
-	std::fill(_visited.begin(), _visited.end(), false);
-
-	for (int i = 0; i < numNodes; ++i)
-	{
-		if (_visited[i])
-			continue;
-
-		topologySort(i);
-	}
 
 	constexpr UINT BUFFER_SIZE = 512;
 	char buffer[BUFFER_SIZE];
@@ -100,38 +89,36 @@ void HlslGenerator::generateShaderFile(const std::wstring& outputPath)
 	fout.close();
 }
 
-std::vector<std::shared_ptr<ShaderStatementNode>> HlslGenerator::getNodes()
+std::shared_ptr<ShaderStatementGraph> HlslGenerator::getShaderStatementGraph()
 {
-	return _nodes;
+	return _graph;
 }
+
 
 UINT HlslGenerator::empty()
 {
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeEmpty>();
-	addNode(newNode);
+	const UINT nodeIndex = _graph->addNode(newNode);
 	return nodeIndex;
 }
 
 UINT HlslGenerator::newFloat(float x)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
+
 	auto newNode =
 		std::make_shared<ShaderStatementNodeNewFloat>(newLocalVariableName, x);
-	addNode(newNode);
-
+	const UINT nodeIndex = _graph->addNode(newNode);
 	return nodeIndex;
 }
 
 UINT HlslGenerator::newFloat3(float x, float y, float z)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeNewFloat3>(newLocalVariableName, x, y, z);
-	addNode(newNode);
+	const UINT nodeIndex = _graph->addNode(newNode);
 
 	return nodeIndex;
 }
@@ -139,10 +126,9 @@ UINT HlslGenerator::newFloat3(float x, float y, float z)
 UINT HlslGenerator::newFloat4(float x, float y, float z, float w)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
-	auto newNode = 
+	auto newNode =
 		std::make_shared<ShaderStatementNodeNewFloat4>(newLocalVariableName, x, y, z, w);
-	addNode(newNode);
+	const UINT nodeIndex = _graph->addNode(newNode);
 
 	return nodeIndex;
 }
@@ -150,10 +136,9 @@ UINT HlslGenerator::newFloat4(float x, float y, float z, float w)
 UINT HlslGenerator::randFloat()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeNewRandFloat>(newLocalVariableName);
-	addNode(newNode);
+	const UINT nodeIndex = _graph->addNode(newNode);
 
 	return nodeIndex;
 }
@@ -161,10 +146,9 @@ UINT HlslGenerator::randFloat()
 UINT HlslGenerator::randFloat3()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeNewRandFloat3>(newLocalVariableName);
-	addNode(newNode);
+	const UINT nodeIndex = _graph->addNode(newNode);
 
 	return nodeIndex;
 }
@@ -172,10 +156,9 @@ UINT HlslGenerator::randFloat3()
 UINT HlslGenerator::randFloat4()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeNewRandFloat4>(newLocalVariableName);
-	addNode(newNode);
+	const UINT nodeIndex = _graph->addNode(newNode);
 
 	return nodeIndex;
 }
@@ -183,14 +166,14 @@ UINT HlslGenerator::randFloat4()
 UINT HlslGenerator::setAlpha(UINT float4Index, UINT alphaIndex)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeSetAlpha>(newLocalVariableName);
-	newNode->setInputFloat4(_nodes[float4Index]);
-	newNode->setInputAlpha(_nodes[alphaIndex]);
-	addNode(newNode);
-	linkNode(float4Index, nodeIndex);
-	linkNode(alphaIndex, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInputFloat4(_graph->getNode(float4Index));
+	newNode->setInputAlpha(_graph->getNode(alphaIndex));
+
+	_graph->linkNode(float4Index, nodeIndex);
+	_graph->linkNode(alphaIndex, nodeIndex);
 
 	return nodeIndex;
 }
@@ -198,13 +181,13 @@ UINT HlslGenerator::setAlpha(UINT float4Index, UINT alphaIndex)
 UINT HlslGenerator::addFloat4(UINT float4Index0, UINT float4Index1)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeAddFloat4>(newLocalVariableName);
-	newNode->setInput(_nodes[float4Index0], _nodes[float4Index1]);
-	addNode(newNode);
-	linkNode(float4Index0, nodeIndex);
-	linkNode(float4Index1, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInput(_graph->getNode(float4Index0), _graph->getNode(float4Index1));
+
+	_graph->linkNode(float4Index0, nodeIndex);
+	_graph->linkNode(float4Index1, nodeIndex);
 
 	return nodeIndex;
 }
@@ -212,13 +195,13 @@ UINT HlslGenerator::addFloat4(UINT float4Index0, UINT float4Index1)
 UINT HlslGenerator::addFloat(UINT floatIndex0, UINT floatIndex1)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeAddFloat>(newLocalVariableName);
-	newNode->setInput(_nodes[floatIndex0], _nodes[floatIndex1]);
-	addNode(newNode);
-	linkNode(floatIndex0, nodeIndex);
-	linkNode(floatIndex1, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInput(_graph->getNode(floatIndex0), _graph->getNode(floatIndex1));
+
+	_graph->linkNode(floatIndex0, nodeIndex);
+	_graph->linkNode(floatIndex1, nodeIndex);
 
 	return nodeIndex;
 }
@@ -226,13 +209,13 @@ UINT HlslGenerator::addFloat(UINT floatIndex0, UINT floatIndex1)
 UINT HlslGenerator::addFloat3(UINT float3Index0, UINT float3Index1)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeAddFloat3>(newLocalVariableName);
-	newNode->setInput(_nodes[float3Index0], _nodes[float3Index1]);
-	addNode(newNode);
-	linkNode(float3Index0, nodeIndex);
-	linkNode(float3Index1, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInput(_graph->getNode(float3Index0), _graph->getNode(float3Index1));
+
+	_graph->linkNode(float3Index0, nodeIndex);
+	_graph->linkNode(float3Index1, nodeIndex);
 
 	return nodeIndex;
 }
@@ -240,13 +223,13 @@ UINT HlslGenerator::addFloat3(UINT float3Index0, UINT float3Index1)
 UINT HlslGenerator::multiplyFloat(UINT floatIndex0, UINT floatIndex1)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeMultiplyFloat>(newLocalVariableName);
-	newNode->setInput(_nodes[floatIndex0], _nodes[floatIndex1]);
-	addNode(newNode);
-	linkNode(floatIndex0, nodeIndex);
-	linkNode(floatIndex1, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInput(_graph->getNode(floatIndex0), _graph->getNode(floatIndex1));
+
+	_graph->linkNode(floatIndex0, nodeIndex);
+	_graph->linkNode(floatIndex1, nodeIndex);
 
 	return nodeIndex;
 }
@@ -254,14 +237,14 @@ UINT HlslGenerator::multiplyFloat(UINT floatIndex0, UINT floatIndex1)
 UINT HlslGenerator::multiplyFloat3ByScalar(UINT float3Index, UINT floatIndex)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeMultiplyFloat3ByScalar>(newLocalVariableName);
-	newNode->setInputFloat3(_nodes[float3Index]);
-	newNode->setInputScalar(_nodes[floatIndex]);
-	addNode(newNode);
-	linkNode(float3Index, nodeIndex);
-	linkNode(floatIndex, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInputFloat3(_graph->getNode(float3Index));
+	newNode->setInputScalar(_graph->getNode(floatIndex));
+
+	_graph->linkNode(float3Index, nodeIndex);
+	_graph->linkNode(floatIndex, nodeIndex);
 
 	return nodeIndex;
 }
@@ -269,12 +252,12 @@ UINT HlslGenerator::multiplyFloat3ByScalar(UINT float3Index, UINT floatIndex)
 UINT HlslGenerator::maskX(UINT float4Index)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeMaskX>(newLocalVariableName);
-	newNode->setInput(_nodes[float4Index]);
-	addNode(newNode);
-	linkNode(float4Index, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInput(_graph->getNode(float4Index));
+
+	_graph->linkNode(float4Index, nodeIndex);
 
 	return nodeIndex;
 }
@@ -282,12 +265,12 @@ UINT HlslGenerator::maskX(UINT float4Index)
 UINT HlslGenerator::maskY(UINT float4Index)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeMaskY>(newLocalVariableName);
-	newNode->setInput(_nodes[float4Index]);
-	addNode(newNode);
-	linkNode(float4Index, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInput(_graph->getNode(float4Index));
+
+	_graph->linkNode(float4Index, nodeIndex);
 
 	return nodeIndex;
 }
@@ -295,12 +278,12 @@ UINT HlslGenerator::maskY(UINT float4Index)
 UINT HlslGenerator::maskZ(UINT float4Index)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeMaskZ>(newLocalVariableName);
-	newNode->setInput(_nodes[float4Index]);
-	addNode(newNode);
-	linkNode(float4Index, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInput(_graph->getNode(float4Index));
+
+	_graph->linkNode(float4Index, nodeIndex);
 
 	return nodeIndex;
 }
@@ -308,12 +291,12 @@ UINT HlslGenerator::maskZ(UINT float4Index)
 UINT HlslGenerator::maskW(UINT float4Index)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeMaskW>(newLocalVariableName);
-	newNode->setInput(_nodes[float4Index]);
-	addNode(newNode);
-	linkNode(float4Index, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInput(_graph->getNode(float4Index));
+
+	_graph->linkNode(float4Index, nodeIndex);
 
 	return nodeIndex;
 }
@@ -321,10 +304,10 @@ UINT HlslGenerator::maskW(UINT float4Index)
 UINT HlslGenerator::getDeltaTime()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeGetFloatByVariableName>(newLocalVariableName, "DeltaTime");
-	addNode(newNode);
+	const UINT nodeIndex =	_graph->addNode(newNode);
+
 
 	return nodeIndex;
 }
@@ -332,14 +315,14 @@ UINT HlslGenerator::getDeltaTime()
 UINT HlslGenerator::setColorOfFloat4(UINT float4Index, UINT colorIndex)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeSetColorOfFloat4>(newLocalVariableName);
-	newNode->setInputFloat4(_nodes[float4Index]);
-	newNode->setInputColor(_nodes[colorIndex]);
-	addNode(newNode);
-	linkNode(float4Index, nodeIndex);
-	linkNode(colorIndex, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInputFloat4(_graph->getNode(float4Index));
+	newNode->setInputColor(_graph->getNode(colorIndex));
+
+	_graph->linkNode(float4Index, nodeIndex);
+	_graph->linkNode(colorIndex, nodeIndex);
 
 	return nodeIndex;
 }
@@ -347,13 +330,13 @@ UINT HlslGenerator::setColorOfFloat4(UINT float4Index, UINT colorIndex)
 UINT HlslGenerator::makeFloat4ByColorAlpha(UINT float3Index, UINT floatIndex)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeMakeFloat4ByColorAlpha>(newLocalVariableName);
-	newNode->setInput(_nodes[float3Index], _nodes[floatIndex]);
-	addNode(newNode);
-	linkNode(float3Index, nodeIndex);
-	linkNode(floatIndex, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInput(_graph->getNode(float3Index), _graph->getNode(floatIndex));
+
+	_graph->linkNode(float3Index, nodeIndex);
+	_graph->linkNode(floatIndex, nodeIndex);
 
 	return nodeIndex;
 }
@@ -361,14 +344,14 @@ UINT HlslGenerator::makeFloat4ByColorAlpha(UINT float3Index, UINT floatIndex)
 UINT HlslGenerator::makeFloat3(UINT floatXIndex, UINT floatYIndex, UINT floatZIndex)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeMakeFloat3>(newLocalVariableName);
-	newNode->setInput(_nodes[floatXIndex], _nodes[floatYIndex], _nodes[floatZIndex]);
-	addNode(newNode);
-	linkNode(floatXIndex, nodeIndex);
-	linkNode(floatYIndex, nodeIndex);
-	linkNode(floatZIndex, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInput(_graph->getNode(floatXIndex), _graph->getNode(floatYIndex), _graph->getNode(floatZIndex));
+
+	_graph->linkNode(floatXIndex, nodeIndex);
+	_graph->linkNode(floatYIndex, nodeIndex);
+	_graph->linkNode(floatZIndex, nodeIndex);
 
 	return nodeIndex;
 }
@@ -376,15 +359,15 @@ UINT HlslGenerator::makeFloat3(UINT floatXIndex, UINT floatYIndex, UINT floatZIn
 UINT HlslGenerator::makeFloat4(UINT floatXIndex, UINT floatYIndex, UINT floatZIndex, UINT floatWIndex)
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeMakeFloat4>(newLocalVariableName);
-	newNode->setInput(_nodes[floatXIndex], _nodes[floatYIndex], _nodes[floatZIndex], _nodes[floatWIndex]);
-	addNode(newNode);
-	linkNode(floatXIndex, nodeIndex);
-	linkNode(floatYIndex, nodeIndex);
-	linkNode(floatZIndex, nodeIndex);
-	linkNode(floatWIndex, nodeIndex);
+	const UINT nodeIndex = _graph->addNode(newNode);
+	newNode->setInput(_graph->getNode(floatXIndex), _graph->getNode(floatYIndex), _graph->getNode(floatZIndex), _graph->getNode(floatWIndex));
+
+	_graph->linkNode(floatXIndex, nodeIndex);
+	_graph->linkNode(floatYIndex, nodeIndex);
+	_graph->linkNode(floatZIndex, nodeIndex);
+	_graph->linkNode(floatWIndex, nodeIndex);
 
 	return nodeIndex;
 }
@@ -392,10 +375,10 @@ UINT HlslGenerator::makeFloat4(UINT floatXIndex, UINT floatYIndex, UINT floatZIn
 UINT HlslGenerator::sinByTime()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
-	const UINT nodeIndex = _nodes.size();
 	auto newNode =
 		std::make_shared<ShaderStatementNodeSinByTime>(newLocalVariableName);
-	addNode(newNode);
+	const UINT nodeIndex = _graph->addNode(newNode);
+
 
 	return nodeIndex;
 }
@@ -446,53 +429,24 @@ int HlslGenerator::parseNumBetween(std::string str, std::string prefix, std::str
 
 void HlslGenerator::insertStatements(std::ofstream& fout)
 {
-	const UINT numNodes = _graph.size();
+	const UINT numNodes = _graph->getSize();
+	const auto topologicalOrder = _graph->topologicalOrder();
+
 	for (int i = 0; i < numNodes; ++i)
 	{
-		UINT nodeIndex = _topologicalOrder[i];
-		fout << _nodes[nodeIndex]->generateStatements() << std::endl;
+		UINT nodeIndex = topologicalOrder[i];
+		fout << _graph->getNode(nodeIndex)->generateStatements() << std::endl;
 	}
 }
-
-void HlslGenerator::topologySort(UINT index)
-{
-	_visited[index] = true;
-	for (auto linkIndex : _graph[index])
-	{
-		if (_visited[linkIndex])
-			continue;
-		topologySort(linkIndex);
-	}
-
-	_topologicalOrder.push_front(index);
-}
-
-//std::vector<ResourceRequest> HlslGenerator::collectSrvRequests()
-//{
-//	std::vector<ResourceRequest> result;
-//
-//	for (auto node : _nodes)
-//	{
-//		std::vector<ResourceRequest> requests = node->getResourceRequests();
-//
-//		for (auto request : requests)
-//		{
-//			if (request.type == ResourceViewType::Srv)
-//			{
-//				result.push_back(request);
-//			}
-//		}
-//	}
-//
-//	return result;
-//}
 
 void HlslGenerator::insertSrvs(std::ofstream& fout)
 {
 	int numSrv = 0;
 
-	for (auto node : _nodes)
+	for (int i = 0; i < _graph->getSize(); ++i)
 	{
+		auto node = _graph->getNode(i);
+
 		int numResourcesToBind = node->getNumResourcesToBind();
 		if (numResourcesToBind == 0)
 			continue;
@@ -540,16 +494,5 @@ std::string HlslGenerator::getTypeInShader(ID3D12Resource* resource) const
 
 std::string HlslGenerator::getNewLocalVariableName()
 {
-	return "local" + std::to_string(_nodes.size());
-}
-
-void HlslGenerator::addNode(std::shared_ptr<ShaderStatementNode> node)
-{
-	_nodes.push_back(node);
-	_graph.emplace_back();
-}
-
-void HlslGenerator::linkNode(UINT from, UINT to)
-{
-	_graph[from].push_back(to);
+	return "local" + std::to_string(_graph->getSize());
 }

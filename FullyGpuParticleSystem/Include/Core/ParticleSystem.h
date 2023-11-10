@@ -6,12 +6,14 @@
 
 #include <memory>
 
+enum class RendererType;
+
 class DxDevice;
 class ParticleResource;
 class ParticleEmitter;
 class ParticleSorter;
 class ParticleSimulator;
-class ParticleRenderer;
+class ParticleRenderPass;
 class PassConstantBuffer;
 
 struct ID3D12GraphicsCommandList;
@@ -32,7 +34,6 @@ public:
 		const GameTimer& gt);
 
 	void setWorldTransform(const DirectX::XMFLOAT4X4& newWorldTransform);
-	void setRenderMaterialName(std::string materialName);	
 
 	/// <summary>
 	/// Set number of particles to spawn per a second.
@@ -40,9 +41,11 @@ public:
 	/// <param name="spawnRate"></param>
 	void setSpawnRate(float spawnRate);
 
+	void setRendererType(RendererType type);
+
 	ParticleEmitter* getEmitter();
 	ParticleSimulator* getSimulator();
-	ParticleRenderer* getRenderer();
+	ParticleRenderPass* getRenderer();
 
 	std::string getName();
 	float getSpawnRate();
@@ -59,12 +62,14 @@ private:
 	std::unique_ptr<ParticleEmitter> _emitter;
 	std::unique_ptr<ParticleSorter> _sorter;
 	std::unique_ptr<ParticleSimulator> _simulator;
-	std::unique_ptr<ParticleRenderer> _renderer;
+	std::unique_ptr<ParticleRenderPass> _renderer;
 
 	DirectX::XMFLOAT4X4 _world = MathHelper::identity4x4();
 	float _spawnRate;
 	float _spawnRateInv;
 	float _deltaTimeAfterSpawn;
+
+	RendererType _currentRendererType;
 
 	bool _canDraw;
 };

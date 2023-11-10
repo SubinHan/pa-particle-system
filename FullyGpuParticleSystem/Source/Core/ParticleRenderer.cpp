@@ -28,7 +28,7 @@ constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER + 1;
 constexpr int ROOT_SLOT_SRV_UAV_TABLE = 0;
 
 ParticleRenderer::ParticleRenderer(ParticleResource* resource, std::string name) :
-	ParticlePass(resource, name),
+	ParticleRenderPass(resource, name),
 	_materialName("default"),
 	_hlslGenerator(std::make_unique<HlslGeneratorRender>(BASE_RENDER_SHADER_PATH)),
 	_currentRendererType(RendererType::Sprite),
@@ -297,7 +297,7 @@ std::vector<CD3DX12_ROOT_PARAMETER> ParticleRenderer::buildRootParameter()
 			IID_PPV_ARGS(&_computeRootSignature)));
 	}
 
-	// build compute root signature for ribbon distance
+	// build root signature for ribbon distance
 	{
 		CD3DX12_ROOT_PARAMETER slotRootParameter[4];
 
@@ -403,7 +403,7 @@ void ParticleRenderer::buildInputLayout()
 
 void ParticleRenderer::buildRibbonPso()
 {
-	auto device = DxDevice::getInstance();
+	auto& device = DxDevice::getInstance();
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC ribbonPsoDesc;
 	ZeroMemory(&ribbonPsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -467,7 +467,7 @@ void ParticleRenderer::buildRibbonPso()
 
 void ParticleRenderer::buildPsos()
 {
-	auto device = DxDevice::getInstance();
+	auto& device = DxDevice::getInstance();
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
 	ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -573,7 +573,7 @@ void ParticleRenderer::buildPsos()
 
 void ParticleRenderer::generateEmptyGeometry()
 {
-	auto device = DxDevice::getInstance();
+	auto& device = DxDevice::getInstance();
 
 	using VertexType = DirectX::XMFLOAT3;
 	using IndexType = std::uint32_t;

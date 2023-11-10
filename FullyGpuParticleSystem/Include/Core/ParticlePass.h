@@ -14,6 +14,7 @@ struct ID3D12GraphicsCommandList;
 
 class ParticleResource;
 class ShaderStatementNode;
+class ShaderStatementGraph;
 
 class ParticlePass : public Hashable
 {
@@ -26,13 +27,10 @@ public:
 	ID3DBlob* getShader();
 	ID3D12PipelineState* getPipelineStateObject();
 
-	void registerShaderStatementNode(std::shared_ptr<ShaderStatementNode> node);
-	void clearRegisteredShaderStatementNodes();
-	void setShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
+	void setShaderStatementGraph(std::shared_ptr<ShaderStatementGraph> graph);
+	std::shared_ptr<ShaderStatementGraph> getShaderStatementGraph();
 
 protected:
-	void bindComputeResourcesOfRegisteredNodes(ID3D12GraphicsCommandList* commandList, int startRootSlot);
-	void bindGraphicsResourcesOfRegisteredNodes(ID3D12GraphicsCommandList* commandList, int startRootSlot);
 
 	virtual std::vector<CD3DX12_ROOT_PARAMETER> buildRootParameter() = 0;
 	virtual int getNumSrvUsing() = 0;
@@ -40,15 +38,12 @@ protected:
 	virtual bool needsStaticSampler() = 0;
 
 	void buildRootSignature();
-	virtual void buildPsos() = 0;
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
-	Microsoft::WRL::ComPtr<ID3DBlob> _shader;
 
 	ParticleResource* _resource;
 
-	std::vector<std::shared_ptr<ShaderStatementNode>> _registeredNodes;
+	std::shared_ptr<ShaderStatementGraph> _shaderStatementGraph;
 
 private:
 	std::string _name;

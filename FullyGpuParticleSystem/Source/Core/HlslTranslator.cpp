@@ -1,6 +1,8 @@
 #include "Core/HlslTranslator.h"
 
 #include "Core/HlslGenerator.h"
+#include "Core/ParticleComputePass.h"
+#include "Core/ParticleRenderPass.h"
 #include "Ui/NodeType.h"
 
 static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/Generated/";
@@ -46,20 +48,18 @@ Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslator::compileShader(ShaderCompileFunc
 	return shaderBlob;
 }
 
-void HlslTranslator::translateTo(ParticlePass* pass)
+void HlslTranslator::translateTo(ParticleComputePass* pass)
 {
-	pass->clearRegisteredShaderStatementNodes();
 	auto blob = compileShader();
-	registerTranslatedShaderNodesInto(pass);
-	pass->setShader(blob);
+	pass->setShaderStatementGraph(_hlslGenerator->getShaderStatementGraph());
+	pass->setComputeShader(blob);
 }
 
-void HlslTranslator::registerTranslatedShaderNodesInto(ParticlePass* pass)
+void HlslTranslator::translateTo(ParticleRenderPass* pass)
 {
-	for (auto node : _hlslGenerator->getNodes())
-	{
-		pass->registerShaderStatementNode(node);
-	}
+	auto blob = compileShader();
+	pass->setShaderStatementGraph(_hlslGenerator->getShaderStatementGraph());
+	pass->setPixelShader(blob);
 }
 
 void HlslTranslator::generateNodes()
