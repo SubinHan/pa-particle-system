@@ -473,7 +473,29 @@ compileShaders();
   * Tessellation을 이용
     * 입력: 4개의 Control points C0, C1, C2, C3
     * C1과 C2 위 아래로 점을 생성해 quad 구성 후 tessellation
+    * <img src="./img/ribbon_hull_shader.png">
     * Catmull-rom spline을 이용해 C1과 C2 사이 세분된 점들의 위치를 조정
+    ``` C++
+    ...
+	float t = uv.x;
+
+	float3 upPosU = catmullRom(
+		ribbonPatch[0].ControlPoint0,
+		ribbonPatch[0].ControlPoint1,
+		ribbonPatch[0].ControlPoint2,
+		ribbonPatch[0].ControlPoint3,
+		t);
+
+	float3 downPosU = catmullRom(
+		ribbonPatch[1].ControlPoint0,
+		ribbonPatch[1].ControlPoint1,
+		ribbonPatch[1].ControlPoint2,
+		ribbonPatch[1].ControlPoint3,
+		t);
+
+	float3 pos = lerp(upPosU, downPosU, uv.y);
+    ...
+    ```
   * Control Points 입력 방식
     * Index View Buffer는 0부터 maxParticleCount까지 채워져 있음
     * Indirect dispatch를 이용해 control points를 입력 조립기에 넣음
@@ -505,21 +527,26 @@ compileShaders();
   * Color, Opacity interpolation
     * Pixel shader까지 각 segment의 uv값을 전달하며, 이를 이용해 spline 보간한 것과 같은 방식으로 보간.
   * Texture Coordinate
+    * 실험을 위한 texture: <img src="./FullyGpuParticleSystem/Textures/uv_mapper.png">
     * 3가지 형태로 Texture mapping을 해보았음: Segment based, Stretched, Distance based
     * Segment based
       * 각 파티클들을 잇는 하나의 segment가 0~1의 Texture Coordinate를 가짐
+      * <img src="./img/ribbon_segment_based.png">
       * <img src="./img/ribbon_texture_segment.webp">
     * Stretched
       * 시작 파티클부터 끝 파티클까지 0~1의 Texture Coordinate를 가짐
+      * <img src="./img/ribbon_stretched.png">
       * <img src="./img/ribbon_texture_stretched.webp">
     * Distance based
       * 세계 좌표 기준으로 파티클 사이의 거리를 근사해 거리를 기준으로 texture coordinate를 부여해 tiling함
+      * <img src="./img/ribbon_distance_based.png">
       * <img src="./img/ribbon_texture_distancebased.webp">
       * Catmull-rom spline이 이루는 호의 길이를 구해보려 했으나 이는 어려움
       * 만들어지는 spline의 곡률이 생각보다 크지 않고 방향 전환도 급격하게 이루어지므로, 단순히 직선 거리를 이용해서 근사해도 적절한 결과물이 나올 것이라고 생각하였음
       * i번째 파티클과 i-1번째 파티클 사이의 거리를 전부 구하고 이를 각각의 파티클들이 정보를 유지하지만, 이것만으로는 부족함
         * 왜냐하면 tiling이 자연스럽게 이루어지게 하기 위해서는 이전 segment의 텍스처 좌표값을 알아야 하기 때문!
         * 즉, "누적합"이 필요함
+        * <img src="./img/ribbon_distance_based_why_prefix_sum.png">
       * 누적합은 Brent-kung adder를 이용해 병렬적으로 연산하였음
         * <img src="./img/brent_kung_adder.png">
       * 이를 통해 첫 파티클로부터 각 파티클까지의 거리를 계산할 수 있으며, 이 값을 그대로(혹은 scaling하여) texture coordinate로 활용함
