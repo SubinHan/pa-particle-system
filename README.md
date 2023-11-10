@@ -521,13 +521,16 @@ compileShaders();
 	        outputCommands.Append(command);
         }
         ```
+    * <img src="./img/ribbon_input.png">
     * 문제점: 0\~1과 n-1\~n의 ribbon이 연결되지 않음.
     * 따라서 index buffer의 앞 부분에 0을 추가로 삽입하여 첫 번째 ribbon의 경우 control point가 0, 0, 1, 2로 입력되게 하여 0~1의 파티클을 잇게 함.
     * 마찬가지로 마지막 ribbon의 경우 numAlives를 확인해서 해당 index를 보정하게끔 함 (n-2, n-1, n, n+1) => (n-2, n-1, n, n)
+    * 이는 vid로 입력이 되며, 이를 인덱스로 이용해 particle buffer에 접근
   * Color, Opacity interpolation
     * Pixel shader까지 각 segment의 uv값을 전달하며, 이를 이용해 spline 보간한 것과 같은 방식으로 보간.
   * Texture Coordinate
-    * 실험을 위한 texture: <img src="./FullyGpuParticleSystem/Textures/uv_mapper.png">
+    * 실험을 위한 texture: 
+      * <img src="./FullyGpuParticleSystem/Textures/uv_mapper.png">
     * 3가지 형태로 Texture mapping을 해보았음: Segment based, Stretched, Distance based
     * Segment based
       * 각 파티클들을 잇는 하나의 segment가 0~1의 Texture Coordinate를 가짐
