@@ -2,12 +2,12 @@
 
 #include "Ui/NodeEditor.h"
 
-class ParticleRenderer;
+class ParticleRenderPass;
 
 class NodeEditorRender : public NodeEditor
 {
 public:
-	NodeEditorRender(ParticleRenderer* renderer);
+	NodeEditorRender(ParticleRenderPass* renderer);
 	virtual ~NodeEditorRender();
 
 	virtual void load() override;
@@ -21,5 +21,5 @@ private:
 	void createOutputNode();
 
 private:
-	ParticleRenderer* _renderer;
+	ParticleRenderPass* _renderer;
 };

@@ -9,6 +9,7 @@ public:
 	virtual ~ShaderStatementNodeMultiplyFloat() = default;
 
 	virtual std::string generateStatements() const override;
+	virtual float getEvaluatedFloat() const override;
 
 	void setInput(
 		std::shared_ptr<ShaderStatementNode> input0,

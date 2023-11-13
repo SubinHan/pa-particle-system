@@ -7,7 +7,17 @@
 #include "Model/RendererType.h"
 #include "Model/RibbonTextureUvType.h"
 
-static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/Generated/";
+static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
+
+std::unique_ptr<ParticleSpriteRenderer> ParticleSpriteRenderer::create(ParticleResource* resource, std::string name)
+{
+	auto created =
+		std::make_unique<ParticleSpriteRenderer>(resource, name);
+
+	created->buildRootSignature();
+
+	return std::move(created);
+}
 
 ParticleSpriteRenderer::ParticleSpriteRenderer(ParticleResource* resource, std::string name) :
 	ParticleRenderPass(resource, name),
@@ -23,17 +33,17 @@ void ParticleSpriteRenderer::render(
 	const ObjectConstants& objectConstants,
 	const PassConstantBuffer& passCb)
 {
-	//calculateRibbonDistanceFromStart(cmdList);
-
 	if (isShaderDirty())
 	{
+		buildRootSignature();
 		rebuildGraphicsPsos();
+		setShaderDirty(false);
 	}
 
 	computeIndirectCommand(cmdList, _computeIndirectCommandPso.Get());
 	executeIndirectCommand(
 		cmdList,
-		_spriteOpaquePso.Get(), 
+		isOpaque()? _spriteOpaquePso.Get() : _spriteTranslucentPso.Get(), 
 		D3D11_PRIMITIVE_TOPOLOGY_POINTLIST,
 		objectConstants, 
 		passCb);
@@ -70,7 +80,7 @@ void ParticleSpriteRenderer::rebuildGraphicsPsos()
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC spriteOpaquePsoDesc;
 	ZeroMemory(&spriteOpaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	spriteOpaquePsoDesc.InputLayout = { getInputLayout().data(), static_cast<UINT>(getInputLayout().size()) };
-	spriteOpaquePsoDesc.pRootSignature = getRenderRootSignature();
+	spriteOpaquePsoDesc.pRootSignature = getRootSignature();
 	spriteOpaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	spriteOpaquePsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 	spriteOpaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);

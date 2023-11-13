@@ -73,7 +73,6 @@
 ### Tasks
 
 ##### Backlogs
-* Ribbon trail renderer
 * Mesh(i.e. cube) render
 * Particle에 Orientation 속성 추가
 * Opaque particles를 먼저 draw해야 함
@@ -87,19 +86,10 @@
   * i.e.) float3에 float4를 대입하지는 않는지?
   * 각 node들이 type 정보를 유지하여 적절한 input임을 검증해야 함
 * 성능 이슈:
-  * ExecuteIndirect에서 적절한 maxCommandsCount를 넘기기 (관련 일지 - 4주차 목요일)
+  *
 
 ##### 진행 중인 Task
-* Particle System 학습
-* Ribbon, Trail rendering 학습
-  * Spline 학습
-  * 1차적 구현 목표:
-    * https://youtu.be/Zn9-U5vQl3g?si=OwzghEU3Dq-Bh-fX&t=155
-    * Spawntime 기반으로 particle 정렬 후
-    * 이들을 지나는 spline 렌더링
-      * Bezier curve
-      * Catmull-rom spline?
-      * Cardinal Spline
+*
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -135,7 +125,8 @@
 * 불 렌더링
 * Orphan node들을 shader code로 변환하지 않음
 * Ribbon 렌더링
-  * 
+* 성능 이슈
+  * ExecuteIndirect에서 적절한 maxCommandsCount를 넘기기 (관련 일지 - 4주차 목요일)
 
 <hr/>
 
@@ -283,7 +274,16 @@
   * 리본 렌더링에서 distance based texture mapping 수행
   * brent-kung parallel prefix sum 학습 및 적용
 * 금요일:
-  * 
+  * 코드 리팩토링
+
+
+##### 6주차: 성능 개선 (2023.11.13. ~ 2023.11.17.)
+* 월요일:
+  * 코드 리팩토링
+  * 4주차 목요일에 제시되었던 성능 이슈 해결
+  * 합리적인 성능 비교를 위한 다양한 상황에서의 성능 지표 수집 
+* 화요일:
+
 
 <hr/>
 
@@ -455,8 +455,6 @@ compileShaders();
   * 불꽃과 연기는 subuv 텍스처를 이용해서 lifetime을 기반으로 애니메이팅됨.
     * <img src="./FullyGpuParticleSystem/Textures/fire_subuv.png">
     * 애니메이션 블렌딩은 하지 않았음!
-  * 
-
 
 #### 리본 렌더링
 * 1차적 구현 목표:
@@ -553,6 +551,12 @@ compileShaders();
       * 누적합은 Brent-kung adder를 이용해 병렬적으로 연산하였음
         * <img src="./img/brent_kung_adder.png">
       * 이를 통해 첫 파티클로부터 각 파티클까지의 거리를 계산할 수 있으며, 이 값을 그대로(혹은 scaling하여) texture coordinate로 활용함
+
+#### 성능 지표
+* 다양한 상황을 고려하여 시간을 측정하였음
+  * 파티클의 수(1000, 1000000)
+  * 렌더링 방법(스프라이트, 리본)
+  * 블렌딩 방법(불투명, 반투명)
   * 
 
 

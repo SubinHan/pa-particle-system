@@ -2,6 +2,7 @@
 
 #include "Core/ICbvSrvUavDemander.h"
 
+#include <memory>
 #include <Windows.h>
 #include <wrl.h>
 #include <d3dx12.h>
@@ -27,6 +28,8 @@ struct ParticleIndirectCommand
 class ParticleResource : public ICbvSrvUavDemander
 {
 public:
+	static std::unique_ptr<ParticleResource> create(ID3D12GraphicsCommandList* cmdList);
+
 	ParticleResource(Microsoft::WRL::ComPtr<ID3D12Device> device, ID3D12GraphicsCommandList* cmdList);
 
 	virtual int getNumDescriptorsToDemand() const override;
@@ -46,6 +49,10 @@ public:
 
 	CD3DX12_GPU_DESCRIPTOR_HANDLE getCountersUavGpuHandle();
 	CD3DX12_GPU_DESCRIPTOR_HANDLE getIndirectCommandsUavGpuHandle();
+
+	void onEmittingPolicyChanged(float spawnRatePerSecond, float averageLifetime);
+	UINT getEstimatedCurrentNumAliveParticles();
+	UINT getEstimatedCurrentNumAliveParticlesAlignedPowerOfTwo();
 
 	void transitParticlesToSrv(ID3D12GraphicsCommandList* cmdList);
 	void transitAliveIndicesToSrv(ID3D12GraphicsCommandList* cmdList);
@@ -73,6 +80,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> _indirectCommandsCounterResetBuffer;
 	
 	Microsoft::WRL::ComPtr<ID3D12Resource> _sortBuffer;
+
+	float _spawnRatePerSecond;
+	float _averageLifetime;
+	int _maxNumParticles;
 
 	int _currentAliveIndicesBufferIndex = 0;
 

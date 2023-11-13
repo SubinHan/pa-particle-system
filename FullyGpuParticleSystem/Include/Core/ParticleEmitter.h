@@ -4,6 +4,7 @@
 #include "Util/DxUtil.h"
 #include "Util/GameTimer.h"
 
+#include <memory>
 #include <wrl.h>
 
 struct ID3D12Device;
@@ -16,6 +17,8 @@ struct ObjectConstants;
 
 struct EmitConstants
 {
+	DirectX::XMFLOAT4X4 World;
+
 	UINT EmitCount;
 	DirectX::XMFLOAT3 Position;
 
@@ -29,28 +32,30 @@ struct EmitConstants
 class ParticleEmitter : public ParticleComputePass
 {
 public:
+	static std::unique_ptr<ParticleEmitter> create(ParticleResource* resource, std::string name);
+
 	ParticleEmitter(ParticleResource* resource, std::string name);
 	virtual ~ParticleEmitter();
 
+	void setSpawnRate(float spawnRate);
+	float getSpawnRate();
 	void emitParticles(
 		ID3D12GraphicsCommandList* cmdList,
 		const ObjectConstants& objectConstants,
-		int numParticlesToEmit, 
 		const GameTimer& gt);
 
 protected:
-	virtual std::vector<CD3DX12_ROOT_PARAMETER> buildRootParameter() override;
-	virtual int getNumSrvUsing() override;
-	virtual int getNumUavUsing() override;
-	virtual bool needsStaticSampler() override;
-
-	virtual void buildPsos() override;
+	virtual int getNum32BitsConstantsUsing() override;
+	virtual void onShaderStatementGraphChanged() override;
 
 private:
 	void initDefault();
 	void setDefaultShader();
 
-	std::unique_ptr<HlslGeneratorEmit> _hlslGenerator;
+private:
+	float _spawnRate;
+	float _spawnRateInv;
+	float _deltaTimeAfterSpawn;
 
-	CD3DX12_DESCRIPTOR_RANGE _uavTable;
+	float _averageLifetime;
 };

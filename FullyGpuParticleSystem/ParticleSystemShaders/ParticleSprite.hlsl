@@ -1,3 +1,11 @@
+#include "ParticleSystemShaders/Particle.hlsl"
+#include "ParticleSystemShaders/Util.hlsl"
+#include "ParticleSystemShaders/ParticleRenderPass.hlsl"
+
+RWStructuredBuffer<Particle> particles : register(u0);
+RWStructuredBuffer<uint> aliveIndices : register(u1);
+RWByteAddressBuffer counters			: register(u2);
+
 struct SpriteVertexOut
 {
 	float3 CenterW	: POSITION;

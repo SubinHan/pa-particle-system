@@ -42,7 +42,6 @@ protected:
 
 	ID3D12RootSignature* getIndirectCommandComputeRootSignature() const;
 	ID3D12CommandSignature* getCommandSignature() const;
-	ID3D12RootSignature* getRenderRootSignature() const;
 	ID3DBlob* getVertexShader() const;
 	ID3DBlob* getHullShader() const;
 	ID3DBlob* getDomainShader() const;
@@ -50,8 +49,6 @@ protected:
 	ID3DBlob* getPixelShader() const;
 
 	const std::vector<D3D12_INPUT_ELEMENT_DESC>& getInputLayout();
-
-	bool isShaderDirty() const;
 
 	void computeIndirectCommand(ID3D12GraphicsCommandList* cmdList, ID3D12PipelineState* computePso);
 	void executeIndirectCommand(
@@ -64,12 +61,13 @@ protected:
 	MeshGeometry* getEmptyGeometry();
 
 private:
+	void buildComputeIndirectRootSignature();
+	void buildCommandSignature();
 	void generateEmptyGeometry();
 
 private:
 	// for compute indirect commands.
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> _computeIndirectRootSignature;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> _renderRootSignature;
 	Microsoft::WRL::ComPtr<ID3D12CommandSignature> _commandSignature;
 
 	CD3DX12_DESCRIPTOR_RANGE _passCbvTable;
@@ -86,7 +84,6 @@ private:
 
 	std::unique_ptr<MeshGeometry> _emptyGeometry = nullptr;
 
-	bool _isShaderDirty;
 	bool _isOpaque;
 
 private:

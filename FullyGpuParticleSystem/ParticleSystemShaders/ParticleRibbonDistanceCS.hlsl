@@ -1,4 +1,5 @@
 #include "ParticleSystemShaders/Particle.hlsl"
+#include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
 cbuffer cbPreRibbonDistanceConstants : register(b0)
 {
@@ -7,10 +8,6 @@ cbuffer cbPreRibbonDistanceConstants : register(b0)
     uint IndexOffsetTo;
     uint ShiftOffset;
 }
-
-RWStructuredBuffer<Particle> particles : register(u0);
-RWStructuredBuffer<uint> aliveIndices : register(u1);
-RWByteAddressBuffer counters			: register(u2);
 
 void addFromTo(uint from, uint to)
 {

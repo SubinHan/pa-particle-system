@@ -15,7 +15,18 @@ std::string ShaderStatementNodeSetValueByVariableName::generateStatements() cons
 	return _variableNameToSet + " = " + _input->getVariableName() + ";";
 }
 
+float ShaderStatementNodeSetValueByVariableName::getEvaluatedFloat() const
+{
+	assert(_input && "getEvaluatedFloat() called before input set");
+	return _input->getEvaluatedFloat();
+}
+
 void ShaderStatementNodeSetValueByVariableName::setInput(std::shared_ptr<ShaderStatementNode> input)
 {
 	_input = input;
+}
+
+std::string ShaderStatementNodeSetValueByVariableName::getVariableNameToSet()
+{
+	return _variableNameToSet;
 }

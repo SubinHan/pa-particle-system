@@ -11,6 +11,7 @@ public:
 	virtual ~ShaderStatementNodeNewFloat() = default;
 
 	virtual std::string generateStatements() const override;
+	virtual float getEvaluatedFloat() const override;
 
 private:
 	float _x;

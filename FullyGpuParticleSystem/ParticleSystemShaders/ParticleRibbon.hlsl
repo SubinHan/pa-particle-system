@@ -1,10 +1,10 @@
 #include "ParticleSystemShaders/Particle.hlsl"
 #include "ParticleSystemShaders/Util.hlsl"
+#include "ParticleSystemShaders/ParticleRenderPass.hlsl"
 
-StructuredBuffer<Particle> particles : register(t0);
-StructuredBuffer<uint> aliveIndices : register(t1);
-
-RWByteAddressBuffer counters			: register(u0);
+RWStructuredBuffer<Particle> particles : register(u0);
+RWStructuredBuffer<uint> aliveIndices : register(u1);
+RWByteAddressBuffer counters			: register(u2);
 
 struct RibbonVertexOut
 {

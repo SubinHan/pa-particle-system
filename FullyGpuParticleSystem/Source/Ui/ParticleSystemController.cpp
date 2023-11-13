@@ -2,7 +2,7 @@
 
 #include "Core/ParticleSystem.h"
 #include "Core/ParticleSystemManager.h"
-#include "Core/ParticleRenderer.h"
+#include "Core/ParticleRenderPass.h"
 #include "Model/RendererType.h"
 #include "Ui/NodeEditorEmit.h"
 #include "Ui/NodeEditorSimulate.h"

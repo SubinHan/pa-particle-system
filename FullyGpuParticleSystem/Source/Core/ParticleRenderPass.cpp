@@ -17,6 +17,8 @@ constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER + 1;
 ParticleRenderPass::ParticleRenderPass(ParticleResource* resource, std::string name) :
 	ParticlePass(resource, name)
 {
+	buildComputeIndirectRootSignature();
+	buildCommandSignature();
 	generateEmptyGeometry();
 }
 
@@ -51,31 +53,31 @@ void ParticleRenderPass::setOpaqueness(bool newIsOpaque)
 void ParticleRenderPass::setVertexShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 {
 	_shaderVs0 = shader;
-	_isShaderDirty = true;
+	setShaderDirty(true);
 }
 
 void ParticleRenderPass::setHullShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 {
 	_shaderHs0 = shader;
-	_isShaderDirty = true;
+	setShaderDirty(true);
 }
 
 void ParticleRenderPass::setDomainShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 {
 	_shaderDs0 = shader;
-	_isShaderDirty = true;
+	setShaderDirty(true);
 }
 
 void ParticleRenderPass::setGeometryShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 {
 	_shaderGs0 = shader;
-	_isShaderDirty = true;
+	setShaderDirty(true);
 }
 
 void ParticleRenderPass::setPixelShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 {
 	_shaderPs0 = shader;
-	_isShaderDirty = true;
+	setShaderDirty(true);
 }
 
 std::vector<CD3DX12_ROOT_PARAMETER> ParticleRenderPass::buildRootParameter()
@@ -87,23 +89,25 @@ std::vector<CD3DX12_ROOT_PARAMETER> ParticleRenderPass::buildRootParameter()
 	_passCbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
 	slotRootParameter[ROOT_SLOT_PASS_CONSTANTS_BUFFER].InitAsDescriptorTable(1, &_passCbvTable);
 
-	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER].InitAsShaderResourceView(0); // particles
-	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER].InitAsShaderResourceView(1); // aliveIndices
+	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER].InitAsUnorderedAccessView(0); // particles
+	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER].InitAsUnorderedAccessView(1); // aliveIndices
 
-	_counterTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+	_counterTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
 	slotRootParameter[ROOT_SLOT_COUNTERS_BUFFER].InitAsDescriptorTable(1, &_counterTable);
+
+	buildComputeIndirectRootSignature();
 
 	return slotRootParameter;
 }
 
 int ParticleRenderPass::getNumSrvUsing()
 {
-	return 2;
+	return 0;
 }
 
 int ParticleRenderPass::getNumUavUsing()
 {
-	return 0;
+	return 3;
 }
 
 bool ParticleRenderPass::needsStaticSampler()
@@ -119,11 +123,6 @@ ID3D12RootSignature* ParticleRenderPass::getIndirectCommandComputeRootSignature(
 ID3D12CommandSignature* ParticleRenderPass::getCommandSignature() const
 {
 	return _commandSignature.Get();
-}
-
-ID3D12RootSignature* ParticleRenderPass::getRenderRootSignature() const
-{
-	return _renderRootSignature.Get();
 }
 
 ID3DBlob* ParticleRenderPass::getVertexShader() const
@@ -154,11 +153,6 @@ ID3DBlob* ParticleRenderPass::getPixelShader() const
 const std::vector<D3D12_INPUT_ELEMENT_DESC>& ParticleRenderPass::getInputLayout()
 {
 	return _inputLayout;
-}
-
-bool ParticleRenderPass::isShaderDirty() const
-{
-	return _isShaderDirty;
 }
 
 void ParticleRenderPass::computeIndirectCommand(
@@ -206,10 +200,7 @@ void ParticleRenderPass::executeIndirectCommand(
 	const ObjectConstants& objectConstants,
 	const PassConstantBuffer& passCb)
 {
-	_resource->transitParticlesToSrv(cmdList);
-	_resource->transitAliveIndicesToSrv(cmdList);
-
-	cmdList->SetGraphicsRootSignature(getRenderRootSignature());
+	cmdList->SetGraphicsRootSignature(getRootSignature());
 
 	auto vertexBuffers = getEmptyGeometry()->VertexBufferView();
 	auto indexBuffer = getEmptyGeometry()->IndexBufferView();
@@ -223,9 +214,9 @@ void ParticleRenderPass::executeIndirectCommand(
 	cmdList->SetGraphicsRoot32BitConstants(ROOT_SLOT_OBJECT_CONSTANTS_BUFFER, sizeof(ObjectConstants) / 4, &objectConstants, 0);
 	cmdList->SetGraphicsRootDescriptorTable(
 		ROOT_SLOT_PASS_CONSTANTS_BUFFER, passCb.getGpuHandle());
-	cmdList->SetGraphicsRootShaderResourceView(
+	cmdList->SetGraphicsRootUnorderedAccessView(
 		ROOT_SLOT_PARTICLES_BUFFER, _resource->getParticlesResource()->GetGPUVirtualAddress());
-	cmdList->SetGraphicsRootShaderResourceView(
+	cmdList->SetGraphicsRootUnorderedAccessView(
 		ROOT_SLOT_ALIVES_INDICES_BUFFER, _resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
 	cmdList->SetGraphicsRootDescriptorTable(
 		ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersUavGpuHandle());
@@ -237,20 +228,80 @@ void ParticleRenderPass::executeIndirectCommand(
 	// TODO: Optimization - Set proper NumMaxCommands.
 	cmdList->ExecuteIndirect(
 		_commandSignature.Get(),
-		_resource->getMaxNumParticles(),
-		//1000,
+		_resource->getEstimatedCurrentNumAliveParticles(),
 		_resource->getIndirectCommandsResource(),
 		0,
 		_resource->getIndirectCommandsResource(),
 		_resource->getCommandBufferCounterOffset());
-
-	_resource->transitParticlesToUav(cmdList);
-	_resource->transitAliveIndicesToUav(cmdList);
 }
 
 MeshGeometry* ParticleRenderPass::getEmptyGeometry()
 {
 	return _emptyGeometry.get();
+}
+
+void ParticleRenderPass::buildComputeIndirectRootSignature()
+{
+	auto device = DxDevice::getInstance().getD3dDevice();
+
+	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+
+	CD3DX12_DESCRIPTOR_RANGE counterTable;
+	counterTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+
+	slotRootParameter[0]
+		.InitAsDescriptorTable(1, &counterTable);
+
+	CD3DX12_DESCRIPTOR_RANGE uavTable;
+	uavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
+
+	slotRootParameter[1]
+		.InitAsDescriptorTable(1, &uavTable);
+
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
+		_countof(slotRootParameter),
+		slotRootParameter,
+		0,
+		nullptr,
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+	);
+
+	ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(
+		&rootSigDesc,
+		D3D_ROOT_SIGNATURE_VERSION_1,
+		serializedRootSig.GetAddressOf(),
+		errorBlob.GetAddressOf()
+	);
+
+	if (errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(device->CreateRootSignature(
+		0,
+		serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(&_computeIndirectRootSignature)));
+}
+
+void ParticleRenderPass::buildCommandSignature()
+{
+	D3D12_INDIRECT_ARGUMENT_DESC argumentDescs[1] = {};
+	argumentDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
+
+	D3D12_COMMAND_SIGNATURE_DESC commandSignatureDesc = {};
+	commandSignatureDesc.pArgumentDescs = argumentDescs;
+	commandSignatureDesc.NumArgumentDescs = _countof(argumentDescs);
+	commandSignatureDesc.ByteStride = sizeof(ParticleIndirectCommand);
+
+	auto device = DxDevice::getInstance().getD3dDevice();
+
+	ThrowIfFailed(device->CreateCommandSignature(
+		&commandSignatureDesc, nullptr, IID_PPV_ARGS(&_commandSignature)));
 }
 
 void ParticleRenderPass::generateEmptyGeometry()

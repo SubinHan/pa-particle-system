@@ -3,7 +3,6 @@
 #include "Core/ParticleSystem.h"
 #include "Core/ParticleEmitter.h"
 #include "Core/ParticleSimulator.h"
-#include "Core/ParticleRenderer.h"
 #include "Core/HlslTranslatorEmit.h"
 #include "Core/HlslTranslatorSimulate.h"
 #include "Core/HlslTranslatorRenderPs.h"

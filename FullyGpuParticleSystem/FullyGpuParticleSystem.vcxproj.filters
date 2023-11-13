@@ -78,9 +78,6 @@
     <ClInclude Include="Include\Core\ParticleSimulator.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Core\ParticleRenderer.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Core\ParticleSystem.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -324,6 +321,12 @@
     <ClInclude Include="Include\Core\ShaderStatementGraph.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Core\ParticlePostSimulator.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ParticlePreSorter.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -366,9 +369,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\ParticleSimulator.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\ParticleRenderer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\ParticleSystem.cpp">
@@ -599,6 +599,12 @@
     <ClCompile Include="Source\Core\ParticleComputePass.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Core\ParticlePostSimulator.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ParticlePreSorter.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FullyGpuParticleSystem.rc">
@@ -633,6 +639,7 @@
     <FxCompile Include="ParticleSystemShaders\ParticleRibbon.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleRenderPass.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleSprite.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleBuffers.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

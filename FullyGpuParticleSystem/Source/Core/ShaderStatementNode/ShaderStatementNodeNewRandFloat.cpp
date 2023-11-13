@@ -13,3 +13,9 @@ std::string ShaderStatementNodeNewRandFloat::generateStatements() const
 	return "float " + _variableName +
 		" = float(random(" + std::to_string(seed) + " + DeltaTime + float(dispatchThreadId.x)));";
 }
+
+float ShaderStatementNodeNewRandFloat::getEvaluatedFloat() const
+{
+	// return average float value
+	return 0.5f;
+}

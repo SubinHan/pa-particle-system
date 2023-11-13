@@ -34,7 +34,7 @@ UINT ShaderStatementGraph::getSize()
 
 std::shared_ptr<ShaderStatementNode> ShaderStatementGraph::getNode(UINT index)
 {
-	return std::shared_ptr<ShaderStatementNode>();
+	return _nodes[index];
 }
 
 std::deque<UINT> ShaderStatementGraph::topologicalOrder()
@@ -50,6 +50,7 @@ std::deque<UINT> ShaderStatementGraph::topologicalOrder()
 void ShaderStatementGraph::topologySort()
 {
 	_topologicalOrder.clear();
+	_visited.clear();
 	_visited.resize(getSize());
 	for (int i = 0; i < getSize(); ++i)
 	{

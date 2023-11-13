@@ -4,12 +4,16 @@
 #include "Core/PassConstantBuffer.h"
 #include "Model/ObjectConstants.h"
 
+#include <memory>
+
 enum class RendererType;
 enum class RibbonTextureUvType;
 
 class ParticleRibbonRenderer : public ParticleRenderPass
 {
 public:
+	static std::unique_ptr<ParticleRibbonRenderer> create(ParticleResource* resource, std::string name);
+
 	ParticleRibbonRenderer(ParticleResource* resource, std::string name);
 
 	virtual void render(

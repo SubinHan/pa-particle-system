@@ -1,6 +1,5 @@
 #include "ParticleSystemShaders/Particle.hlsl"
-
-RWByteAddressBuffer counters				: register(u0);
+#include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
 // each thread updates a particle and kills if expired.
 [numthreads(1, 1, 1)]

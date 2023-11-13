@@ -5,4 +5,5 @@ enum class RibbonTextureUvType
 	SegmentBased,
 	Stretched,
 	DistanceBased,
+	Size,
 };

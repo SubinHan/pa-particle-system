@@ -1,6 +1,7 @@
 #include "ParticleSystemShaders/Particle.hlsl"
 #include "ParticleSystemShaders/Util.hlsl"
 #include "ParticleSystemShaders/ParticleSimulateUtil.hlsl"
+#include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
 cbuffer cbUpdateConstants : register(b0)
 {
@@ -8,14 +9,6 @@ cbuffer cbUpdateConstants : register(b0)
 }
 
 %t
-
-RWStructuredBuffer<Particle> particles		: register(u0);
-
-RWStructuredBuffer<uint> aliveIndices		: register(u1);
-RWStructuredBuffer<uint> newAliveIndices	: register(u2);
-RWStructuredBuffer<uint> deadIndices		: register(u3);
-
-RWByteAddressBuffer counters				: register(u4);
 
 %u
 

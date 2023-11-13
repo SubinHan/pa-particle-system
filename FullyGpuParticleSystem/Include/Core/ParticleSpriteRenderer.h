@@ -10,6 +10,8 @@ enum class RibbonTextureUvType;
 class ParticleSpriteRenderer : public ParticleRenderPass
 {
 public:
+	static std::unique_ptr<ParticleSpriteRenderer> create(ParticleResource* resource, std::string name);
+
 	ParticleSpriteRenderer(ParticleResource* resource, std::string name);
 
 	virtual void render(
@@ -18,10 +20,6 @@ public:
 		const PassConstantBuffer& passCb) override;
 
 protected:
-	virtual std::vector<CD3DX12_ROOT_PARAMETER> buildRootParameter() override;
-	virtual int getNumSrvUsing() override;
-	virtual int getNumUavUsing() override;
-	virtual bool needsStaticSampler() override;
 
 private:
 	void buildShaders();

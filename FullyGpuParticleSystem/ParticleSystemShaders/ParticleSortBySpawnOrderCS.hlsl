@@ -1,5 +1,6 @@
 #include "ParticleSystemShaders/Util.hlsl"
 #include "ParticleSystemShaders/Particle.hlsl"
+#include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
 cbuffer cbSortConstants : register(b0)
 {
@@ -7,11 +8,6 @@ cbuffer cbSortConstants : register(b0)
 	uint sequenceSize;
 	uint stage;
 }
-
-RWStructuredBuffer<Particle> particles		: register(u0);
-
-RWStructuredBuffer<uint> aliveIndices	: register(u1);
-RWByteAddressBuffer counters			: register(u2);
 
 #define NUM_THREADS 256
 

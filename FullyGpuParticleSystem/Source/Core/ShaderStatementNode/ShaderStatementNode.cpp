@@ -4,7 +4,8 @@
 #include <d3dx12.h>
 
 ShaderStatementNode::ShaderStatementNode(std::string variableName) :
-	_variableName(variableName)
+	_variableName(variableName),
+	_evaluatedFloat(0.0f)
 {
 }
 

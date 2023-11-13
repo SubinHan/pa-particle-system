@@ -176,6 +176,8 @@
     <ClInclude Include="Include\Core\MaterialManager.h" />
     <ClInclude Include="Include\Core\ParticleComputePass.h" />
     <ClInclude Include="Include\Core\ParticlePass.h" />
+    <ClInclude Include="Include\Core\ParticlePostSimulator.h" />
+    <ClInclude Include="Include\Core\ParticlePreSorter.h" />
     <ClInclude Include="Include\Core\ParticleRenderPass.h" />
     <ClInclude Include="Include\Core\ParticleRibbonRenderer.h" />
     <ClInclude Include="Include\Core\ParticleSorter.h" />
@@ -254,7 +256,6 @@
     <ClInclude Include="Include\Core\HlslGenerator.h" />
     <ClInclude Include="ParticleApp\ParticleApp.h" />
     <ClInclude Include="Include\Core\ParticleEmitter.h" />
-    <ClInclude Include="Include\Core\ParticleRenderer.h" />
     <ClInclude Include="Include\Core\ParticleResource.h" />
     <ClInclude Include="Include\Core\ParticleSimulator.h" />
     <ClInclude Include="Resource.h" />
@@ -284,6 +285,8 @@
     <ClCompile Include="Source\Core\HlslTranslatorRenderPs.cpp" />
     <ClCompile Include="Source\Core\ImguiInitializer.cpp" />
     <ClCompile Include="Source\Core\MaterialManager.cpp" />
+    <ClCompile Include="Source\Core\ParticlePostSimulator.cpp" />
+    <ClCompile Include="Source\Core\ParticlePreSorter.cpp" />
     <ClCompile Include="Source\Core\ParticleRenderPass.cpp" />
     <ClCompile Include="Source\Core\ParticleRibbonRenderer.cpp" />
     <ClCompile Include="Source\Core\ParticleSpriteRenderer.cpp" />
@@ -316,7 +319,6 @@
     <ClCompile Include="Source\Core\ParticleSystem.cpp" />
     <ClCompile Include="Source\Core\PassConstantBuffer.cpp" />
     <ClCompile Include="Source\Core\ParticleEmitter.cpp" />
-    <ClCompile Include="Source\Core\ParticleRenderer.cpp" />
     <ClCompile Include="Source\Core\ParticleResource.cpp" />
     <ClCompile Include="Source\Core\ParticleSimulator.cpp" />
     <ClCompile Include="Source\Core\DxDevice.cpp" />
@@ -366,6 +368,12 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ParticleApp\Shaders\color.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleSystemShaders\ParticleBuffers.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

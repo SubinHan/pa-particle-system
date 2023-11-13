@@ -1,3 +1,10 @@
+#ifndef PARTICLE_RENDER_PASS_HLSL
+#define PARTICLE_RENDER_PASS_HLSL
+
+cbuffer cbPerParticleSystem : register (b0)
+{
+	float4x4 gWorld;
+}
 
 cbuffer cbPass : register(b1)
 {
@@ -19,3 +26,5 @@ cbuffer cbPass : register(b1)
 	float gTotalTime;
 	float DeltaTime;
 };
+
+#endif

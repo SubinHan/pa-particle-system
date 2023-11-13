@@ -6,7 +6,6 @@
 #include "Core/ParticleEmitter.h"
 #include "Core/ParticleSorter.h"
 #include "Core/ParticleSimulator.h"
-#include "Core/ParticleRenderer.h"
 #include "Core/ParticleSpriteRenderer.h"
 #include "Core/ParticleRibbonRenderer.h"
 #include "Model/ObjectConstants.h"
@@ -75,14 +74,16 @@ void ParticleSystem::onDraw(
 		_emitter->emitParticles(
 			commandList,
 			objConstants,
-			numSpawn,
 			gt);
 	}
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 1);
 	_simulator->simulateParticles(commandList, gt.deltaTime());
 
-	_sorter->sortParticles(commandList);
+	if (_currentRendererType == RendererType::Ribbon)
+	{
+		_sorter->sortParticles(commandList);
+	}
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 2);
 	_renderer->render(commandList, objConstants, passCb);
@@ -142,9 +143,7 @@ void ParticleSystem::setWorldTransform(const DirectX::XMFLOAT4X4& newWorldTransf
 
 void ParticleSystem::setSpawnRate(float spawnRate)
 {
-	_spawnRate = spawnRate;
-
-	_spawnRateInv = 1.0f / _spawnRate;
+	_emitter->setSpawnRate(spawnRate);
 }
 
 void ParticleSystem::setRendererType(RendererType type)
@@ -152,20 +151,21 @@ void ParticleSystem::setRendererType(RendererType type)
 	if (_currentRendererType == type)
 		return;
 
+	_currentRendererType = type;
 	auto graph = _renderer->getShaderStatementGraph();
 
-	switch (type)
+	switch (_currentRendererType)
 	{
 	case RendererType::Sprite:
 	{
-		_renderer = std::make_unique<ParticleSpriteRenderer>(
+		_renderer = ParticleSpriteRenderer::create(
 			_resource.get(),
 			_name + "_Renderer");
 		break;
 	}
 	case RendererType::Ribbon:
 	{
-		_renderer = std::make_unique<ParticleRibbonRenderer>(
+		_renderer = ParticleRibbonRenderer::create(
 			_resource.get(),
 			_name + "_Renderer");
 		break;
@@ -202,29 +202,18 @@ std::string ParticleSystem::getName()
 
 float ParticleSystem::getSpawnRate()
 {
-	return _spawnRate;
+	return _emitter->getSpawnRate();
 }
 
 void ParticleSystem::init()
 {
 	auto commandList = _device->getCommandList();
 
-	_resource = std::make_unique<ParticleResource>(
-		_device->getD3dDevice(), 
-		commandList.Get());
-	_emitter = std::make_unique<ParticleEmitter>(
-		_resource.get(),
-		_name + "_Emitter");
-	_sorter = std::make_unique<ParticleSorter>(
-		_device->getD3dDevice(),
-		_resource.get(),
-		_name + "_Sorter");
-	_simulator = std::make_unique<ParticleSimulator>(
-		_resource.get(),
-		_name + "_Simulator");
-	_renderer = std::make_unique<ParticleRenderer>(
-		_resource.get(),
-		_name + "_Renderer");
+	_resource = ParticleResource::create(commandList.Get());
+	_emitter = ParticleEmitter::create(_resource.get(), _name + "_Emitter");
+	_sorter = ParticleSorter::create(_resource.get(), _name + "_Sorter");
+	_simulator = ParticleSimulator::create(_resource.get(), _name + "_Simulator");
+	_renderer = ParticleSpriteRenderer::create(_resource.get(), _name + "_Renderer");
 
 	//_device->submitCommands(commandList);
 }

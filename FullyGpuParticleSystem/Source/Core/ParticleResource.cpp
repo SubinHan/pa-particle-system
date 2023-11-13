@@ -1,5 +1,6 @@
 #include "Core/ParticleResource.h"
 
+#include "Core/DxDevice.h"
 #include "Model/Particle.h"
 #include "Util/DxDebug.h"
 #include "Util/DxUtil.h"
@@ -7,15 +8,26 @@
 #include "d3d11.h"
 
 // should be power of 2. (for sort)
-//static constexpr int PARTICLES_BUFFER_SIZE = 1'048'576 / 2;
+static constexpr int PARTICLES_BUFFER_SIZE = 1'048'576;
+static constexpr int USABLE_PARTICLES_BUFFER_SIZE = PARTICLES_BUFFER_SIZE - 1;
 //static constexpr int PARTICLES_BUFFER_SIZE = 65'536;
-static constexpr int PARTICLES_BUFFER_SIZE = 16384;
+//static constexpr int PARTICLES_BUFFER_SIZE = 16384;
 
 
 using namespace DirectX;
 
+std::unique_ptr<ParticleResource> ParticleResource::create(ID3D12GraphicsCommandList* cmdList)
+{
+	auto created = 
+		std::make_unique<ParticleResource>(DxDevice::getInstance().getD3dDevice(), cmdList);
+
+	return std::move(created);
+}
+
 ParticleResource::ParticleResource(Microsoft::WRL::ComPtr<ID3D12Device> device, ID3D12GraphicsCommandList* cmdList) :
-	_device(device)
+	_device(device),
+	_spawnRatePerSecond(0.0f),
+	_averageLifetime(0.0f)
 {
 	_commandSizePerFrame = getMaxNumParticles() * sizeof(ParticleIndirectCommand);
 	_commandBufferCounterOffset = alignForUavCounter(ParticleResource::_commandSizePerFrame);
@@ -127,6 +139,29 @@ CD3DX12_GPU_DESCRIPTOR_HANDLE ParticleResource::getIndirectCommandsUavGpuHandle(
 	return _hIndirectCommandGpuUav;
 }
 
+void ParticleResource::onEmittingPolicyChanged(float spawnRatePerSecond, float averageLifetime)
+{
+	_spawnRatePerSecond = spawnRatePerSecond;
+	_averageLifetime = averageLifetime;
+}
+
+UINT ParticleResource::getEstimatedCurrentNumAliveParticles()
+{
+	return _spawnRatePerSecond * _averageLifetime * 1.5f;
+}
+
+UINT ParticleResource::getEstimatedCurrentNumAliveParticlesAlignedPowerOfTwo()
+{
+	UINT estimated = getEstimatedCurrentNumAliveParticles();
+	UINT result = 1;
+	while (result < estimated)
+	{
+		result <<= 1;
+	}
+
+	return result;
+}
+
 void ParticleResource::transitParticlesToSrv(ID3D12GraphicsCommandList* cmdList)
 {
 	const auto particlesToSrv = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -190,7 +225,7 @@ void ParticleResource::transitCommandBufferToUav(ID3D12GraphicsCommandList* cmdL
 int ParticleResource::getMaxNumParticles()
 {
 	// index 0 is reserved. (used for sorting)
-	return PARTICLES_BUFFER_SIZE - 1;
+	return USABLE_PARTICLES_BUFFER_SIZE;
 }
 
 int ParticleResource::getReservedParticlesBufferSize()

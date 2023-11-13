@@ -1,16 +1,11 @@
 #include "ParticleSystemShaders/Particle.hlsl"
+#include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
 cbuffer cbPreSortConstants : register(b0)
 {
 	uint fillEndIndex;
 	uint fillNumber;
 }
-
-RWStructuredBuffer<Particle> particles		: register(u0);
-
-RWStructuredBuffer<uint> aliveIndices	: register(u1);
-RWByteAddressBuffer counters			: register(u2);
-
 
 [numthreads(256, 1, 1)]
 void PreSortCS(

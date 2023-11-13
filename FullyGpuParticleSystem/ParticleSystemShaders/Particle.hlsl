@@ -1,3 +1,6 @@
+#ifndef PARTICLE_HLSL
+#define PARTICLE_HLSL
+
 struct Particle
 {
 	float3 Position;
@@ -26,3 +29,4 @@ struct Particle
 static const uint PARTICLECOUNTER_OFFSET_NUMDEADS = 0;
 static const uint PARTICLECOUNTER_OFFSET_NUMALIVES = 4;
 static const uint PARTICLECOUNTER_OFFSET_NUMALIVES_POST_UPDATE = 8;
+#endif

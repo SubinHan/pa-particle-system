@@ -1,9 +1,11 @@
 #include "ParticleSystemShaders/Util.hlsl"
 #include "ParticleSystemShaders/Particle.hlsl"
-#include "ParticleSystemShaders/ParticleSystem.hlsl"
+#include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
-cbuffer cbEmitConstants : register(b1)
+cbuffer cbEmitConstants : register(b0)
 {
+	float4x4 gWorld;
+
 	uint EmitCount;
 	float3 Postion;
 
@@ -13,13 +15,6 @@ cbuffer cbEmitConstants : register(b1)
 
 	float TotalTime;
 }
-
-RWStructuredBuffer<Particle> particles	: register(u0);
-
-RWStructuredBuffer<uint> aliveIndices	: register(u1);
-RWStructuredBuffer<uint> deadIndices	: register(u2);
-
-RWByteAddressBuffer counters			: register(u3);
 
 #define NUM_THREADS 256
 

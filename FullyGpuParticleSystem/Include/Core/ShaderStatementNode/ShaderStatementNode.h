@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <Windows.h>
+#include <assert.h>
 
 struct ID3D12Resource;
 
@@ -26,6 +27,9 @@ public:
 	virtual bool isResourceViewCreated(int index) const { return false; }
 	virtual CD3DX12_GPU_DESCRIPTOR_HANDLE getResourceGpuHandle(int index) const { return CD3DX12_GPU_DESCRIPTOR_HANDLE{}; }
 
+	virtual float getEvaluatedFloat() const { assert(0 && "Calling getEvaluatedFloat() is not expected on this node.");  return 0.0f; };
+
 protected:
 	std::string _variableName;
+	float _evaluatedFloat;
 };

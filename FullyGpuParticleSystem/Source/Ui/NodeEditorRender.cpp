@@ -1,11 +1,11 @@
 #include "Ui/NodeEditorRender.h"
 
-#include "Core/ParticleRenderer.h"
 #include "Core/HlslTranslatorRenderPs.h"
+#include "Core/ParticleRenderPass.h"
 #include "Ui/UiNodeFactory.h"
 #include "Ui/NodeType.h"
 
-NodeEditorRender::NodeEditorRender(ParticleRenderer* renderer) :
+NodeEditorRender::NodeEditorRender(ParticleRenderPass* renderer) :
 	NodeEditor(),
 	_renderer(renderer)
 {
@@ -22,21 +22,6 @@ void NodeEditorRender::onCompileButtonClicked()
 {
 	HlslTranslatorRenderPs translator(_nodes, _links);
 	translator.translateTo(_renderer);
-
-	// TODO: change to translateTo
-	//auto blob = translator.compileShader();
-
-	//_renderer->setSpritePixelShader(blob);
-
-	//blob = translator.compileShader([](std::wstring path)
-	//	{
-	//		return DxUtil::compileShader(
-	//			path,
-	//			nullptr,
-	//			"RibbonParticlePS",
-	//			"ps_5_1");
-	//	});
-	//_renderer->setRibbonPixelShader(blob);
 }
 
 std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorRender::getCreatableNodes() const

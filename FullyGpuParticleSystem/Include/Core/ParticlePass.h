@@ -24,13 +24,14 @@ public:
 	std::string getName();
 
 	ID3D12RootSignature* getRootSignature();
-	ID3DBlob* getShader();
-	ID3D12PipelineState* getPipelineStateObject();
 
 	void setShaderStatementGraph(std::shared_ptr<ShaderStatementGraph> graph);
 	std::shared_ptr<ShaderStatementGraph> getShaderStatementGraph();
 
 protected:
+	bool isShaderDirty() const;
+	void setShaderDirty(bool newIsShaderDirty);
+	virtual void onShaderStatementGraphChanged() {};
 
 	virtual std::vector<CD3DX12_ROOT_PARAMETER> buildRootParameter() = 0;
 	virtual int getNumSrvUsing() = 0;
@@ -46,5 +47,7 @@ protected:
 	std::shared_ptr<ShaderStatementGraph> _shaderStatementGraph;
 
 private:
+	bool _isShaderDirty;
+
 	std::string _name;
 };

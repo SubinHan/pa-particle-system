@@ -7,11 +7,21 @@
 #include "Model/RendererType.h"
 #include "Model/RibbonTextureUvType.h"
 
-static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/Generated/";
+static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
+
+std::unique_ptr<ParticleRibbonRenderer> ParticleRibbonRenderer::create(ParticleResource* resource, std::string name)
+{
+	auto created =
+		std::make_unique<ParticleRibbonRenderer>(resource, name);
+
+	created->buildRootSignature();
+
+	return std::move(created);
+}
 
 ParticleRibbonRenderer::ParticleRibbonRenderer(ParticleResource* resource, std::string name) :
 	ParticleRenderPass(resource, name),
-	_currentRibbonTextureUvType(RibbonTextureUvType::SegmentBased)
+	_currentRibbonTextureUvType(RibbonTextureUvType::Size)
 {
 	buildShaders();
 	setShaders();
@@ -27,13 +37,15 @@ void ParticleRibbonRenderer::render(
 
 	if (isShaderDirty())
 	{
+		buildRootSignature();
 		rebuildGraphicsPsos();
+		setShaderDirty(false);
 	}
 
 	computeIndirectCommand(cmdList, _computeIndirectCommandPso.Get());
 	executeIndirectCommand(
 		cmdList, 
-		_ribbonOpaquePso.Get(),
+		isOpaque()? _ribbonOpaquePso.Get() : _ribbonTranslucentPso.Get(),
 		D3D_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST,
 		objectConstants,
 		passCb);
@@ -122,7 +134,7 @@ void ParticleRibbonRenderer::rebuildGraphicsPsos()
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC ribbonOpaquePsoDesc;
 	ZeroMemory(&ribbonOpaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	ribbonOpaquePsoDesc.InputLayout = { getInputLayout().data(), static_cast<UINT>(getInputLayout().size()) };
-	ribbonOpaquePsoDesc.pRootSignature = getRenderRootSignature();
+	ribbonOpaquePsoDesc.pRootSignature = getRootSignature();
 	ribbonOpaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	ribbonOpaquePsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 	ribbonOpaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -194,7 +206,7 @@ void ParticleRibbonRenderer::rebuildGraphicsPsos()
 void ParticleRibbonRenderer::setShaders()
 {
 	setVertexShader(_vertexShader);
-	setRibbonTextureUvType(RibbonTextureUvType::DistanceBased);
+	setRibbonTextureUvType(RibbonTextureUvType::SegmentBased);
 	setDomainShader(_domainShader);
 	setPixelShader(HlslGeneratorRender::generateDefaultPixelShader("RibbonParticlePS"));
 }

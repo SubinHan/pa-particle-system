@@ -8,7 +8,8 @@
 ParticlePass::ParticlePass(ParticleResource* resource, std::string name) :
 	Hashable(),
 	_resource(resource),
-	_name(name)
+	_name(name),
+	_shaderStatementGraph()
 {
 }
 
@@ -25,11 +26,22 @@ ID3D12RootSignature* ParticlePass::getRootSignature()
 void ParticlePass::setShaderStatementGraph(std::shared_ptr<ShaderStatementGraph> graph)
 {
 	_shaderStatementGraph = graph;
+	onShaderStatementGraphChanged();
 }
 
 std::shared_ptr<ShaderStatementGraph> ParticlePass::getShaderStatementGraph()
 {
 	return _shaderStatementGraph;
+}
+
+bool ParticlePass::isShaderDirty() const
+{
+	return _isShaderDirty;
+}
+
+void ParticlePass::setShaderDirty(bool newIsShaderDirty)
+{
+	_isShaderDirty = newIsShaderDirty;
 }
 
 void ParticlePass::buildRootSignature()
@@ -41,29 +53,32 @@ void ParticlePass::buildRootSignature()
 	int curSrvRegister = getNumSrvUsing();
 	int curUavRegister = getNumUavUsing();
 
-	for (int i = 0; i < _shaderStatementGraph->getSize(); ++i)
+	if (_shaderStatementGraph)
 	{
-		const int numResourceToBind = _shaderStatementGraph->getNode(i)->getNumResourcesToBind();
-
-		if (numResourceToBind == 0)
-			continue;
-
-		for (int j = 0; j < numResourceToBind; ++j)
+		for (int i = 0; i < _shaderStatementGraph->getSize(); ++i)
 		{
-			if (_shaderStatementGraph->getNode(i)->getResourceViewType(j) == ResourceViewType::Srv)
-			{
-				tables.emplace_back();
+			const int numResourceToBind = _shaderStatementGraph->getNode(i)->getNumResourcesToBind();
 
-				int index = tables.size() - 1;
-				tables[index].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, curSrvRegister++);
+			if (numResourceToBind == 0)
+				continue;
+
+			for (int j = 0; j < numResourceToBind; ++j)
+			{
+				if (_shaderStatementGraph->getNode(i)->getResourceViewType(j) == ResourceViewType::Srv)
+				{
+					tables.emplace_back();
+
+					int index = tables.size() - 1;
+					tables[index].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, curSrvRegister++);
+				}
 			}
 		}
-	}
 
-	for (int i = 0; i < tables.size(); ++i)
-	{
-		slotRootParameter.emplace_back();
-		slotRootParameter[curRootParameterSlot++].InitAsDescriptorTable(1, &tables[i]);
+		for (int i = 0; i < tables.size(); ++i)
+		{
+			slotRootParameter.emplace_back();
+			slotRootParameter[curRootParameterSlot++].InitAsDescriptorTable(1, &tables[i]);
+		}
 	}
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc;

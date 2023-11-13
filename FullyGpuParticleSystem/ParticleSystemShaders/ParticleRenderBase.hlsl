@@ -1,5 +1,4 @@
 #include "ParticleSystemShaders/Particle.hlsl"
-#include "ParticleSystemShaders/ParticleSystem.hlsl"
 #include "ParticleSystemShaders/Util.hlsl"
 #include "ParticleSystemShaders/ParticleRenderPass.hlsl"
 
@@ -18,13 +17,11 @@ struct SpritePixelIn
 	float2 TexC : TEXCOORD;
 	uint ThreadId : THREADID;
 };
-
-StructuredBuffer<Particle> particles : register(t0);
-StructuredBuffer<uint> aliveIndices : register(t1);
-
 %t
 
-RWByteAddressBuffer counters			: register(u0);
+RWStructuredBuffer<Particle> particles : register(u0);
+RWStructuredBuffer<uint> aliveIndices : register(u1);
+RWByteAddressBuffer counters			: register(u2);
 
 %u
 
