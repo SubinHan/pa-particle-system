@@ -43,7 +43,7 @@ SpriteVertexOut SpriteParticleVS(
 	SpriteVertexOut vertexOut;
 
 	const float4 posW = mul(float4(particle.Position, 1.0f), gWorld);
-	vertexOut.CenterW = posW;
+	vertexOut.CenterW = posW.xyz;
 
 	float initialLifetime = particle.InitialLifetime;
 	float remainLifetime = particle.RemainLifetime;
@@ -64,7 +64,7 @@ void SpriteParticleGS(
 	point SpriteVertexOut gin[1],
 	inout TriangleStream<SpritePixelIn> triStream)
 {
-	float3 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
+	float4 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
 	float3 up = mul(upView, gInvView).xyz;
 	float3 look = normalize(gEyePosW - gin[0].CenterW);
 	
@@ -208,7 +208,7 @@ RibbonHullOut RibbonParticleHS_SegmentBased(InputPatch<RibbonVertexOut, 4> p,
 {
 	RibbonHullOut hout;
 
-	float3 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
+	float4 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
 	float3 up = mul(upView, gInvView).xyz;
 
 	const float3 offset0 = up * p[0].Size;
@@ -275,7 +275,7 @@ RibbonHullOut RibbonParticleHS_Stretched(InputPatch<RibbonVertexOut, 4> p,
 {
 	RibbonHullOut hout;
 
-	float3 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
+	float4 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
 	float3 up = mul(upView, gInvView).xyz;
 
 	const float3 offset0 = up * p[0].Size;
@@ -344,7 +344,7 @@ RibbonHullOut RibbonParticleHS_DistanceBased(InputPatch<RibbonVertexOut, 4> p,
 {
 	RibbonHullOut hout;
 
-	float3 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
+	float4 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
 	float3 up = mul(upView, gInvView).xyz;
 
 	const float3 offset0 = up * p[0].Size;
@@ -438,7 +438,7 @@ RibbonPixelIn RibbonParticleDS(PatchTess patchTess,
 
 	float4 posW = mul(float4(pos, 1.0f), gWorld);
 	dout.PosH = mul(posW, gViewProj);
-	dout.PosW = posW;
+	dout.PosW = posW.xyz;
 	dout.NormalW = float3(0.0f, 0.0f, 0.0f); // unused
 
 	float2 upTexU = lerp(ribbonPatch[0].TexC, ribbonPatch[2].TexC, uv.x);

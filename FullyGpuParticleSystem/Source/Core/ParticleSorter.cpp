@@ -32,34 +32,36 @@ ParticleSorter::ParticleSorter(ParticleResource* resource, std::string name) :
 {
 	buildShaders();
 	setComputeShader(_shaderBySpawnOrder);
+
+	auto& device = DxDevice::getInstance();
 }
 
 void ParticleSorter::sortParticles(ID3D12GraphicsCommandList* cmdList)
 {
+	_resource->uavBarrier(cmdList);
 	_preSorter->preSortParticles(cmdList);
 
 	readyDispatch(cmdList);
+	const auto maxNumParticles = _resource->getEstimatedCurrentNumAliveParticlesAlignedPowerOfTwo();
+
+	const auto numGroupsX = static_cast<UINT>(ceilf(maxNumParticles / 256.0f));
+	const auto numGroupsY = 1;
+	const auto numGroupsZ = 1;
+
+	for (int sequenceSize = 2; sequenceSize <= maxNumParticles; sequenceSize <<= 1)
 	{
-		const auto maxNumParticles = _resource->getEstimatedCurrentNumAliveParticlesAlignedPowerOfTwo();
-
-		const auto numGroupsX = static_cast<UINT>(ceilf(maxNumParticles / 256.0f));
-		const auto numGroupsY = 1;
-		const auto numGroupsZ = 1;
-
-		for (int sequenceSize = 2; sequenceSize <= maxNumParticles; sequenceSize <<= 1)
+		for (int stage = sequenceSize >> 1; stage > 0; stage >>= 1)
 		{
-			for (int stage = sequenceSize >> 1; stage > 0; stage >>= 1)
+			const SortConstants c =
 			{
-				const SortConstants c =
-				{
-					maxNumParticles,
-					sequenceSize,
-					stage,
-				};
+				maxNumParticles,
+				sequenceSize,
+				stage,
+			};
 
-				setConstants(cmdList, &c);
-				cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
-			}
+			setConstants(cmdList, &c);
+			_resource->uavBarrier(cmdList);
+			cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
 		}
 	}
 }

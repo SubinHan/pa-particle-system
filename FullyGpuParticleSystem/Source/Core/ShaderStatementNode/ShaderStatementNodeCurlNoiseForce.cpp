@@ -1,7 +1,6 @@
 #include "Core/ShaderStatementNode/ShaderStatementNodeCurlNoiseForce.h"
 
 #include "Core/DxDevice.h"
-#include "Util/MathHelper.h"
 #include "Util/DxDebug.h"
 
 #include <d3dx12.h>
@@ -26,6 +25,8 @@ ShaderStatementNodeCurlNoiseForce::~ShaderStatementNodeCurlNoiseForce()
 {
 	DxDevice& device = DxDevice::getInstance();
 	device.unregisterCbvSrvUavDescriptorDemander(this);
+
+	delete[] _noiseData;
 }
 
 int ShaderStatementNodeCurlNoiseForce::getNumDescriptorsToDemand() const
@@ -146,7 +147,7 @@ void ShaderStatementNodeCurlNoiseForce::buildResource()
 		nullptr,
 		IID_PPV_ARGS(&_uploadBufferResource)));
 
-	DirectX::XMFLOAT3* noiseData =
+	_noiseData =
 		new DirectX::XMFLOAT3[TEXTURE_SIZE * TEXTURE_SIZE * TEXTURE_SIZE];
 	int sizeSquare = TEXTURE_SIZE * TEXTURE_SIZE;
 
@@ -162,13 +163,13 @@ void ShaderStatementNodeCurlNoiseForce::buildResource()
 				float y = (MathHelper::randF() - 0.5f) * _amplitude;
 				float z = (MathHelper::randF() - 0.5f) * _amplitude;
 
-				noiseData[index] = DirectX::XMFLOAT3(x, y, z);
+				_noiseData[index] = DirectX::XMFLOAT3(x, y, z);
 			}
 		}
 	}
 
 	D3D12_SUBRESOURCE_DATA subResourceData = {};
-	subResourceData.pData = noiseData;
+	subResourceData.pData = _noiseData;
 	subResourceData.RowPitch = sizeSquare * sizeof(DirectX::XMFLOAT3);
 	subResourceData.SlicePitch = TEXTURE_SIZE;
 
@@ -188,7 +189,6 @@ void ShaderStatementNodeCurlNoiseForce::buildResource()
 	commandList->ResourceBarrier(1, &copyDestToRead);
 
 	device.submitCommands(commandList);
-	delete[] noiseData;
 }
 
 

@@ -32,10 +32,11 @@ void ParticlePreSorter::preSortParticles(ID3D12GraphicsCommandList* cmdList)
 		0,
 	};
 
+
 	readyDispatch(cmdList);
 	setConstants(cmdList, &c);
 
-	const auto maxNumParticles = _resource->getMaxNumParticles();
+	const auto maxNumParticles = _resource->getReservedParticlesBufferSize();
 
 	const auto numGroupsX = static_cast<UINT>(ceilf(maxNumParticles / 256.0f));
 	const auto numGroupsY = 1;

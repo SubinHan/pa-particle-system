@@ -3,6 +3,7 @@
 #include "Core/ShaderStatementNode/ShaderStatementNode.h"
 
 #include "Core/ICbvSrvUavDemander.h"
+#include "Util/MathHelper.h"
 
 #include <wrl.h>
 
@@ -42,4 +43,5 @@ private:
 	CD3DX12_GPU_DESCRIPTOR_HANDLE _hGpu;
 
 	bool _srvCreated;
+	DirectX::XMFLOAT3* _noiseData;
 };

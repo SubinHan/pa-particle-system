@@ -13,8 +13,8 @@ std::string ShaderStatementNodeNewRandFloat4::generateStatements() const
 	const float seedZ = seed + 0.3f;
 	const float seedW = seed + 0.4f;
 	return "float4 " + _variableName + 
-		" = float4(random(" + std::to_string(seedX) + " + DeltaTime + float(dispatchThreadId.x)), " +
-		"random(" + std::to_string(seedY) + " + DeltaTime + float(dispatchThreadId.x)), " +
-		"random(" + std::to_string(seedZ) + " + DeltaTime + float(dispatchThreadId.x)), " +
-		"random(" + std::to_string(seedW) + " + DeltaTime + float(dispatchThreadId.x)));";
+		" = float4(random(" + std::to_string(seedX) + " + TotalTime + float(dispatchThreadId.x)), " +
+		"random(" + std::to_string(seedY) + " + TotalTime + float(dispatchThreadId.x)), " +
+		"random(" + std::to_string(seedZ) + " + TotalTime + float(dispatchThreadId.x)), " +
+		"random(" + std::to_string(seedW) + " + TotalTime + float(dispatchThreadId.x)));";
 }

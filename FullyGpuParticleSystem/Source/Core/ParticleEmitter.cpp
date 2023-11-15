@@ -48,7 +48,7 @@ ParticleEmitter::~ParticleEmitter() = default;
 void ParticleEmitter::setSpawnRate(float spawnRate)
 {
 	_spawnRate = spawnRate;
-	_spawnRateInv = 1.0f / _spawnRate;
+	_spawnRateInv = 1.0 / _spawnRate;
 	_resource->onEmittingPolicyChanged(_spawnRate, _averageLifetime);
 }
 
@@ -60,9 +60,10 @@ float ParticleEmitter::getSpawnRate()
 void ParticleEmitter::emitParticles(
 	ID3D12GraphicsCommandList* cmdList,
 	const ObjectConstants& objectConstants,
-	const GameTimer& gt)
+	const double deltaTime,
+	const double totalTime)
 {
-	_deltaTimeAfterSpawn += gt.deltaTime();
+	_deltaTimeAfterSpawn += deltaTime;
 	unsigned int numSpawn = 0;
 
 	numSpawn = _deltaTimeAfterSpawn * _spawnRate;
@@ -70,17 +71,17 @@ void ParticleEmitter::emitParticles(
 	if (numSpawn == 0)
 		return;
 
-	_deltaTimeAfterSpawn -= _spawnRateInv * static_cast<float>(numSpawn);
-	_deltaTimeAfterSpawn = max(0.0f, _deltaTimeAfterSpawn);
+	_deltaTimeAfterSpawn -= _spawnRateInv * static_cast<double>(numSpawn);
+	_deltaTimeAfterSpawn = max(0.0, _deltaTimeAfterSpawn);
 
 	EmitConstants c = {
 		objectConstants._world,
 		numSpawn,
 		DirectX::XMFLOAT3{0.0f, 0.0f, 0.0f}, 
 		DirectX::XMFLOAT2{0.0f, 0.0f},
-		gt.deltaTime(),
+		deltaTime,
 		_resource->getMaxNumParticles(),
-		gt.totalTime(),
+		totalTime,
 	};
 
 	readyDispatch(cmdList);
@@ -89,6 +90,7 @@ void ParticleEmitter::emitParticles(
 	const auto numGroupsX = static_cast<UINT>(ceilf(numSpawn / 256.0f));
 	const auto numGroupsY = 1;
 	const UINT numGroupsZ = 1;
+	_resource->uavBarrier(cmdList);
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
 }
 

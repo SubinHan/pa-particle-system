@@ -33,7 +33,7 @@ SpriteVertexOut SpriteParticleVS(
 	SpriteVertexOut vertexOut;
 
 	const float4 posW = mul(float4(particle.Position, 1.0f), gWorld);
-	vertexOut.CenterW = posW;
+	vertexOut.CenterW = posW.xyz;
 
 	float initialLifetime = particle.InitialLifetime;
 	float remainLifetime = particle.RemainLifetime;
@@ -54,7 +54,7 @@ void SpriteParticleGS(
 	point SpriteVertexOut gin[1],
 	inout TriangleStream<SpritePixelIn> triStream)
 {
-	float3 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
+	float4 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
 	float3 up = mul(upView, gInvView).xyz;
 	float3 look = normalize(gEyePosW - gin[0].CenterW);
 

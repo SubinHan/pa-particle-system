@@ -9,10 +9,9 @@
 
 // should be power of 2. (for sort)
 static constexpr int PARTICLES_BUFFER_SIZE = 1'048'576;
-static constexpr int USABLE_PARTICLES_BUFFER_SIZE = PARTICLES_BUFFER_SIZE - 1;
 //static constexpr int PARTICLES_BUFFER_SIZE = 65'536;
-//static constexpr int PARTICLES_BUFFER_SIZE = 16384;
-
+//static constexpr int PARTICLES_BUFFER_SIZE = 4096;
+static constexpr int USABLE_PARTICLES_BUFFER_SIZE = PARTICLES_BUFFER_SIZE - 1;
 
 using namespace DirectX;
 
@@ -114,6 +113,11 @@ ID3D12Resource* ParticleResource::getCountersResource()
 	return _countersBuffer.Get();
 }
 
+ID3D12Resource* ParticleResource::getCountersTempResource()
+{
+	return _countersTempBuffer.Get();
+}
+
 ID3D12Resource* ParticleResource::getIndirectCommandsResource()
 {
 	return _indirectCommandsBuffer.Get();
@@ -147,7 +151,7 @@ void ParticleResource::onEmittingPolicyChanged(float spawnRatePerSecond, float a
 
 UINT ParticleResource::getEstimatedCurrentNumAliveParticles()
 {
-	return _spawnRatePerSecond * _averageLifetime * 1.5f;
+	return static_cast<UINT>(min(_spawnRatePerSecond * _averageLifetime * 1.5, USABLE_PARTICLES_BUFFER_SIZE));
 }
 
 UINT ParticleResource::getEstimatedCurrentNumAliveParticlesAlignedPowerOfTwo()
@@ -232,6 +236,20 @@ int ParticleResource::getReservedParticlesBufferSize()
 {
 	// index 0 is reserved. (used for sorting)
 	return PARTICLES_BUFFER_SIZE;
+}
+
+void ParticleResource::uavBarrier(ID3D12GraphicsCommandList* cmdList)
+{
+	static const D3D12_RESOURCE_BARRIER barriers[5] =
+	{
+		CD3DX12_RESOURCE_BARRIER::UAV(getAliveIndicesResourceFront()),
+		CD3DX12_RESOURCE_BARRIER::UAV(getAliveIndicesResourceBack()),
+		CD3DX12_RESOURCE_BARRIER::UAV(getCountersResource()),
+		CD3DX12_RESOURCE_BARRIER::UAV(getParticlesResource()),
+		CD3DX12_RESOURCE_BARRIER::UAV(getDeadIndicesResource()),
+	};
+
+	cmdList->ResourceBarrier(_countof(barriers), barriers);
 }
 
 void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
@@ -319,6 +337,14 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 			nullptr,
 			IID_PPV_ARGS(_countersBuffer.GetAddressOf())));
 
+		ThrowIfFailed(_device->CreateCommittedResource(
+			&heapPropertiesDefault,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			IID_PPV_ARGS(_countersTempBuffer.GetAddressOf())));
+
 		auto heapPropertiesUpload = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 		// In order to copy CPU memory data into our default buffer, we need to create
 		// an intermediate upload heap. 
@@ -349,6 +375,7 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 
 		cmdList->ResourceBarrier(1, &barrierCopy);
 		UpdateSubresources<1>(cmdList, _countersBuffer.Get(), _countersUploadBuffer.Get(), 0, 0, 1, &subResourceData);
+		UpdateSubresources<1>(cmdList, _countersTempBuffer.Get(), _countersUploadBuffer.Get(), 0, 0, 1, &subResourceData);
 
 		auto barrierUpdate = CD3DX12_RESOURCE_BARRIER::Transition(
 			_countersBuffer.Get(),
@@ -384,7 +411,6 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 	{
 		auto heapPropertiesDefault = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(_commandBufferCounterOffset + sizeof(UINT), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
-
 
 		// Create the actual default buffer resource.
 		ThrowIfFailed(_device->CreateCommittedResource(
@@ -422,4 +448,9 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 		D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT);
 
 	cmdList->ResourceBarrier(1, &commandBufferToIndirectArgument);
+
+	_aliveIndicesBuffer[0]->SetName(L"AliveIndices0");
+	_aliveIndicesBuffer[1]->SetName(L"AliveIndices1");
+	_deadIndicesBuffer->SetName(L"DeadIndices");
+	_countersBuffer->SetName(L"Counters");
 }

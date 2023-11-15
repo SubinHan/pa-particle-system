@@ -18,6 +18,7 @@ class ParticlePostSimulator;
 struct ParticleSimulateConstants
 {
 	float DeltaTime;
+	float TotalTime;
 };
 
 class ParticleSimulator : public ParticleComputePass
@@ -27,7 +28,10 @@ public:
 
 	ParticleSimulator(ParticleResource* resource, std::string name);
 	~ParticleSimulator();
-	void simulateParticles(ID3D12GraphicsCommandList* cmdList, float deltaTime);
+	void simulateParticles(
+		ID3D12GraphicsCommandList* cmdList,
+		double deltaTime,
+		double totalTime);
 
 protected:
 	virtual bool needsStaticSampler() override;

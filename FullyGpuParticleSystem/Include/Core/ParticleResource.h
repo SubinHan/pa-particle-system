@@ -42,6 +42,7 @@ public:
 	ID3D12Resource* getAliveIndicesResourceBack();
 	ID3D12Resource* getDeadIndicesResource();
 	ID3D12Resource* getCountersResource();
+	ID3D12Resource* getCountersTempResource();
 	ID3D12Resource* getIndirectCommandsResource();
 	ID3D12Resource* getIndirectCommandsCounterResetResource();
 
@@ -64,6 +65,8 @@ public:
 	int getMaxNumParticles();
 	int getReservedParticlesBufferSize();
 
+	void uavBarrier(ID3D12GraphicsCommandList* cmdList);
+
 private:
 	void buildResources(ID3D12GraphicsCommandList* cmdList);
 
@@ -78,6 +81,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> _countersUploadBuffer = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> _indirectCommandsBuffer;
 	Microsoft::WRL::ComPtr<ID3D12Resource> _indirectCommandsCounterResetBuffer;
+	Microsoft::WRL::ComPtr<ID3D12Resource> _countersTempBuffer;
 	
 	Microsoft::WRL::ComPtr<ID3D12Resource> _sortBuffer;
 

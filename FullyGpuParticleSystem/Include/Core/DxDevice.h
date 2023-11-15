@@ -78,6 +78,7 @@ public:
 	UINT getCurrentFence();
 	UINT increaseFence();
 
+	void handleDeviceLost();
 
 public:
 	static constexpr UINT SWAP_CHAIN_BUFFER_COUNT = 2;

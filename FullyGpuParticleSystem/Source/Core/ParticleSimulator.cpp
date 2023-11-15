@@ -32,9 +32,12 @@ ParticleSimulator::ParticleSimulator(ParticleResource* resource, std::string nam
 
 ParticleSimulator::~ParticleSimulator() = default;
 
-void ParticleSimulator::simulateParticles(ID3D12GraphicsCommandList* cmdList, float deltaTime)
+void ParticleSimulator::simulateParticles(
+	ID3D12GraphicsCommandList* cmdList,
+	double deltaTime,
+	double totalTime)
 {
-	ParticleSimulateConstants c = { deltaTime };
+	ParticleSimulateConstants c = { static_cast<float>(deltaTime), static_cast<float>(totalTime) };
 
 	readyDispatch(cmdList);
 	setConstants(cmdList, &c);
@@ -42,8 +45,10 @@ void ParticleSimulator::simulateParticles(ID3D12GraphicsCommandList* cmdList, fl
 	const auto numGroupsX = static_cast<UINT>(ceilf(_resource->getMaxNumParticles() / 256.0f));
 	const auto numGroupsY = 1;
 	const UINT numGroupsZ = 1;
+	_resource->uavBarrier(cmdList);
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
 
+	_resource->uavBarrier(cmdList);
 	_postSimulator->postSimulate(cmdList);
 
 	_resource->swapAliveIndicesBuffer();

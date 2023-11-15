@@ -14,12 +14,18 @@ cbuffer cbSortConstants : register(b0)
 // if true, the order is ascending.
 bool compare(Particle p1, Particle p2)
 {
+	bool result;
+
 	if (p1.SpawnTime == p2.SpawnTime)
 	{
-		return p1.SpawnOrderInFrame < p2.SpawnOrderInFrame;
+		result = p1.SpawnOrderInFrame < p2.SpawnOrderInFrame;
+	}
+	else
+	{
+		result = p1.SpawnTime < p2.SpawnTime;
 	}
 
-	return p1.SpawnTime < p2.SpawnTime;
+	return result;
 }
 
 [numthreads(NUM_THREADS, 1, 1)]

@@ -65,9 +65,8 @@ private:
 	std::unique_ptr<ParticleRenderPass> _renderer;
 
 	DirectX::XMFLOAT4X4 _world = MathHelper::identity4x4();
-	float _spawnRate;
-	float _spawnRateInv;
-	float _deltaTimeAfterSpawn;
+
+	double _deltaTimeAcc;
 
 	RendererType _currentRendererType;
 

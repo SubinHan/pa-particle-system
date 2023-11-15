@@ -12,14 +12,18 @@
 #include "Model/Material.h"
 #include "Model/RendererType.h"
 
+#if defined(DEBUG) || defined(_DEBUG) 
+#include "pix3.h"
+#endif
+
 #include <iostream>
+
+constexpr double FIXED_DELTA_TIME = 1.0 / 60.0;
 
 ParticleSystem::ParticleSystem(DxDevice* device, std::string name) :
 	_device(device),
 	_name(name),
-	_spawnRate(100.0f),
-	_spawnRateInv(1.0f / _spawnRate),
-	_deltaTimeAfterSpawn(0.0f)
+	_deltaTimeAcc(0.0)
 {
 	init();
 }
@@ -61,32 +65,49 @@ void ParticleSystem::onDraw(
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 0);
 
-	_deltaTimeAfterSpawn += gt.deltaTime();
-	unsigned int numSpawn = 0;
+	_deltaTimeAcc += gt.deltaTime();
 
-	numSpawn = _deltaTimeAfterSpawn * _spawnRate;
-
-	if (numSpawn > 0)
+	if (_deltaTimeAcc >= FIXED_DELTA_TIME)
 	{
-		_deltaTimeAfterSpawn -= _spawnRateInv * static_cast<float>(numSpawn);
-		_deltaTimeAfterSpawn = max(0.0f, _deltaTimeAfterSpawn);
-
+#if defined(DEBUG) || defined(_DEBUG) 
+		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Emission");
+#endif
 		_emitter->emitParticles(
 			commandList,
 			objConstants,
-			gt);
+			_deltaTimeAcc,
+			gt.totalTime());
+#if defined(DEBUG) || defined(_DEBUG) 
+		PIXEndEvent(commandList);
+
+		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Simulation");
+#endif
+		_simulator->simulateParticles(commandList, _deltaTimeAcc, gt.totalTime());
+#if defined(DEBUG) || defined(_DEBUG) 
+		PIXEndEvent(commandList);
+
+		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Sort");
+#endif
+		if (_currentRendererType == RendererType::Ribbon)
+		{
+			_sorter->sortParticles(commandList);
+		}
+#if defined(DEBUG) || defined(_DEBUG) 
+		PIXEndEvent(commandList);
+#endif
+
+		_deltaTimeAcc = 0.0;
 	}
 
-	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 1);
-	_simulator->simulateParticles(commandList, gt.deltaTime());
-
-	if (_currentRendererType == RendererType::Ribbon)
-	{
-		_sorter->sortParticles(commandList);
-	}
-
-	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 2);
+#if defined(DEBUG) || defined(_DEBUG) 
+	PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Render");
+#endif
 	_renderer->render(commandList, objConstants, passCb);
+	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 2);
+#if defined(DEBUG) || defined(_DEBUG) 
+	PIXEndEvent(commandList);
+#endif
+
 
 	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 3);
 

@@ -42,7 +42,8 @@ public:
 	void emitParticles(
 		ID3D12GraphicsCommandList* cmdList,
 		const ObjectConstants& objectConstants,
-		const GameTimer& gt);
+		const double deltaTime,
+		const double totalTime);
 
 protected:
 	virtual int getNum32BitsConstantsUsing() override;
@@ -53,9 +54,9 @@ private:
 	void setDefaultShader();
 
 private:
-	float _spawnRate;
-	float _spawnRateInv;
-	float _deltaTimeAfterSpawn;
+	double _spawnRate;
+	double _spawnRateInv;
+	double _deltaTimeAfterSpawn;
 
 	float _averageLifetime;
 };

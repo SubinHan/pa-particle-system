@@ -281,7 +281,7 @@
 * 월요일:
   * 코드 리팩토링
   * 4주차 목요일에 제시되었던 성능 이슈 해결
-  * 합리적인 성능 비교를 위한 다양한 상황에서의 성능 지표 수집 
+  * 성능 측정 환경 구성
 * 화요일:
 
 
@@ -553,6 +553,7 @@ compileShaders();
       * 이를 통해 첫 파티클로부터 각 파티클까지의 거리를 계산할 수 있으며, 이 값을 그대로(혹은 scaling하여) texture coordinate로 활용함
 
 #### 성능 지표
+* PIX Debugger를 활용하였음 (각 패스에서 이벤트 마킹) [WinPixEventRuntime](https://devblogs.microsoft.com/pix/winpixeventruntime/)
 * 다양한 상황을 고려하여 시간을 측정하였음
   * 파티클의 수(1000, 1000000)
   * 렌더링 방법(스프라이트, 리본)

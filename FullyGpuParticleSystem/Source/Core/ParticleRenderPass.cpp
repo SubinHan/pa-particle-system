@@ -15,7 +15,8 @@ constexpr int ROOT_SLOT_ALIVES_INDICES_BUFFER = ROOT_SLOT_PARTICLES_BUFFER + 1;
 constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER + 1;
 
 ParticleRenderPass::ParticleRenderPass(ParticleResource* resource, std::string name) :
-	ParticlePass(resource, name)
+	ParticlePass(resource, name),
+	_isOpaque(true)
 {
 	buildComputeIndirectRootSignature();
 	buildCommandSignature();

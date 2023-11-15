@@ -6,4 +6,4 @@ RWStructuredBuffer<uint> aliveIndices		: register(u1);
 RWStructuredBuffer<uint> newAliveIndices	: register(u2);
 RWStructuredBuffer<uint> deadIndices		: register(u3);
 
-RWByteAddressBuffer counters				: register(u4);
+globallycoherent RWByteAddressBuffer counters				: register(u4);

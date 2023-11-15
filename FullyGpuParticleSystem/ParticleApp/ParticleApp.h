@@ -47,15 +47,14 @@ private:
 	virtual void update(const GameTimer& gt) override;
 	virtual void draw(const GameTimer& gt) override;
 
-	void drawObjects(ID3D12GraphicsCommandList* commandList, const GameTimer& gt);
-	void drawUi(ID3D12GraphicsCommandList* commandList);
+	void drawObjects(const GameTimer& gt);
+	void drawUi();
 
 	void loadTextures(ID3D12GraphicsCommandList* commandList);
 	void registerCbvSrvUavDescriptors();
 	void buildMaterials();
 	void buildRootSignature();
 	void buildShadersAndInputLayout();
-	void buildBoxGeometry();
 	void buildPso();
 
 	void updateCamera(const GameTimer& gt);

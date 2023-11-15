@@ -39,6 +39,6 @@ void PreSortCS(
 		newParticle.DistanceFromPrevious = 0.0f;
 		newParticle.DistanceFromStart = 0.0f;
 
-		particles[fillNumber] = newParticle;
+		particles[0] = newParticle;
 	}
 }

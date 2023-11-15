@@ -18,9 +18,9 @@ float GameTimer::totalTime() const
 	return (float)(((_currentTime - _pausedTime) - _baseTime) * _secondsPerCount);
 }
 
-float GameTimer::deltaTime() const
+double GameTimer::deltaTime() const
 {
-	return (float)_deltaTime;
+	return _deltaTime;
 }
 
 void GameTimer::reset()

@@ -41,4 +41,6 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderByIndex;
 	Microsoft::WRL::ComPtr<ID3DBlob> _shaderBySpawnOrder;
+
+	ID3D12DescriptorHeap* _descriptorHeaps;
 };

@@ -16,20 +16,27 @@ void DxDevice::init()
 
 void DxDevice::createDevice()
 {
+    UINT dxgiFactoryFlags = 0;
+
 #if defined(DEBUG) || defined(_DEBUG) 
     // Enable the D3D12 debug layer.
     {
         ComPtr<ID3D12Debug> debugController;
-        ComPtr<ID3D12Debug1> debugController1;
+        ComPtr<ID3D12Debug3> debugController1;
+        ComPtr<ID3D12DeviceRemovedExtendedDataSettings> dredSettings;
+        ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings)));
         ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
         debugController->QueryInterface(IID_PPV_ARGS(&debugController1));
         debugController->EnableDebugLayer();
         debugController1->SetEnableGPUBasedValidation(true);
+        dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+        dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
 
+        dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
     }
 #endif
 
-    ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&_dxgiFactory)));
+    ThrowIfFailed(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&_dxgiFactory)));
 
     HRESULT hardwareResult = D3D12CreateDevice(
         nullptr,
@@ -495,9 +502,29 @@ void DxDevice::swapBuffers()
     _currentBackBufferIndex = (_currentBackBufferIndex + 1) % SWAP_CHAIN_BUFFER_COUNT;
 }
 
+UINT DxDevice::getCurrentFence()
+{
+    return _currentFence;
+}
+
 UINT DxDevice::increaseFence()
 {
     return ++_currentFence;
+}
+
+void DxDevice::handleDeviceLost()
+{
+#if defined(DEBUG) || defined(_DEBUG) 
+    ComPtr<ID3D12DeviceRemovedExtendedData> dred;
+    ThrowIfFailed(_d3dDevice->QueryInterface(IID_PPV_ARGS(&dred)));
+    D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT DredAutoBreadcrumbsOutput;
+    D3D12_DRED_PAGE_FAULT_OUTPUT DredPageFaultOutput;
+    ThrowIfFailed(dred->GetAutoBreadcrumbsOutput(&DredAutoBreadcrumbsOutput));
+    ThrowIfFailed(dred->GetPageFaultAllocationOutput(&DredPageFaultOutput));
+    HRESULT removedReason = _d3dDevice->GetDeviceRemovedReason();
+    _com_error err(removedReason);
+    OutputDebugString(err.ErrorMessage());
+#endif
 }
 
 UINT DxDevice::getClientWidth()
@@ -518,6 +545,11 @@ void DxDevice::setClientWidth(UINT width)
 void DxDevice::setClientHeight(UINT height)
 {
     _clientHeight = height;
+}
+
+ComPtr<ID3D12Fence> DxDevice::getFence()
+{
+    return _fence;
 }
 
 D3D12_VIEWPORT& DxDevice::getScreenViewport()

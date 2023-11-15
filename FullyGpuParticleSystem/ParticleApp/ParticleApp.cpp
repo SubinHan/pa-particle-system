@@ -1,5 +1,6 @@
 #include "ParticleApp.h"
 
+#include "Core/DxDevice.h"
 #include "Core/ImguiInitializer.h"
 #include "Core/UploadBuffer.h"
 #include "Core/PassConstantBuffer.h"
@@ -14,12 +15,15 @@
 #include "Util/DDSTextureLoader.h"
 #include "Ui/NodeEditorEmit.h"
 #include "Ui/ParticleSystemController.h"
-
 #include "Core/ShaderStatementNode/ShaderStatementNodeCurlNoiseForce.h"
 
+#include <d3d12.h>
 #include "imgui.h"
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
+
+#include <chrono>
+#include <thread>
 
 using namespace DirectX;
 
@@ -60,28 +64,15 @@ bool ParticleApp::initialize()
 		std::make_shared<PassConstantBuffer>(
 			_device->getD3dDevice());
 
-	// be careful about order!! load texture - buildDescriptors - buildMaterials
+	// be careful to order!! load texture - buildDescriptors - buildMaterials
 	loadTextures(commandList.Get());
 	registerCbvSrvUavDescriptors();
 	buildMaterials();
 	buildRootSignature();
 	buildShadersAndInputLayout();
-	buildBoxGeometry();
 	buildPso();
 
 	_device->submitCommands(commandList);
-
-	//// init Particle Systems
-	//auto newWorld = DirectX::XMMatrixRotationY(MathHelper::Pi);
-	//DirectX::XMFLOAT4X4 newWorldFloat4x4;
-	//DirectX::XMStoreFloat4x4(&newWorldFloat4x4, newWorld);
-	//_particleSystems[0]->setWorldTransform(newWorldFloat4x4);
-
-	//_particleSystems[0]->setMaterial(_materials["particle"].get());
-	//_particleSystems[1]->setMaterial(_materials["particle"].get());
-
-	//_particleSystems[0]->setSpawnRate(10000.0f);
-	//_particleSystems[1]->setSpawnRate(10000.0f);
 
 	return true;
 }
@@ -97,6 +88,16 @@ void ParticleApp::onResize()
 void ParticleApp::update(const GameTimer& gt)
 {
 	updateCamera(gt);
+
+	//auto& device = DxDevice::getInstance();
+
+	//if (device.getCurrentFence() != 0 && device.getFence()->GetCompletedValue() < device.getCurrentFence())
+	//{
+	//	HANDLE eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
+	//	ThrowIfFailed(device.getFence()->SetEventOnCompletion(_device->getCurrentFence(), eventHandle));
+	//	WaitForSingleObject(eventHandle, INFINITE);
+	//	CloseHandle(eventHandle);
+	//}
 
 	XMMATRIX view = XMLoadFloat4x4(&this->_view);
 	XMMATRIX proj = XMLoadFloat4x4(&this->_proj);
@@ -132,17 +133,12 @@ void ParticleApp::update(const GameTimer& gt)
 
 void ParticleApp::draw(const GameTimer& gt)
 {
-	auto currentBackBuffer = _device->getCurrentBackBuffer();
+	drawObjects(gt);
+	drawUi();
 
 	auto commandList = _device->startRecordingCommands();
-	drawObjects(commandList.Get(), gt);
-	_device->submitCommands(commandList);
 
-	commandList = _device->startRecordingCommands();
-	drawUi(commandList.Get());
-	_device->submitCommands(commandList);
-
-	commandList = _device->startRecordingCommands();
+	auto currentBackBuffer = _device->getCurrentBackBuffer();
 	auto barrierDraw = CD3DX12_RESOURCE_BARRIER::Transition(
 		currentBackBuffer,
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
@@ -152,11 +148,13 @@ void ParticleApp::draw(const GameTimer& gt)
 	commandList->ResourceBarrier(1, &barrierDraw);
 
 	_device->submitCommands(commandList);
-	_device->swapBuffers();
+    _device->swapBuffers();
 }
 
-void ParticleApp::drawObjects(ID3D12GraphicsCommandList* commandList, const GameTimer& gt)
+void ParticleApp::drawObjects(const GameTimer& gt)
 {
+	auto commandList = _device->startRecordingCommands();
+
 	auto cbvSrvUavDescriptorHeap = _device->getCbvSrvUavDescriptorHeap();
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { cbvSrvUavDescriptorHeap.Get() };
@@ -184,37 +182,17 @@ void ParticleApp::drawObjects(ID3D12GraphicsCommandList* commandList, const Game
 	commandList->OMSetRenderTargets(1, &currentBackBufferView,
 		true, &depthStencilView);
 
-	commandList->SetGraphicsRootSignature(_rootSignature.Get());
-
-	auto vertexBuffers = _boxGeometry->VertexBufferView();
-	auto indexBuffer = _boxGeometry->IndexBufferView();
-
-	commandList->IASetVertexBuffers(0, 1, &vertexBuffers);
-	commandList->IASetIndexBuffer(&indexBuffer);
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	commandList->SetGraphicsRootDescriptorTable(
-		0, cbvSrvUavDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-
-	commandList->SetPipelineState(
-		_pso.Get());
-
-	//commandList->DrawIndexedInstanced(
-	//	_boxGeometry->DrawArgs["box"].IndexCount,
-	//	1, 
-	//	0,
-	//	0, 
-	//	0);
-
-	fireDrawToParticleSystems(commandList, gt);
+	fireDrawToParticleSystems(commandList.Get(), gt);
+	_device->submitCommands(commandList);
 }
 
-void ParticleApp::drawUi(ID3D12GraphicsCommandList* commandList)
+void ParticleApp::drawUi()
 {
+	auto commandList = _device->startRecordingCommands();
+
 	auto cbvSrvUavDescriptorHeap = _device->getCbvSrvUavDescriptorHeap();
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { cbvSrvUavDescriptorHeap.Get() };
-	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	auto currentBackBuffer = _device->getCurrentBackBuffer();
 	auto currentBackBufferView = _device->getCurrentBackBufferViewHandle();
@@ -225,6 +203,8 @@ void ParticleApp::drawUi(ID3D12GraphicsCommandList* commandList)
 	commandList->RSSetScissorRects(1, &_device->getScissorRect());
 	commandList->OMSetRenderTargets(1, &currentBackBufferView,
 		true, &depthStencilView);
+
+
 	// render imgui
 
 	// Start the Dear ImGui frame
@@ -238,7 +218,8 @@ void ParticleApp::drawUi(ID3D12GraphicsCommandList* commandList)
 	// Rendering
 	ImGui::Render();
 
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+	_device->submitCommands(commandList);
 }
 
 void ParticleApp::loadTextures(ID3D12GraphicsCommandList* commandList)
@@ -271,12 +252,6 @@ void ParticleApp::loadTextures(ID3D12GraphicsCommandList* commandList)
 }
 void ParticleApp::registerCbvSrvUavDescriptors()
 {
-	//// register textures
-	//for (auto& [_, texture] : _textures)
-	//{
-	//	_device->registerCbvSrvUavDescriptorDemander(texture.get());
-	//}
-
 	// register cbv demander
 
 	_device->registerCbvSrvUavDescriptorDemander(
@@ -359,84 +334,6 @@ void ParticleApp::buildShadersAndInputLayout()
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,
 		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 	};
-}
-
-void ParticleApp::buildBoxGeometry()
-{
-	using namespace DirectX;
-
-	std::array<ParticleAppVertex, 8> vertices =
-	{
-		ParticleAppVertex({XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White)}),
-		ParticleAppVertex({XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black)}),
-		ParticleAppVertex({XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red)}),
-		ParticleAppVertex({XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green)}),
-		ParticleAppVertex({XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue)}),
-		ParticleAppVertex({XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow)}),
-		ParticleAppVertex({XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan)}),
-		ParticleAppVertex({XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta)})
-	};
-
-	std::array<std::uint16_t, 36> indices =
-	{
-		0, 1, 2,
-		0, 2, 3,
-
-		4, 6, 5,
-		4, 7, 6,
-
-		4, 5, 1,
-		4, 1, 0,
-
-		3, 2, 6,
-		3, 6, 7,
-
-		1, 5, 6,
-		1, 6, 2,
-
-		4, 0, 3,
-		4, 3, 7
-	};
-
-	const UINT vbByteSize = (UINT)vertices.size() * sizeof(ParticleAppVertex);
-	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
-
-	_boxGeometry = std::make_unique<MeshGeometry>();
-	_boxGeometry->Name = "boxGeo";
-
-	ThrowIfFailed(D3DCreateBlob(vbByteSize, &_boxGeometry->VertexBufferCPU));
-	CopyMemory(_boxGeometry->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
-
-	ThrowIfFailed(D3DCreateBlob(vbByteSize, &_boxGeometry->IndexBufferCPU));
-	CopyMemory(_boxGeometry->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
-
-	_boxGeometry->VertexBufferGPU = DxUtil::createDefaultBuffer(
-		_device->getD3dDevice().Get(),
-		_device->getCommandList().Get(),
-		vertices.data(),
-		vbByteSize,
-		_boxGeometry->VertexBufferUploader
-	);
-
-	_boxGeometry->IndexBufferGPU = DxUtil::createDefaultBuffer(
-		_device->getD3dDevice().Get(),
-		_device->getCommandList().Get(),
-		indices.data(),
-		ibByteSize,
-		_boxGeometry->IndexBufferUploader
-	);
-
-	_boxGeometry->VertexByteStride = sizeof(ParticleAppVertex);
-	_boxGeometry->VertexBufferByteSize = vbByteSize;
-	_boxGeometry->IndexFormat = DXGI_FORMAT_R16_UINT;
-	_boxGeometry->IndexBufferByteSize = ibByteSize;
-
-	SubmeshGeometry submesh;
-	submesh.IndexCount = (UINT)indices.size();
-	submesh.StartIndexLocation = 0;
-	submesh.BaseVertexLocation = 0;
-
-	_boxGeometry->DrawArgs["box"] = submesh;
 }
 
 void ParticleApp::buildPso()

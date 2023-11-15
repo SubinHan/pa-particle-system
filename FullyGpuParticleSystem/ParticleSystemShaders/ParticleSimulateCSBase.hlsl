@@ -6,6 +6,7 @@
 cbuffer cbUpdateConstants : register(b0)
 {
 	float DeltaTime;
+	float TotalTime;
 }
 
 %t
@@ -35,7 +36,7 @@ void SimulateCS(
 		const int particleIndex = aliveIndices[id];
 		particles[particleIndex].RemainLifetime -= DeltaTime;
 
-		const bool isExpired = particles[particleIndex].RemainLifetime <= 0.f;
+		bool isExpired = particles[particleIndex].RemainLifetime <= 0.f;
 
 		if (isExpired)
 		{
@@ -46,7 +47,6 @@ void SimulateCS(
 			deadIndices[numDeads] = particleIndex;
 			
 			particles[particleIndex] = (Particle)0;
-
 		}
 		else
 		{

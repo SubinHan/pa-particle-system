@@ -7,7 +7,7 @@ public:
 	GameTimer();
 
 	float totalTime() const;
-	float deltaTime() const;
+	double deltaTime() const;
 
 	void reset();
 	void start();
