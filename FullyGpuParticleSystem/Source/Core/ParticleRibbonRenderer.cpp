@@ -3,6 +3,7 @@
 #include "Core/DxDevice.h"
 #include "Core/ParticleResource.h"
 #include "Core/HlslGeneratorRender.h"
+#include "Core/ParticleDistanceCalculator.h"
 #include "Model/Geometry.h"
 #include "Model/RendererType.h"
 #include "Model/RibbonTextureUvType.h"
@@ -21,6 +22,7 @@ std::unique_ptr<ParticleRibbonRenderer> ParticleRibbonRenderer::create(ParticleR
 
 ParticleRibbonRenderer::ParticleRibbonRenderer(ParticleResource* resource, std::string name) :
 	ParticleRenderPass(resource, name),
+	_distanceCalculator(ParticleDistanceCalculator::create(resource, name + "distanceCalculator")),
 	_currentRibbonTextureUvType(RibbonTextureUvType::Size)
 {
 	buildShaders();
@@ -28,18 +30,23 @@ ParticleRibbonRenderer::ParticleRibbonRenderer(ParticleResource* resource, std::
 	buildComputePsos();
 }
 
+ParticleRibbonRenderer::~ParticleRibbonRenderer() = default;
+
 void ParticleRibbonRenderer::render(
 	ID3D12GraphicsCommandList* cmdList,
 	const ObjectConstants& objectConstants, 
 	const PassConstantBuffer& passCb)
 {
-	//calculateRibbonDistanceFromStart(cmdList);
-
 	if (isShaderDirty())
 	{
 		buildRootSignature();
 		rebuildGraphicsPsos();
 		setShaderDirty(false);
+	}
+
+	if (_currentRibbonTextureUvType == RibbonTextureUvType::DistanceBased)
+	{
+		_distanceCalculator->calculateRibbonDistanceFromStart(cmdList);
 	}
 
 	computeIndirectCommand(cmdList, _computeIndirectCommandPso.Get());

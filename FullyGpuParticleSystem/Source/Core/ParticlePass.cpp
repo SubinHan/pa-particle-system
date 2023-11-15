@@ -14,6 +14,8 @@ ParticlePass::ParticlePass(ParticleResource* resource, std::string name) :
 {
 }
 
+ParticlePass::~ParticlePass() = default;
+
 std::string ParticlePass::getName()
 {
 	return _name;

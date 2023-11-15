@@ -23,6 +23,8 @@ ParticleRenderPass::ParticleRenderPass(ParticleResource* resource, std::string n
 	generateEmptyGeometry();
 }
 
+ParticleRenderPass::~ParticleRenderPass() = default;
+
 void ParticleRenderPass::bindGraphicsResourcesOfRegisteredNodes(ID3D12GraphicsCommandList* commandList, int startRootSlot)
 {
 	for (int i = 0; i < _shaderStatementGraph->getSize(); ++i)

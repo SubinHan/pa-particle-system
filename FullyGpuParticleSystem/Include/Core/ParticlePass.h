@@ -20,6 +20,7 @@ class ParticlePass : public Hashable
 {
 public:
 	ParticlePass(ParticleResource* resource, std::string name);
+	virtual ~ParticlePass();
 
 	std::string getName();
 

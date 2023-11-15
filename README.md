@@ -283,7 +283,34 @@
   * 4주차 목요일에 제시되었던 성능 이슈 해결
   * 성능 측정 환경 구성
 * 화요일:
-
+  * 이슈 발생:
+    * 현상:
+      * reserved된 파티클 버퍼의 길이를 넘어가는 수준으로 파티클이 생성된 시점 전후에 디바이스가 제거됨.
+      * 가령 한 particle system이 최대 1만 개의 파티클을 관리할 수 있다면, 현재 파티클의 수와 상관 없이 총 1만 개의 파티클을 생성한 시점 이후에 디바이스가 제거됨.
+    * 재현 방법:
+      * DebugLayer에서 [GPUbaseValidation 혹은 DRED auto-breadcrumb]를 하나라도 활성화하지 않을 시(둘 다 비활성화 시) 이상 현상 발생
+      * 위 조건이더라도, 수직동기화를 사용 시 문제가 발생하지 않음
+      * 프레임 최초의 compute shader dispatch인 particle emission은 정상 동작 함.
+    * 직접적인 원인: 
+      * UAV의 값 갱신이 제대로 되지 않는 것으로 추정
+      * 살아있는 파티클의 수를 관리하는 counter가 비정상적인 UAV 값 갱신으로 인해 최대 파티클 수를 넘어가게 되고, 이로 인해 out of bounds access가 일어나는 것으로 추정
+* 수요일:
+  * 이슈 해결:
+    * 원인: UAV를 사용하는 Dispatch 사이에 UAV Resource Barrier를 두지 않음
+    * 질문: GPU based validation이나 auto-breadcrumb를 사용 시 자원들의 상태를 관리하기 위해서 삽입되는 코드들로 인해 이러한 문제가 드러나지 않은 것일까?
+  * 현재 CPU 측에서는 단 하나의 frame resource만 관리하고 갱신함
+    * cpu 측에서 관리하는 자원이 카메라 자원 밖에 없고 나머지는 전부 gpu 자원이기 때문에 필요 없다고 생각하였음.
+    * 그래도 혹시나 성능에 영향이 있을까 3개의 frame 자원을 활용하도록 만들어보았음 => 성능에 실질적인 변화 없음.
+    * 임시적으로 스파게티 코드로 구현한 것이라 혹여 이후에 버그의 원인이 될까 두려워 다시 원복.
+  * IndirectDrawing Timing?
+    * <img src="./img/pix_indirect_drawing_timing.png">
+    * ExecuteIndirect 명령 이전에 비정상적으로 긴 gpu 유휴가 확인됨 (마우스 커서 부분이 ExecuteIndirect)
+    * 100만 개의 파티클을 그린 예인데, drawing 시간이 비정상적으로 짧은 것으로 보아 gpu 유휴로 보이는 부분들이 전부 drawing에 활용되는 시간이라 추정
+    * 확인을 위해 Indirect Drawing을 시연하는 DirectX12 Sample의 timing 역시 측정해보았고 같은 현상을 볼 수 있었음.
+  * 
+* 목요일:
+  * ㅁ
+  * 
 
 <hr/>
 
@@ -552,13 +579,18 @@ compileShaders();
         * <img src="./img/brent_kung_adder.png">
       * 이를 통해 첫 파티클로부터 각 파티클까지의 거리를 계산할 수 있으며, 이 값을 그대로(혹은 scaling하여) texture coordinate로 활용함
 
-#### 성능 지표
+#### 성능 개선 기록
 * PIX Debugger를 활용하였음 (각 패스에서 이벤트 마킹) [WinPixEventRuntime](https://devblogs.microsoft.com/pix/winpixeventruntime/)
 * 다양한 상황을 고려하여 시간을 측정하였음
   * 파티클의 수(1000, 1000000)
   * 렌더링 방법(스프라이트, 리본)
   * 블렌딩 방법(불투명, 반투명)
-  * 
+* CPU 측에서 여러 개의 frame resource 관리
+  * cpu 측에서 관리하는 자원이 카메라 자원 밖에 없고 나머지는 전부 gpu 자원이기 때문에 필요 없다고 생각하였음.
+  * 그래도 혹시나 성능에 영향이 있을까 3개의 frame 자원을 활용하도록 만들어보았음 => 성능에 실질적인 변화 없음.
+  * 임시적으로 스파게티 코드로 구현한 것이라 혹여 이후에 버그의 원인이 될까 두려워 다시 원복.
+* ㅁ
+* 
 
 
 <hr/>

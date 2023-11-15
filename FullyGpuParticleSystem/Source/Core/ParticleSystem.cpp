@@ -12,9 +12,7 @@
 #include "Model/Material.h"
 #include "Model/RendererType.h"
 
-#if defined(DEBUG) || defined(_DEBUG) 
 #include "pix3.h"
-#endif
 
 #include <iostream>
 
@@ -56,105 +54,35 @@ void ParticleSystem::onDraw(
 
 	XMStoreFloat4x4(&objConstants._world, XMMatrixTranspose(world));
 
-	//D3D12_QUERY_HEAP_DESC heapDesc = {};
-	//heapDesc.Type = D3D12_QUERY_HEAP_TYPE_TIMESTAMP;
-	//heapDesc.Count = 4;
-	//heapDesc.NodeMask = 0;
-	//ID3D12QueryHeap* pQueryHeap;
-	//_device->getD3dDevice()->CreateQueryHeap(&heapDesc, IID_PPV_ARGS(&pQueryHeap));
-
-	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 0);
-
 	_deltaTimeAcc += gt.deltaTime();
 
 	if (_deltaTimeAcc >= FIXED_DELTA_TIME)
 	{
-#if defined(DEBUG) || defined(_DEBUG) 
 		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Emission");
-#endif
 		_emitter->emitParticles(
 			commandList,
 			objConstants,
 			_deltaTimeAcc,
 			gt.totalTime());
-#if defined(DEBUG) || defined(_DEBUG) 
 		PIXEndEvent(commandList);
 
 		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Simulation");
-#endif
 		_simulator->simulateParticles(commandList, _deltaTimeAcc, gt.totalTime());
-#if defined(DEBUG) || defined(_DEBUG) 
 		PIXEndEvent(commandList);
 
 		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Sort");
-#endif
 		if (_currentRendererType == RendererType::Ribbon)
 		{
 			_sorter->sortParticles(commandList);
 		}
-#if defined(DEBUG) || defined(_DEBUG) 
 		PIXEndEvent(commandList);
-#endif
 
 		_deltaTimeAcc = 0.0;
 	}
 
-#if defined(DEBUG) || defined(_DEBUG) 
 	PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Render");
-#endif
 	_renderer->render(commandList, objConstants, passCb);
-	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 2);
-#if defined(DEBUG) || defined(_DEBUG) 
 	PIXEndEvent(commandList);
-#endif
-
-
-	//commandList->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 3);
-
-	//ID3D12Resource* pReadbackBuffer = nullptr;
-
-	//auto heapPropertiesDefault = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-	//auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(UINT64) * 4);
-
-	//// Create the actual default buffer resource.
-	//ThrowIfFailed(_device->getD3dDevice()->CreateCommittedResource(
-	//	&heapPropertiesDefault,
-	//	D3D12_HEAP_FLAG_NONE,
-	//	&resourceDesc,
-	//	D3D12_RESOURCE_STATE_GENERIC_READ,
-	//	nullptr,
-	//	IID_PPV_ARGS(&pReadbackBuffer)));
-
-	//auto barrierCopy = CD3DX12_RESOURCE_BARRIER::Transition(
-	//	pReadbackBuffer,
-	//	D3D12_RESOURCE_STATE_GENERIC_READ,
-	//	D3D12_RESOURCE_STATE_COPY_DEST
-	//);
-	//commandList->ResourceBarrier(1, &barrierCopy);
-
-	//commandList->ResolveQueryData(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 0, 4, pReadbackBuffer, 0);
-
-	//auto barrierRead = CD3DX12_RESOURCE_BARRIER::Transition(
-	//	pReadbackBuffer,
-	//	D3D12_RESOURCE_STATE_COPY_DEST,
-	//	D3D12_RESOURCE_STATE_GENERIC_READ
-	//);
-	//commandList->ResourceBarrier(1, &barrierRead);
-
-	//UINT64* pTimestamps;
-	//ThrowIfFailed(pReadbackBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pTimestamps)));
-
-	//UINT64 start = pTimestamps[0];
-	//UINT64 afterEmit = pTimestamps[1];
-	//UINT64 afterSimulate = pTimestamps[2];
-	//UINT64 afterRender = pTimestamps[3];
-
-	//auto cmdQueue = _device->getCommandQueue();
-	//UINT64 frequency;
-	//cmdQueue->GetTimestampFrequency(&frequency);
-	//double time = static_cast<double>(afterRender - afterSimulate) / frequency;
-
-	//std::cout << time << std::endl;
 }
 
 void ParticleSystem::setWorldTransform(const DirectX::XMFLOAT4X4& newWorldTransform)

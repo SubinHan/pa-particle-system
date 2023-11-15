@@ -9,12 +9,15 @@
 enum class RendererType;
 enum class RibbonTextureUvType;
 
+class ParticleDistanceCalculator;
+
 class ParticleRibbonRenderer : public ParticleRenderPass
 {
 public:
 	static std::unique_ptr<ParticleRibbonRenderer> create(ParticleResource* resource, std::string name);
 
 	ParticleRibbonRenderer(ParticleResource* resource, std::string name);
+	virtual ~ParticleRibbonRenderer();
 
 	virtual void render(
 		ID3D12GraphicsCommandList* cmdList,
@@ -30,6 +33,8 @@ private:
 	void buildComputePsos();
 
 private:
+	std::unique_ptr<ParticleDistanceCalculator> _distanceCalculator;
+
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _ribbonOpaquePso;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _ribbonTranslucentPso;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _computeIndirectCommandPso;

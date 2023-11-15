@@ -19,6 +19,8 @@ ParticleComputePass::ParticleComputePass(ParticleResource* resource, std::string
 {
 }
 
+ParticleComputePass::~ParticleComputePass() = default;
+
 void ParticleComputePass::setParticlesComputeRootUav(ID3D12GraphicsCommandList* commandList)
 {
 	commandList->SetComputeRootUnorderedAccessView(ROOT_SLOT_PARTICLES_BUFFER, _resource->getParticlesResource()->GetGPUVirtualAddress());

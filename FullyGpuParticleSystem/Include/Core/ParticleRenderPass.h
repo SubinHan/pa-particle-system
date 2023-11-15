@@ -17,6 +17,7 @@ class ParticleRenderPass : public ParticlePass
 {
 public:
 	ParticleRenderPass(ParticleResource* resource, std::string name);
+	virtual ~ParticleRenderPass();
 
 	virtual void render(
 		ID3D12GraphicsCommandList* cmdList,

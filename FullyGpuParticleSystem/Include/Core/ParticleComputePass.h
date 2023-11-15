@@ -6,6 +6,7 @@ class ParticleComputePass : public ParticlePass
 {
 public:
 	ParticleComputePass(ParticleResource* resource, std::string name);
+	virtual ~ParticleComputePass();
 
 	void setComputeShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
 
