@@ -595,9 +595,9 @@ compileShaders();
 
     | \# of Particles | Renderer Type | Blending Type | Ribbon UV Mode    | Emission | Simulation | Post-simulation | Pre-sort | Sort     | Pre-prefix Sum | Prefix Sum | Computing Indirect Commands | Indirect Drawing | Total     |
     | --------------- | ------------- | ------------- | ----------------- | -------- | ---------- | --------------- | -------- | -------- | -------------- | ---------- | --------------------------- | ---------------- | --------- |
-    | 1,000,000       | Sprite        | Opaque        | \-                | 0.074592 | 11.902528  | 0.001088        | 0.000000 | 0.000000 | 0.000000       | 0.000000   | 0.516608                    | 13.619712        | 26.114528 |
-    | 10,000          | Ribbon        | Opaque        | Segment based     | 0.005984 | 0.057088   | 0.001088        | 0.042048 | 0.450976 | 0.000000       | 0.000000   | 0.032448                    | 4.077952         | 4.667584  |
-    | 10,000          | Ribbon        | Opaque        | Distance based UV | 0.005216 | 0.059200   | 0.001088        | 0.042208 | 0.463328 | 0.038752       | 0.873888   | 0.032352                    | 3.980608         | 5.496640  |
+    | 1,000,000       | Sprite        | Opaque        | \-                | 0.074592 | <span style="color:red">11.902528</span>  | 0.001088        | 0.000000 | 0.000000 | 0.000000       | 0.000000   | 0.516608                    | <span style="color:red">13.619712</span>        | 26.114528 |
+    | 10,000          | Ribbon        | Opaque        | Segment based     | 0.005984 | 0.057088   | 0.001088        | 0.042048 | 0.450976 | 0.000000       | 0.000000   | 0.032448                    | <span style="color:red">4.077952</span>         | 4.667584  |
+    | 10,000          | Ribbon        | Opaque        | Distance based UV | 0.005216 | 0.059200   | 0.001088        | 0.042208 | 0.463328 | 0.038752       | 0.873888   | 0.032352                    | <span style="color:red">3.980608</span>         | 5.496640  |
 
 * 파티클 시스템 구조
   * <img src="./img/particle_system_before.png">
