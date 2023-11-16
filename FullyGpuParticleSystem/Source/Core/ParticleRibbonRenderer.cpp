@@ -3,6 +3,7 @@
 #include "Core/DxDevice.h"
 #include "Core/ParticleResource.h"
 #include "Core/HlslGeneratorRender.h"
+#include "Core/ParticlePreDistanceCalculator.h"
 #include "Core/ParticleDistanceCalculator.h"
 #include "Model/Geometry.h"
 #include "Model/RendererType.h"
@@ -22,6 +23,7 @@ std::unique_ptr<ParticleRibbonRenderer> ParticleRibbonRenderer::create(ParticleR
 
 ParticleRibbonRenderer::ParticleRibbonRenderer(ParticleResource* resource, std::string name) :
 	ParticleRenderPass(resource, name),
+	_preDistanceCalculator(ParticlePreDistanceCalculator::create(resource, name + "preDistanceCalculator")),
 	_distanceCalculator(ParticleDistanceCalculator::create(resource, name + "distanceCalculator")),
 	_currentRibbonTextureUvType(RibbonTextureUvType::Size)
 {
@@ -46,6 +48,7 @@ void ParticleRibbonRenderer::render(
 
 	if (_currentRibbonTextureUvType == RibbonTextureUvType::DistanceBased)
 	{
+		_preDistanceCalculator->preRibbonDistance(cmdList);
 		_distanceCalculator->calculateRibbonDistanceFromStart(cmdList);
 	}
 
@@ -213,7 +216,7 @@ void ParticleRibbonRenderer::rebuildGraphicsPsos()
 void ParticleRibbonRenderer::setShaders()
 {
 	setVertexShader(_vertexShader);
-	setRibbonTextureUvType(RibbonTextureUvType::SegmentBased);
+	setRibbonTextureUvType(RibbonTextureUvType::DistanceBased);
 	setDomainShader(_domainShader);
 	setPixelShader(HlslGeneratorRender::generateDefaultPixelShader("RibbonParticlePS"));
 }

@@ -30,7 +30,7 @@ void PreSortCS(
 		newParticle.Acceleration = float3(0.0f, 0.0f, 0.0f);
 		newParticle.InitialOpacity = 1.0f;
 		newParticle.InitialColor = float3(1.0f, 1.0f, 1.0f);
-		newParticle.RemainLifetime = 0.0f;
+		newParticle.RemainLifetime = 1.0f;
 		newParticle.EndColor = float3(1.0f, 1.0f, 1.0f);
 		newParticle.EndSize = 0.01f;
 		newParticle.EndOpacity = 0.0f;

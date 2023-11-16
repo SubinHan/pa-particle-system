@@ -180,6 +180,7 @@
     <ClInclude Include="Include\Core\ParticleComputePass.h" />
     <ClInclude Include="Include\Core\ParticlePass.h" />
     <ClInclude Include="Include\Core\ParticlePostSimulator.h" />
+    <ClInclude Include="Include\Core\ParticlePreDistanceCalculator.h" />
     <ClInclude Include="Include\Core\ParticlePreSorter.h" />
     <ClInclude Include="Include\Core\ParticleRenderPass.h" />
     <ClInclude Include="Include\Core\ParticleRibbonRenderer.h" />
@@ -278,6 +279,7 @@
     <ClCompile Include="..\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\include\imgui\imnodes.cpp" />
     <ClCompile Include="Source\Core\ParticleComputePass.cpp" />
+    <ClCompile Include="Source\Core\ParticleDistanceCalculator.cpp" />
     <ClCompile Include="Source\Core\ParticlePass.cpp" />
     <ClCompile Include="Source\Core\Hashable.cpp" />
     <ClCompile Include="Source\Core\HlslGeneratorEmit.cpp" />
@@ -289,6 +291,7 @@
     <ClCompile Include="Source\Core\ImguiInitializer.cpp" />
     <ClCompile Include="Source\Core\MaterialManager.cpp" />
     <ClCompile Include="Source\Core\ParticlePostSimulator.cpp" />
+    <ClCompile Include="Source\Core\ParticlePreDistanceCalculator.cpp" />
     <ClCompile Include="Source\Core\ParticlePreSorter.cpp" />
     <ClCompile Include="Source\Core\ParticleRenderPass.cpp" />
     <ClCompile Include="Source\Core\ParticleRibbonRenderer.cpp" />

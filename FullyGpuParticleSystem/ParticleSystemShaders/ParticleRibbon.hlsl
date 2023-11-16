@@ -233,8 +233,8 @@ RibbonHullOut RibbonParticleHS_DistanceBased(InputPatch<RibbonVertexOut, 4> p,
 
 	uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
 
-	float texU0 = p[1].DistanceFromStart * 1.0f;
-	float texU1 = p[2].DistanceFromStart * 1.0f;
+	float texU0 = p[1].DistanceFromStart * 0.5f;
+	float texU1 = p[2].DistanceFromStart * 0.5f;
 
 	if (i == 0)
 	{

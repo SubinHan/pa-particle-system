@@ -9,6 +9,7 @@
 enum class RendererType;
 enum class RibbonTextureUvType;
 
+class ParticlePreDistanceCalculator;
 class ParticleDistanceCalculator;
 
 class ParticleRibbonRenderer : public ParticleRenderPass
@@ -33,6 +34,7 @@ private:
 	void buildComputePsos();
 
 private:
+	std::unique_ptr<ParticlePreDistanceCalculator> _preDistanceCalculator;
 	std::unique_ptr<ParticleDistanceCalculator> _distanceCalculator;
 
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> _ribbonOpaquePso;

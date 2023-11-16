@@ -286,7 +286,7 @@
   * 이슈 발생:
     * 현상:
       * reserved된 파티클 버퍼의 길이를 넘어가는 수준으로 파티클이 생성된 시점 전후에 디바이스가 제거됨.
-      * 가령 한 particle system이 최대 1만 개의 파티클을 관리할 수 있다면, 현재 파티클의 수와 상관 없이 총 1만 개의 파티클을 생성한 시점 이후에 디바이스가 제거됨.
+      * 가령 한 particle system이 최대 1만 개의 파티클을 관리할 수 있다면, 현재 파티클의 수와 상관 없이 대략 1만 개의 파티클을 생성한 시점 이후에 디바이스가 제거됨.
     * 재현 방법:
       * DebugLayer에서 [GPUbaseValidation 혹은 DRED auto-breadcrumb]를 하나라도 활성화하지 않을 시(둘 다 비활성화 시) 이상 현상 발생
       * 위 조건이더라도, 수직동기화를 사용 시 문제가 발생하지 않음
@@ -298,10 +298,6 @@
   * 이슈 해결:
     * 원인: UAV를 사용하는 Dispatch 사이에 UAV Resource Barrier를 두지 않음
     * 질문: GPU based validation이나 auto-breadcrumb를 사용 시 자원들의 상태를 관리하기 위해서 삽입되는 코드들로 인해 이러한 문제가 드러나지 않은 것일까?
-  * 현재 CPU 측에서는 단 하나의 frame resource만 관리하고 갱신함
-    * cpu 측에서 관리하는 자원이 카메라 자원 밖에 없고 나머지는 전부 gpu 자원이기 때문에 필요 없다고 생각하였음.
-    * 그래도 혹시나 성능에 영향이 있을까 3개의 frame 자원을 활용하도록 만들어보았음 => 성능에 실질적인 변화 없음.
-    * 임시적으로 스파게티 코드로 구현한 것이라 혹여 이후에 버그의 원인이 될까 두려워 다시 원복.
   * IndirectDrawing Timing?
     * <img src="./img/pix_indirect_drawing_timing.png">
     * ExecuteIndirect 명령 이전에 비정상적으로 긴 gpu 유휴가 확인됨 (마우스 커서 부분이 ExecuteIndirect)
@@ -309,8 +305,8 @@
     * 확인을 위해 Indirect Drawing을 시연하는 DirectX12 Sample의 timing 역시 측정해보았고 같은 현상을 볼 수 있었음.
   * 
 * 목요일:
-  * ㅁ
-  * 
+  * 성능 측정
+  * 파티클 관리 방법 개선 구상
 
 <hr/>
 
@@ -585,14 +581,28 @@ compileShaders();
   * 파티클의 수(1000, 1000000)
   * 렌더링 방법(스프라이트, 리본)
   * 블렌딩 방법(불투명, 반투명)
-* CPU 측에서 여러 개의 frame resource 관리
-  * cpu 측에서 관리하는 자원이 카메라 자원 밖에 없고 나머지는 전부 gpu 자원이기 때문에 필요 없다고 생각하였음.
-  * 그래도 혹시나 성능에 영향이 있을까 3개의 frame 자원을 활용하도록 만들어보았음 => 성능에 실질적인 변화 없음.
-  * 임시적으로 스파게티 코드로 구현한 것이라 혹여 이후에 버그의 원인이 될까 두려워 다시 원복.
-* ㅁ
-* 
+* 성능 측정 환경 구성
+  * 해상도: FHD (보다 약간 작음)
+  * 파티클은 화면 전체에 분포되어 렌더링
+  * Lifetime: 3s
+  * 예시
+    * Sprite
+      * <img src="./img/performance_test_sprite_example.png">
+    * Ribbon
+      * <img src="./img/performance_test_ribbon_example.png">
+* 성능 측정 
+  * 개선 이전
 
+    | \# of Particles | Renderer Type | Blending Type | Ribbon UV Mode    | Emission | Simulation | Post-simulation | Pre-sort | Sort     | Pre-prefix Sum | Prefix Sum | Computing Indirect Commands | Indirect Drawing | Total     |
+    | --------------- | ------------- | ------------- | ----------------- | -------- | ---------- | --------------- | -------- | -------- | -------------- | ---------- | --------------------------- | ---------------- | --------- |
+    | 1,000,000       | Sprite        | Opaque        | \-                | 0.074592 | 11.902528  | 0.001088        | 0.000000 | 0.000000 | 0.000000       | 0.000000   | 0.516608                    | 13.619712        | 26.114528 |
+    | 10,000          | Ribbon        | Opaque        | Segment based     | 0.005984 | 0.057088   | 0.001088        | 0.042048 | 0.450976 | 0.000000       | 0.000000   | 0.032448                    | 4.077952         | 4.667584  |
+    | 10,000          | Ribbon        | Opaque        | Distance based UV | 0.005216 | 0.059200   | 0.001088        | 0.042208 | 0.463328 | 0.038752       | 0.873888   | 0.032352                    | 3.980608         | 5.496640  |
 
+* 파티클 시스템 구조
+  * <img src="./img/particle_system_before.png">
+  * 1차적 목표: numDeads는 numAlives와 maxParticleCount에 의해서 유도될 수 있다. (atomic operation 필요 X)
+  * 질문: 지금은 인덱스만을 다루고 이를 기반으로 파티클 버퍼를 참조하고 있는데, 인덱스가 아니라 직접 파티클 버퍼를 다루고 값을 다루는 형태로 바꾸면 성능이 많이 개선될까?
 <hr/>
 
 ### 참고문헌 및 코드

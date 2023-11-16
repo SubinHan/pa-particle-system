@@ -34,10 +34,12 @@ void BitonicSortCS(
 {
 	uint id = dispatchThreadId.x;
 
-	uint compareIndex = id ^ stage;
+	if (id >= particlesBufferSize)
+	{
+		return;
+	}
 
-	uint numAlives =
-		counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
+	uint compareIndex = id ^ stage;
 
 	// prevent comparing twice.
 	if (id < compareIndex)

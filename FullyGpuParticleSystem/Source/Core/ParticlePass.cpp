@@ -9,8 +9,9 @@
 ParticlePass::ParticlePass(ParticleResource* resource, std::string name) :
 	Hashable(),
 	_resource(resource),
+	_shaderStatementGraph(std::make_shared<ShaderStatementGraph>()),
 	_name(name),
-	_shaderStatementGraph()
+	_isShaderDirty(false)
 {
 }
 

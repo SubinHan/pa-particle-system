@@ -327,6 +327,9 @@
     <ClInclude Include="Include\Core\ParticlePreSorter.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Core\ParticlePreDistanceCalculator.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -603,6 +606,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\ParticlePreSorter.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ParticleDistanceCalculator.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ParticlePreDistanceCalculator.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
