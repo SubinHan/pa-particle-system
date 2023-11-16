@@ -52,7 +52,10 @@ void ParticleRibbonRenderer::render(
 		_distanceCalculator->calculateRibbonDistanceFromStart(cmdList);
 	}
 
-	computeIndirectCommand(cmdList, _computeIndirectCommandPso.Get());
+	computeIndirectCommand(
+		cmdList, 
+		_computeIndirectCommandPso.Get(),
+		static_cast<UINT>(ceil(static_cast<float>(_resource->getMaxNumParticles()) / 256.0f)));
 	executeIndirectCommand(
 		cmdList, 
 		isOpaque()? _ribbonOpaquePso.Get() : _ribbonTranslucentPso.Get(),

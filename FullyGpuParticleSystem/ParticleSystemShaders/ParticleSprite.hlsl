@@ -23,9 +23,9 @@ struct SpritePixelIn
 };
 
 SpriteVertexOut SpriteParticleVS(
-	uint vid : SV_VertexID)
+	uint iid : SV_InstanceID)
 {
-	const uint threadId = vid;
+	const uint threadId = iid;
 
 	const uint particleIndex = aliveIndices[threadId];
 	Particle particle = particles[particleIndex];

@@ -160,7 +160,8 @@ const std::vector<D3D12_INPUT_ELEMENT_DESC>& ParticleRenderPass::getInputLayout(
 
 void ParticleRenderPass::computeIndirectCommand(
 	ID3D12GraphicsCommandList* cmdList, 
-	ID3D12PipelineState* computePso)
+	ID3D12PipelineState* computePso,
+	UINT numDispatchBlocks)
 {
 	cmdList->SetComputeRootSignature(getIndirectCommandComputeRootSignature());
 	cmdList->SetPipelineState(computePso);
@@ -193,7 +194,7 @@ void ParticleRenderPass::computeIndirectCommand(
 			D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	cmdList->ResourceBarrier(1, &toUav);
 
-	cmdList->Dispatch(static_cast<UINT>(ceil(static_cast<float>(_resource->getMaxNumParticles()) / 256.0f)), 1, 1);
+	cmdList->Dispatch(numDispatchBlocks, 1, 1);
 }
 
 void ParticleRenderPass::executeIndirectCommand(

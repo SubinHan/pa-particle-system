@@ -40,7 +40,7 @@ void ParticleSpriteRenderer::render(
 		setShaderDirty(false);
 	}
 
-	computeIndirectCommand(cmdList, _computeIndirectCommandPso.Get());
+	computeIndirectCommand(cmdList, _computeIndirectCommandPso.Get(), 1);
 	executeIndirectCommand(
 		cmdList,
 		isOpaque()? _spriteOpaquePso.Get() : _spriteTranslucentPso.Get(), 

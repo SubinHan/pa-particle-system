@@ -51,7 +51,10 @@ protected:
 
 	const std::vector<D3D12_INPUT_ELEMENT_DESC>& getInputLayout();
 
-	void computeIndirectCommand(ID3D12GraphicsCommandList* cmdList, ID3D12PipelineState* computePso);
+	void computeIndirectCommand(
+		ID3D12GraphicsCommandList* cmdList, 
+		ID3D12PipelineState* computePso,
+		UINT numDispatchBlocks);
 	void executeIndirectCommand(
 		ID3D12GraphicsCommandList* cmdList, 
 		ID3D12PipelineState* renderPso,

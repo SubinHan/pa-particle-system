@@ -12,21 +12,15 @@ struct IndirectCommand
 RWByteAddressBuffer counters : register(u0);
 AppendStructuredBuffer<IndirectCommand> outputCommands : register(u1);
 
-[numthreads(256, 1, 1)]
+[numthreads(1, 1, 1)]
 void ComputeIndirectCommandsCS(int3 dispatchThreadId : SV_DispatchThreadID)
 {
-	uint id = dispatchThreadId.x;
 	uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
-
-	if (id >= numAlives)
-	{
-		return;
-	}
 	
 	IndirectCommand command;
 	command.IndexCountPerInstance = 1;
-	command.InstanceCount = 1;
-	command.StartIndexLocation = id + 1;
+	command.InstanceCount = numAlives;
+	command.StartIndexLocation = 0;
 	command.BaseVertexLocation = 0;
 	command.StartInstanceLocation = 0;
 
