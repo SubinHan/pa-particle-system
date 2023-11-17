@@ -15,13 +15,14 @@ struct RibbonVertexOut
 };
 
 RibbonVertexOut RibbonParticleVS(
+	uint iid : SV_InstanceID,
 	uint vid : SV_VertexID)
 {
 	RibbonVertexOut vertexOut;
 
 	uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
 
-	const uint threadId = min(vid, numAlives - 1);
+	const uint threadId = min(uint(max(int(iid + vid) - 1, 0)), numAlives - 1);
 	const uint particleIndex = aliveIndices[threadId];
 	Particle particle = particles[particleIndex];
 
@@ -51,7 +52,7 @@ PatchTess ConstantHS(InputPatch<RibbonVertexOut, 4> patch, uint PatchID : SV_Pri
 {
 	PatchTess pt;
 
-	float tess = 10.0f;
+	float tess = 30.0f;
 
 	pt.EdgeTess[0] = tess;
 	pt.EdgeTess[1] = tess;

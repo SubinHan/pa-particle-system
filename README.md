@@ -89,7 +89,8 @@
   *
 
 ##### 진행 중인 Task
-*
+* 성능 최적화
+  * Caching을 고려한 파티클 버퍼 구성
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -125,8 +126,10 @@
 * 불 렌더링
 * Orphan node들을 shader code로 변환하지 않음
 * Ribbon 렌더링
-* 성능 이슈
+* 성능 최적화
   * ExecuteIndirect에서 적절한 maxCommandsCount를 넘기기 (관련 일지 - 4주차 목요일)
+  * Instancing을 이용한 ExecuteIndirect로 commands 개수를 줄이기
+  * 
 
 <hr/>
 
@@ -307,6 +310,10 @@
 * 목요일:
   * 성능 측정
   * 파티클 관리 방법 개선 구상
+* 금요일:
+  * Instancing을 이용해서 커맨드를 제출하도록 수정
+    * 100만 개 sprite 렌더링 14ms -> 4ms
+  * 
 
 <hr/>
 

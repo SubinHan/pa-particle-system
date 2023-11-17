@@ -315,14 +315,12 @@ void ParticleRenderPass::generateEmptyGeometry()
 	using VertexType = DirectX::XMFLOAT3;
 	using IndexType = std::uint32_t;
 
-	auto maxNumParticles = _resource->getMaxNumParticles() + 1;
 	std::vector<VertexType> vertices(1);
-	std::vector<IndexType> indices(maxNumParticles);
+	std::vector<IndexType> indices(4);
 
-	indices[0] = 0;
-	for (int i = 1; i < indices.size(); ++i)
+	for (int i = 0; i < indices.size(); ++i)
 	{
-		indices[i] = i - 1;
+		indices[i] = i;
 	}
 
 	const UINT vbByteSize = (UINT)vertices.size() * sizeof(VertexType);

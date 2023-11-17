@@ -55,7 +55,7 @@ void ParticleRibbonRenderer::render(
 	computeIndirectCommand(
 		cmdList, 
 		_computeIndirectCommandPso.Get(),
-		static_cast<UINT>(ceil(static_cast<float>(_resource->getMaxNumParticles()) / 256.0f)));
+		1);
 	executeIndirectCommand(
 		cmdList, 
 		isOpaque()? _ribbonOpaquePso.Get() : _ribbonTranslucentPso.Get(),
