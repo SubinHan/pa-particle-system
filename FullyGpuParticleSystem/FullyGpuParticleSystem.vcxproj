@@ -177,8 +177,11 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="FullyGpuParticleSystem.h" />
     <ClInclude Include="Include\Core\MaterialManager.h" />
+    <ClInclude Include="Include\Core\ParticleAliveMover.h" />
     <ClInclude Include="Include\Core\ParticleComputePass.h" />
+    <ClInclude Include="Include\Core\ParticleDestroyer.h" />
     <ClInclude Include="Include\Core\ParticlePass.h" />
+    <ClInclude Include="Include\Core\ParticlePostDestroyer.h" />
     <ClInclude Include="Include\Core\ParticlePostSimulator.h" />
     <ClInclude Include="Include\Core\ParticlePreDistanceCalculator.h" />
     <ClInclude Include="Include\Core\ParticlePreSorter.h" />
@@ -278,7 +281,9 @@
     <ClCompile Include="..\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\include\imgui\imnodes.cpp" />
+    <ClCompile Include="Source\Core\ParticleAliveMover.cpp" />
     <ClCompile Include="Source\Core\ParticleComputePass.cpp" />
+    <ClCompile Include="Source\Core\ParticleDestroyer.cpp" />
     <ClCompile Include="Source\Core\ParticleDistanceCalculator.cpp" />
     <ClCompile Include="Source\Core\ParticlePass.cpp" />
     <ClCompile Include="Source\Core\Hashable.cpp" />
@@ -290,6 +295,7 @@
     <ClCompile Include="Source\Core\HlslTranslatorRenderPs.cpp" />
     <ClCompile Include="Source\Core\ImguiInitializer.cpp" />
     <ClCompile Include="Source\Core\MaterialManager.cpp" />
+    <ClCompile Include="Source\Core\ParticlePostDestroyer.cpp" />
     <ClCompile Include="Source\Core\ParticlePostSimulator.cpp" />
     <ClCompile Include="Source\Core\ParticlePreDistanceCalculator.cpp" />
     <ClCompile Include="Source\Core\ParticlePreSorter.cpp" />
@@ -417,9 +423,15 @@
     </FxCompile>
     <FxCompile Include="ParticleSystemShaders\ParticleDestroyCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleSystemShaders\ParticleMoveAlivesCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleSystemShaders\ParticlePreRibbonDistanceCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

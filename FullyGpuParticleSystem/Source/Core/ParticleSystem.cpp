@@ -5,6 +5,7 @@
 #include "Core/ParticleResource.h"
 #include "Core/ParticleEmitter.h"
 #include "Core/ParticleSorter.h"
+#include "Core/ParticleDestroyer.h"
 #include "Core/ParticleSimulator.h"
 #include "Core/ParticleSpriteRenderer.h"
 #include "Core/ParticleRibbonRenderer.h"
@@ -66,15 +67,17 @@ void ParticleSystem::onDraw(
 			gt.totalTime());
 		PIXEndEvent(commandList);
 
-		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Simulation");
-		_simulator->simulateParticles(commandList, _deltaTimeAcc, gt.totalTime());
+		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Destruction");
+		_destroyer->destroyExpiredParticles(
+			commandList,
+			_deltaTimeAcc,
+			getSpawnRate(),
+			3.0f,
+			3.0f);
 		PIXEndEvent(commandList);
 
-		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Sort");
-		if (_currentRendererType == RendererType::Ribbon)
-		{
-			_sorter->sortParticles(commandList);
-		}
+		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Simulation");
+		_simulator->simulateParticles(commandList, _deltaTimeAcc, gt.totalTime());
 		PIXEndEvent(commandList);
 
 		_deltaTimeAcc = 0.0;
@@ -161,8 +164,7 @@ void ParticleSystem::init()
 	_resource = ParticleResource::create(commandList.Get());
 	_emitter = ParticleEmitter::create(_resource.get(), _name + "_Emitter");
 	_sorter = ParticleSorter::create(_resource.get(), _name + "_Sorter");
+	_destroyer = ParticleDestroyer::create(_resource.get(), _name + "_Destroyer");
 	_simulator = ParticleSimulator::create(_resource.get(), _name + "_Simulator");
 	_renderer = ParticleSpriteRenderer::create(_resource.get(), _name + "_Renderer");
-
-	//_device->submitCommands(commandList);
 }

@@ -32,7 +32,7 @@ void DxDevice::createDevice()
         //dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
         //dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
 
-        //dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+        dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
     }
 #endif
 

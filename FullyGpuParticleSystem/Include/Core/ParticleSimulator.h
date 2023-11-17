@@ -41,5 +41,4 @@ private:
 	void setDefaultShader();
 
 private:
-	std::unique_ptr<ParticlePostSimulator> _postSimulator;
 };

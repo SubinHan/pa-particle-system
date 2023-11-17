@@ -49,6 +49,7 @@ void EmitCS(
 		newParticle.SpawnOrderInFrame = dispatchThreadId.x;
 		newParticle.DistanceFromPrevious = 0.0f;
 		newParticle.DistanceFromStart = 0.0f;
+		newParticle.Pad = float3(0.0f, 0.0f, 0.0f);
 
 		%s
 

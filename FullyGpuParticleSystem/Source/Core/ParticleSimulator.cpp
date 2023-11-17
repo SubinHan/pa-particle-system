@@ -24,8 +24,7 @@ std::unique_ptr<ParticleSimulator> ParticleSimulator::create(ParticleResource* r
 }
 
 ParticleSimulator::ParticleSimulator(ParticleResource* resource, std::string name) :
-	ParticleComputePass(resource, name),
-	_postSimulator(ParticlePostSimulator::create(resource, name + "post"))
+	ParticleComputePass(resource, name)
 {
 	setDefaultShader();
 }
@@ -47,11 +46,6 @@ void ParticleSimulator::simulateParticles(
 	const UINT numGroupsZ = 1;
 	_resource->uavBarrier(cmdList);
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
-
-	_resource->uavBarrier(cmdList);
-	_postSimulator->postSimulate(cmdList);
-
-	_resource->swapAliveIndicesBuffer();
 }
 
 void ParticleSimulator::setDefaultShader()

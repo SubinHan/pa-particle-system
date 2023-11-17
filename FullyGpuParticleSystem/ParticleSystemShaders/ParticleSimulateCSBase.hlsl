@@ -32,29 +32,15 @@ void SimulateCS(
 
 	if (id < numAlives)
 	{
-		particlesCurrent[id].RemainLifetime -= DeltaTime;
+		float3 currentVelocity = particlesCurrent[id].Velocity;
+		float3 currentPosition = particlesCurrent[id].Position;
+		float3 currentAcceleration = particlesCurrent[id].Acceleration;
 
-		bool isAlive = particlesCurrent[id].RemainLifetime > 0.f;
-
-		if (isAlive)
-		{
-			float3 currentVelocity = particlesCurrent[id].Velocity;
-			float3 currentPosition = particlesCurrent[id].Position;
-			float3 currentAcceleration = particlesCurrent[id].Acceleration;
-
-			%s
-			
-			// move alive particles to ping-pong buffer 
-
-			uint newIndex;
-			counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMALIVES_POST_UPDATE, 1, newIndex);
-
-			particlesNext[newIndex] = particlesCurrent[id];
-
-			currentVelocity += currentAcceleration * DeltaTime;
-			particlesNext[newIndex].Position +=
-				(currentVelocity + particlesNext[newIndex].Velocity) * DeltaTime * 0.5f;
-			particlesNext[newIndex].Velocity = currentVelocity;
-		}
+		%s
+		
+		currentVelocity += currentAcceleration * DeltaTime;
+		particlesCurrent[id].Position +=
+			(currentVelocity + particlesCurrent[id].Velocity) * DeltaTime * 0.5f;
+		particlesCurrent[id].Velocity = currentVelocity;
 	}
 }

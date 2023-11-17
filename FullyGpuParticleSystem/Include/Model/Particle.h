@@ -25,4 +25,5 @@ struct Particle
 	float DistanceFromPrevious;
 
 	float DistanceFromStart;
+	DirectX::XMFLOAT3 Pad;
 };

@@ -24,9 +24,10 @@ struct Particle
 	float DistanceFromPrevious;
 
 	float DistanceFromStart;
+	float3 Pad;
 };
 
-static const uint PARTICLECOUNTER_OFFSET_NUMDEADS = 0;
+static const uint PARTICLECOUNTER_OFFSET_NEW_NUMALIVES = 0;
 static const uint PARTICLECOUNTER_OFFSET_NUMALIVES = 4;
-static const uint PARTICLECOUNTER_OFFSET_NUMALIVES_POST_UPDATE = 8;
+static const uint PARTICLECOUNTER_OFFSET_NUMSURVIVED = 8;
 #endif
