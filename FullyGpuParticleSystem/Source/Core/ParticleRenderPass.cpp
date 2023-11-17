@@ -229,7 +229,6 @@ void ParticleRenderPass::executeIndirectCommand(
 
 	_resource->transitCommandBufferToIndirectArgument(cmdList);
 
-	// TODO: Optimization - Set proper NumMaxCommands.
 	cmdList->ExecuteIndirect(
 		_commandSignature.Get(),
 		_resource->getEstimatedCurrentNumAliveParticles(),
@@ -316,8 +315,15 @@ void ParticleRenderPass::generateEmptyGeometry()
 	using IndexType = std::uint32_t;
 
 	std::vector<VertexType> vertices(1);
-	std::vector<IndexType> indices(4);
 
+	//std::vector<IndexType> indices(_resource->getMaxNumParticles() + 1);
+	//indices[0] = 0;
+	//for (int i = 1; i < indices.size(); ++i)
+	//{
+	//	indices[i] = i - 1;
+	//}
+
+	std::vector<IndexType> indices(4);
 	for (int i = 0; i < indices.size(); ++i)
 	{
 		indices[i] = i;
