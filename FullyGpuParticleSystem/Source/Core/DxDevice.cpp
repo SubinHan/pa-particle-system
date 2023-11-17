@@ -21,18 +21,18 @@ void DxDevice::createDevice()
 #if defined(DEBUG) || defined(_DEBUG) 
     // Enable the D3D12 debug layer.
     {
-        ComPtr<ID3D12Debug> debugController;
-        ComPtr<ID3D12Debug3> debugController1;
-        ComPtr<ID3D12DeviceRemovedExtendedDataSettings> dredSettings;
-        ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings)));
-        ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
-        debugController->QueryInterface(IID_PPV_ARGS(&debugController1));
-        debugController->EnableDebugLayer();
-        debugController1->SetEnableGPUBasedValidation(true);
-        dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
-        dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+        //ComPtr<ID3D12Debug> debugController;
+        //ComPtr<ID3D12Debug3> debugController1;
+        //ComPtr<ID3D12DeviceRemovedExtendedDataSettings> dredSettings;
+        //ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings)));
+        //ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
+        //debugController->QueryInterface(IID_PPV_ARGS(&debugController1));
+        //debugController->EnableDebugLayer();
+        //debugController1->SetEnableGPUBasedValidation(true);
+        //dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+        //dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
 
-        dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+        //dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
     }
 #endif
 

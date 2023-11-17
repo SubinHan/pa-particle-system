@@ -3,8 +3,7 @@
 #include "ParticleSystemShaders/ParticleRenderPass.hlsl"
 
 RWStructuredBuffer<Particle> particles : register(u0);
-RWStructuredBuffer<uint> aliveIndices : register(u1);
-RWByteAddressBuffer counters			: register(u2);
+RWByteAddressBuffer counters			: register(u1);
 
 struct RibbonVertexOut
 {
@@ -24,8 +23,8 @@ RibbonVertexOut RibbonParticleVS(
 
 	const uint threadId = min(max(int(iid + vid) - 1, 0), numAlives - 1);
 	//const uint threadId = min(vid, numAlives - 1);
-	const uint particleIndex = aliveIndices[threadId];
-	Particle particle = particles[particleIndex];
+
+	Particle particle = particles[threadId];
 
 	vertexOut.PosL = particle.Position;
 	vertexOut.ThreadId = threadId;

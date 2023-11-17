@@ -46,17 +46,15 @@ void BitonicSortCS(
 	{
 		bool isAscending = ((id & sequenceSize) == 0);
 
-		uint particleIndex1 = aliveIndices[id];
-		uint particleIndex2 = aliveIndices[compareIndex];
-		Particle p1 = particles[particleIndex1];
-		Particle p2 = particles[particleIndex2];
+		Particle p1 = particlesCurrent[id];
+		Particle p2 = particlesCurrent[compareIndex];
 
 		if ((isAscending && !compare(p1, p2)) ||
 			(!isAscending && compare(p1, p2)))
 		{
-			uint temp = aliveIndices[id];
-			aliveIndices[id] = aliveIndices[compareIndex];
-			aliveIndices[compareIndex] = temp;
+			Particle temp = particlesCurrent[id];
+			particlesCurrent[id] = particlesCurrent[compareIndex];
+			particlesCurrent[compareIndex] = temp;
 		}
 	}
 }

@@ -11,8 +11,8 @@
 constexpr int ROOT_SLOT_OBJECT_CONSTANTS_BUFFER = 0;
 constexpr int ROOT_SLOT_PASS_CONSTANTS_BUFFER = ROOT_SLOT_OBJECT_CONSTANTS_BUFFER + 1;
 constexpr int ROOT_SLOT_PARTICLES_BUFFER = ROOT_SLOT_PASS_CONSTANTS_BUFFER + 1;
-constexpr int ROOT_SLOT_ALIVES_INDICES_BUFFER = ROOT_SLOT_PARTICLES_BUFFER + 1;
-constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER + 1;
+constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_PARTICLES_BUFFER + 1;
+constexpr int ROOT_SLOT_SIZE = ROOT_SLOT_COUNTERS_BUFFER + 1;
 
 ParticleRenderPass::ParticleRenderPass(ParticleResource* resource, std::string name) :
 	ParticlePass(resource, name),
@@ -86,16 +86,15 @@ void ParticleRenderPass::setPixelShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
 std::vector<CD3DX12_ROOT_PARAMETER> ParticleRenderPass::buildRootParameter()
 {
 	// root parameter for renderbase
-	std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter(5);
+	std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter(ROOT_SLOT_SIZE);
 	slotRootParameter[ROOT_SLOT_OBJECT_CONSTANTS_BUFFER].InitAsConstants(sizeof(ObjectConstants) / 4, 0);
 
 	_passCbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
 	slotRootParameter[ROOT_SLOT_PASS_CONSTANTS_BUFFER].InitAsDescriptorTable(1, &_passCbvTable);
 
 	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER].InitAsUnorderedAccessView(0); // particles
-	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER].InitAsUnorderedAccessView(1); // aliveIndices
 
-	_counterTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
+	_counterTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
 	slotRootParameter[ROOT_SLOT_COUNTERS_BUFFER].InitAsDescriptorTable(1, &_counterTable);
 
 	buildComputeIndirectRootSignature();
@@ -219,13 +218,11 @@ void ParticleRenderPass::executeIndirectCommand(
 	cmdList->SetGraphicsRootDescriptorTable(
 		ROOT_SLOT_PASS_CONSTANTS_BUFFER, passCb.getGpuHandle());
 	cmdList->SetGraphicsRootUnorderedAccessView(
-		ROOT_SLOT_PARTICLES_BUFFER, _resource->getParticlesResource()->GetGPUVirtualAddress());
-	cmdList->SetGraphicsRootUnorderedAccessView(
-		ROOT_SLOT_ALIVES_INDICES_BUFFER, _resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
+		ROOT_SLOT_PARTICLES_BUFFER, _resource->getCurrentParticlesResource()->GetGPUVirtualAddress());
 	cmdList->SetGraphicsRootDescriptorTable(
 		ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersUavGpuHandle());
 
-	bindGraphicsResourcesOfRegisteredNodes(cmdList, 5);
+	bindGraphicsResourcesOfRegisteredNodes(cmdList, ROOT_SLOT_SIZE);
 
 	_resource->transitCommandBufferToIndirectArgument(cmdList);
 

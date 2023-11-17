@@ -73,12 +73,6 @@ int ParticleSorter::getNum32BitsConstantsUsing()
 
 void ParticleSorter::buildShaders()
 {
-	_shaderByIndex = DxUtil::compileShader(
-		L"ParticleSystemShaders\\ParticleSortByIndexCS.hlsl",
-		nullptr,
-		"BitonicSortCS",
-		"cs_5_1");
-
 	_shaderBySpawnOrder = DxUtil::compileShader(
 		L"ParticleSystemShaders\\ParticleSortBySpawnOrderCS.hlsl",
 		nullptr,

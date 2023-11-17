@@ -54,17 +54,10 @@ void EmitCS(
 
 		newParticle.RemainLifetime = newParticle.InitialLifetime;
 		// add particle into buffer
-		// TODO: remove either numDeads or numAlives and derive it with max num of particles.
-		uint numDeads;
-		counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMDEADS, -1, numDeads);
-
-		uint newParticleIndex = deadIndices[numDeads - 1];
 
 		uint numAlives;
 		counters.InterlockedAdd(PARTICLECOUNTER_OFFSET_NUMALIVES, 1, numAlives);
 
-		aliveIndices[numAlives] = newParticleIndex;
-
-		particles[newParticleIndex] = newParticle;
+		particlesCurrent[numAlives] = newParticle;
 	}
 }

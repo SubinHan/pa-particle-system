@@ -636,11 +636,9 @@
     <FxCompile Include="ParticleApp\Shaders\ParticleSimulateCS.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticleRender.hlsl" />
     <FxCompile Include="ParticleApp\Shaders\ParticlePostSimulateCS.hlsl" />
-    <FxCompile Include="ParticleSystemShaders\ParticleSortByIndexCS.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleComputeIndirectCommands.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleRenderBase.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleSimulateUtil.hlsl" />
-    <FxCompile Include="ParticleSystemShaders\ParticlePreSortCS.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleSortBySpawnOrderCS.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticlePreSortCS0.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleRibbonDistanceCS.hlsl" />
@@ -649,6 +647,8 @@
     <FxCompile Include="ParticleSystemShaders\ParticleRenderPass.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleSprite.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleBuffers.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleDestroyCS.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleMoveAlivesCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

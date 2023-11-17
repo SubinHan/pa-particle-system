@@ -37,10 +37,8 @@ public:
 
 	void swapAliveIndicesBuffer();
 
-	ID3D12Resource* getParticlesResource();
-	ID3D12Resource* getAliveIndicesResourceFront();
-	ID3D12Resource* getAliveIndicesResourceBack();
-	ID3D12Resource* getDeadIndicesResource();
+	ID3D12Resource* getCurrentParticlesResource();
+	ID3D12Resource* getNextParticlesResource();
 	ID3D12Resource* getCountersResource();
 	ID3D12Resource* getCountersTempResource();
 	ID3D12Resource* getIndirectCommandsResource();
@@ -55,10 +53,6 @@ public:
 	UINT getEstimatedCurrentNumAliveParticles();
 	UINT getEstimatedCurrentNumAliveParticlesAlignedPowerOfTwo();
 
-	void transitParticlesToSrv(ID3D12GraphicsCommandList* cmdList);
-	void transitAliveIndicesToSrv(ID3D12GraphicsCommandList* cmdList);
-	void transitParticlesToUav(ID3D12GraphicsCommandList* cmdList);
-	void transitAliveIndicesToUav(ID3D12GraphicsCommandList* cmdList);
 	void transitCommandBufferToIndirectArgument(ID3D12GraphicsCommandList* cmdList);
 	void transitCommandBufferToUav(ID3D12GraphicsCommandList* cmdList);
 
@@ -73,10 +67,7 @@ private:
 private:
 	Microsoft::WRL::ComPtr<ID3D12Device> _device;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> _particlesBuffer;
-	Microsoft::WRL::ComPtr<ID3D12Resource> _aliveIndicesBuffer[2]; // for ping-pong
-	Microsoft::WRL::ComPtr<ID3D12Resource> _deadIndicesBuffer;
-	Microsoft::WRL::ComPtr<ID3D12Resource> _deadIndicesUploadBuffer = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> _particlesBuffer[2]; // for ping-pong
 	Microsoft::WRL::ComPtr<ID3D12Resource> _countersBuffer;
 	Microsoft::WRL::ComPtr<ID3D12Resource> _countersUploadBuffer = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> _indirectCommandsBuffer;
@@ -89,7 +80,7 @@ private:
 	float _averageLifetime;
 	int _maxNumParticles;
 
-	int _currentAliveIndicesBufferIndex = 0;
+	int _currentParticlesBufferIndex = 0;
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE _hCounterCpuUav;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE _hCounterGpuUav;

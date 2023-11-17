@@ -4,9 +4,8 @@
 
 %t
 
-RWStructuredBuffer<Particle> particles : register(u0);
-RWStructuredBuffer<uint> aliveIndices : register(u1);
-RWByteAddressBuffer counters			: register(u2);
+RWStructuredBuffer<Particle> particles  : register(u0);
+RWByteAddressBuffer counters			: register(u1);
 
 %u
 
@@ -29,8 +28,7 @@ struct SpritePixelIn
 float4 ParticlePS(SpritePixelIn pin) : SV_Target
 {
 	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-	const uint particleIndex = aliveIndices[pin.ThreadId];
-	Particle particle = particles[particleIndex];
+	Particle particle = particles[pin.ThreadId];
 
 	float initialLifetime = particle.InitialLifetime;
 	float remainLifetime = particle.RemainLifetime;
@@ -64,8 +62,7 @@ struct RibbonPixelIn
 float4 RibbonParticlePS(RibbonPixelIn pin) : SV_Target
 {
 	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-	const uint particleIndex = aliveIndices[pin.ThreadId];
-	Particle particle = particles[particleIndex];
+	Particle particle = particles[pin.ThreadId];
 
 	float initialLifetime = particle.InitialLifetime;
 	float remainLifetime = particle.RemainLifetime;
@@ -86,8 +83,7 @@ float4 RibbonParticlePS(RibbonPixelIn pin) : SV_Target
 		previousThreadId = 0;
 	}
 
-	const uint previousParticleIndex = aliveIndices[previousThreadId];
-	Particle previousParticle = particles[previousParticleIndex];
+	Particle previousParticle = particles[previousThreadId];
 
 	float previousInitialLifetime = previousParticle.InitialLifetime;
 	float previousRemainLifetime = previousParticle.RemainLifetime;

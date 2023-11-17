@@ -2,9 +2,8 @@
 #include "ParticleSystemShaders/Util.hlsl"
 #include "ParticleSystemShaders/ParticleRenderPass.hlsl"
 
-RWStructuredBuffer<Particle> particles : register(u0);
-RWStructuredBuffer<uint> aliveIndices : register(u1);
-RWByteAddressBuffer counters			: register(u2);
+RWStructuredBuffer<Particle> particles	: register(u0);
+RWByteAddressBuffer counters			: register(u1);
 
 struct SpriteVertexOut
 {
@@ -27,8 +26,7 @@ SpriteVertexOut SpriteParticleVS(
 {
 	const uint threadId = iid;
 
-	const uint particleIndex = aliveIndices[threadId];
-	Particle particle = particles[particleIndex];
+	Particle particle = particles[threadId];
 
 	SpriteVertexOut vertexOut;
 

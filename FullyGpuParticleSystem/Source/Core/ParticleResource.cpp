@@ -84,28 +84,17 @@ void ParticleResource::buildCbvSrvUav(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpu, CD3DX1
 
 void ParticleResource::swapAliveIndicesBuffer()
 {
-	_currentAliveIndicesBufferIndex = (_currentAliveIndicesBufferIndex + 1) % 2;
+	_currentParticlesBufferIndex = (_currentParticlesBufferIndex + 1) % 2;
 }
 
-ID3D12Resource* ParticleResource::getParticlesResource()
+ID3D12Resource* ParticleResource::getCurrentParticlesResource()
 {
-	return _particlesBuffer.Get();
+	return _particlesBuffer[_currentParticlesBufferIndex].Get();
 }
 
-ID3D12Resource* ParticleResource::getAliveIndicesResourceFront()
+ID3D12Resource* ParticleResource::getNextParticlesResource()
 {
-	return _aliveIndicesBuffer[_currentAliveIndicesBufferIndex].Get();
-}
-
-ID3D12Resource* ParticleResource::getAliveIndicesResourceBack()
-{
-	const auto other = (_currentAliveIndicesBufferIndex + 1) % 2;
-	return _aliveIndicesBuffer[other].Get();
-}
-
-ID3D12Resource* ParticleResource::getDeadIndicesResource()
-{
-	return _deadIndicesBuffer.Get();
+	return _particlesBuffer[(_currentParticlesBufferIndex + 1) % 2].Get();
 }
 
 ID3D12Resource* ParticleResource::getCountersResource()
@@ -166,46 +155,6 @@ UINT ParticleResource::getEstimatedCurrentNumAliveParticlesAlignedPowerOfTwo()
 	return result;
 }
 
-void ParticleResource::transitParticlesToSrv(ID3D12GraphicsCommandList* cmdList)
-{
-	const auto particlesToSrv = CD3DX12_RESOURCE_BARRIER::Transition(
-		_particlesBuffer.Get(),
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-		D3D12_RESOURCE_STATE_GENERIC_READ);
-
-	cmdList->ResourceBarrier(1, &particlesToSrv);
-}
-
-void ParticleResource::transitAliveIndicesToSrv(ID3D12GraphicsCommandList* cmdList)
-{
-	const auto aliveIndicesToSrv = CD3DX12_RESOURCE_BARRIER::Transition(
-		getAliveIndicesResourceFront(),
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-		D3D12_RESOURCE_STATE_GENERIC_READ);
-
-	cmdList->ResourceBarrier(1, &aliveIndicesToSrv);
-}
-
-void ParticleResource::transitParticlesToUav(ID3D12GraphicsCommandList* cmdList)
-{
-	const auto particlesToUav = CD3DX12_RESOURCE_BARRIER::Transition(
-		_particlesBuffer.Get(),
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-
-	cmdList->ResourceBarrier(1, &particlesToUav);
-}
-
-void ParticleResource::transitAliveIndicesToUav(ID3D12GraphicsCommandList* cmdList)
-{
-	const auto aliveIndicesToUav = CD3DX12_RESOURCE_BARRIER::Transition(
-		getAliveIndicesResourceFront(),
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-
-	cmdList->ResourceBarrier(1, &aliveIndicesToUav);
-}
-
 void ParticleResource::transitCommandBufferToIndirectArgument(ID3D12GraphicsCommandList* cmdList)
 {
 	const auto commandBufferToIndirectArgument= CD3DX12_RESOURCE_BARRIER::Transition(
@@ -240,13 +189,11 @@ int ParticleResource::getReservedParticlesBufferSize()
 
 void ParticleResource::uavBarrier(ID3D12GraphicsCommandList* cmdList)
 {
-	static const D3D12_RESOURCE_BARRIER barriers[5] =
+	static const D3D12_RESOURCE_BARRIER barriers[3] =
 	{
-		CD3DX12_RESOURCE_BARRIER::UAV(getAliveIndicesResourceFront()),
-		CD3DX12_RESOURCE_BARRIER::UAV(getAliveIndicesResourceBack()),
 		CD3DX12_RESOURCE_BARRIER::UAV(getCountersResource()),
-		CD3DX12_RESOURCE_BARRIER::UAV(getParticlesResource()),
-		CD3DX12_RESOURCE_BARRIER::UAV(getDeadIndicesResource()),
+		CD3DX12_RESOURCE_BARRIER::UAV(getCurrentParticlesResource()),
+		CD3DX12_RESOURCE_BARRIER::UAV(getNextParticlesResource()),
 	};
 
 	cmdList->ResourceBarrier(_countof(barriers), barriers);
@@ -254,15 +201,7 @@ void ParticleResource::uavBarrier(ID3D12GraphicsCommandList* cmdList)
 
 void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 {
-	std::vector<UINT> deadIndices(PARTICLES_BUFFER_SIZE);
-	for (int i = 0; i < PARTICLES_BUFFER_SIZE; ++i)
-	{
-		deadIndices[i] = i + 1;
-	}
-	deadIndices[PARTICLES_BUFFER_SIZE - 1] = 0; // reserved.
-
 	const auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-
 	{
 		const UINT64 particlesByteSize = PARTICLES_BUFFER_SIZE * sizeof(Particle);
 		const auto buffer =
@@ -274,15 +213,10 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 				&buffer,
 				D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
 				nullptr,
-				IID_PPV_ARGS(&_particlesBuffer)
+				IID_PPV_ARGS(&_particlesBuffer[0])
 			)
 		);
-	}
 
-	{
-		const UINT64 aliveIndicesByteSize = PARTICLES_BUFFER_SIZE * sizeof(UINT);
-		const auto buffer =
-			CD3DX12_RESOURCE_DESC::Buffer(aliveIndicesByteSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 		ThrowIfFailed(
 			_device->CreateCommittedResource(
 				&heapProperties,
@@ -290,30 +224,11 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 				&buffer,
 				D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
 				nullptr,
-				IID_PPV_ARGS(&_aliveIndicesBuffer[0])
-			)
-		);
-		ThrowIfFailed(
-			_device->CreateCommittedResource(
-				&heapProperties,
-				D3D12_HEAP_FLAG_NONE,
-				&buffer,
-				D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-				nullptr,
-				IID_PPV_ARGS(&_aliveIndicesBuffer[1])
+				IID_PPV_ARGS(&_particlesBuffer[1])
 			)
 		);
 	}
 
-	const UINT64 deadIndicesByteSize = PARTICLES_BUFFER_SIZE * sizeof(UINT);
-	_deadIndicesBuffer = DxUtil::createDefaultBuffer(
-		_device.Get(),
-		cmdList,
-		deadIndices.data(),
-		deadIndicesByteSize,
-		_deadIndicesUploadBuffer
-	);
-	
 	{
 		ParticleCounters counters =
 		{
@@ -385,29 +300,6 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 		cmdList->ResourceBarrier(1, &barrierUpdate);
 	}
 
-	const auto deadIndicesToUav = CD3DX12_RESOURCE_BARRIER::Transition(
-		_deadIndicesBuffer.Get(),
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-
-	cmdList->ResourceBarrier(1, &deadIndicesToUav);
-
-	{
-		const UINT64 particlesByteSize = PARTICLES_BUFFER_SIZE * sizeof(Particle);
-		const auto buffer =
-			CD3DX12_RESOURCE_DESC::Buffer(particlesByteSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
-		ThrowIfFailed(
-			_device->CreateCommittedResource(
-				&heapProperties,
-				D3D12_HEAP_FLAG_NONE,
-				&buffer,
-				D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-				nullptr,
-				IID_PPV_ARGS(&_particlesBuffer)
-			)
-		);
-	}
-
 	{
 		auto heapPropertiesDefault = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(_commandBufferCounterOffset + sizeof(UINT), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
@@ -449,8 +341,5 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 
 	cmdList->ResourceBarrier(1, &commandBufferToIndirectArgument);
 
-	_aliveIndicesBuffer[0]->SetName(L"AliveIndices0");
-	_aliveIndicesBuffer[1]->SetName(L"AliveIndices1");
-	_deadIndicesBuffer->SetName(L"DeadIndices");
 	_countersBuffer->SetName(L"Counters");
 }

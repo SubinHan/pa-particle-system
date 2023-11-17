@@ -8,11 +8,10 @@
 #include "d3dx12.h"
 
 constexpr int ROOT_SLOT_CONSTANTS_BUFFER = 0;
-constexpr int ROOT_SLOT_PARTICLES_BUFFER = 1;
-constexpr int ROOT_SLOT_ALIVES_INDICES_BUFFER_FRONT = ROOT_SLOT_PARTICLES_BUFFER + 1;
-constexpr int ROOT_SLOT_ALIVES_INDICES_BUFFER_BACK = ROOT_SLOT_ALIVES_INDICES_BUFFER_FRONT + 1;
-constexpr int ROOT_SLOT_DEADS_INDICES_BUFFER = ROOT_SLOT_ALIVES_INDICES_BUFFER_BACK + 1;
-constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_DEADS_INDICES_BUFFER + 1;
+constexpr int ROOT_SLOT_PARTICLES_CURRENT_BUFFER = 1;
+constexpr int ROOT_SLOT_PARTICLES_NEXT_BUFFER = ROOT_SLOT_PARTICLES_CURRENT_BUFFER + 1;
+constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_PARTICLES_NEXT_BUFFER + 1;
+constexpr int ROOT_SLOT_SIZE = ROOT_SLOT_COUNTERS_BUFFER + 1;
 
 ParticleComputePass::ParticleComputePass(ParticleResource* resource, std::string name) :
 	ParticlePass(resource, name)
@@ -23,10 +22,8 @@ ParticleComputePass::~ParticleComputePass() = default;
 
 void ParticleComputePass::setParticlesComputeRootUav(ID3D12GraphicsCommandList* commandList)
 {
-	commandList->SetComputeRootUnorderedAccessView(ROOT_SLOT_PARTICLES_BUFFER, _resource->getParticlesResource()->GetGPUVirtualAddress());
-	commandList->SetComputeRootUnorderedAccessView(ROOT_SLOT_ALIVES_INDICES_BUFFER_FRONT, _resource->getAliveIndicesResourceFront()->GetGPUVirtualAddress());
-	commandList->SetComputeRootUnorderedAccessView(ROOT_SLOT_ALIVES_INDICES_BUFFER_BACK, _resource->getAliveIndicesResourceBack()->GetGPUVirtualAddress());
-	commandList->SetComputeRootUnorderedAccessView(ROOT_SLOT_DEADS_INDICES_BUFFER, _resource->getDeadIndicesResource()->GetGPUVirtualAddress());
+	commandList->SetComputeRootUnorderedAccessView(ROOT_SLOT_PARTICLES_CURRENT_BUFFER, _resource->getCurrentParticlesResource()->GetGPUVirtualAddress());
+	commandList->SetComputeRootUnorderedAccessView(ROOT_SLOT_PARTICLES_NEXT_BUFFER, _resource->getNextParticlesResource()->GetGPUVirtualAddress());
 	commandList->SetComputeRootDescriptorTable(ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersUavGpuHandle());
 }
 
@@ -68,7 +65,7 @@ void ParticleComputePass::readyDispatch(ID3D12GraphicsCommandList* commandList)
 	commandList->SetComputeRootSignature(getRootSignature());
 	commandList->SetPipelineState(_pso.Get());
 	setParticlesComputeRootUav(commandList);
-	bindComputeResourcesOfRegisteredNodes(commandList, ROOT_SLOT_COUNTERS_BUFFER + 1);
+	bindComputeResourcesOfRegisteredNodes(commandList, ROOT_SLOT_SIZE);
 }
 
 void ParticleComputePass::setComputeShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
@@ -80,19 +77,15 @@ void ParticleComputePass::setComputeShader(Microsoft::WRL::ComPtr<ID3DBlob> shad
 std::vector<CD3DX12_ROOT_PARAMETER> ParticleComputePass::buildRootParameter()
 {
 	// root parameter for renderbase
-	std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter(6);
+	std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter(ROOT_SLOT_SIZE);
 	slotRootParameter[ROOT_SLOT_CONSTANTS_BUFFER].InitAsConstants(getNum32BitsConstantsUsing(), 0);
 
-	slotRootParameter[ROOT_SLOT_PARTICLES_BUFFER]
+	slotRootParameter[ROOT_SLOT_PARTICLES_CURRENT_BUFFER]
 		.InitAsUnorderedAccessView(0);
-	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER_FRONT]
+	slotRootParameter[ROOT_SLOT_PARTICLES_NEXT_BUFFER]
 		.InitAsUnorderedAccessView(1);
-	slotRootParameter[ROOT_SLOT_ALIVES_INDICES_BUFFER_BACK]
-		.InitAsUnorderedAccessView(2);
-	slotRootParameter[ROOT_SLOT_DEADS_INDICES_BUFFER]
-		.InitAsUnorderedAccessView(3);
 
-	_counterUavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 4);
+	_counterUavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
 	slotRootParameter[ROOT_SLOT_COUNTERS_BUFFER]
 		.InitAsDescriptorTable(1, &_counterUavTable);
 

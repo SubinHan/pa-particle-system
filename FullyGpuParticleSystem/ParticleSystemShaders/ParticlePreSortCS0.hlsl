@@ -17,28 +17,20 @@ void PreSortCS(
 
 	if (id < fillEndIndex)
 	{
-		aliveIndices[id] = fillNumber;
-	}
-
-	if (dispatchThreadId.x == 0)
-	{
-		Particle newParticle;
-		newParticle.Position = float3(0.0f, 0.0f, 0.0f);
-		newParticle.InitialSize = 1.0f;
-		newParticle.Velocity = float3(0.0f, 0.0f, 0.0f);
-		newParticle.InitialLifetime = 1.0f;
-		newParticle.Acceleration = float3(0.0f, 0.0f, 0.0f);
-		newParticle.InitialOpacity = 1.0f;
-		newParticle.InitialColor = float3(1.0f, 1.0f, 1.0f);
-		newParticle.RemainLifetime = 1.0f;
-		newParticle.EndColor = float3(1.0f, 1.0f, 1.0f);
-		newParticle.EndSize = 0.01f;
-		newParticle.EndOpacity = 0.0f;
-		newParticle.SpawnTime = 10000.0f;
-		newParticle.SpawnOrderInFrame = 0;
-		newParticle.DistanceFromPrevious = 0.0f;
-		newParticle.DistanceFromStart = 0.0f;
-
-		particles[0] = newParticle;
+		particlesCurrent[id].Position = float3(0.0f, 0.0f, 0.0f);
+		particlesCurrent[id].InitialSize = 1.0f;
+		particlesCurrent[id].Velocity = float3(0.0f, 0.0f, 0.0f);
+		particlesCurrent[id].InitialLifetime = 1.0f;
+		particlesCurrent[id].Acceleration = float3(0.0f, 0.0f, 0.0f);
+		particlesCurrent[id].InitialOpacity = 1.0f;
+		particlesCurrent[id].InitialColor = float3(1.0f, 1.0f, 1.0f);
+		particlesCurrent[id].RemainLifetime = 1.0f;
+		particlesCurrent[id].EndColor = float3(1.0f, 1.0f, 1.0f);
+		particlesCurrent[id].EndSize = 0.01f;
+		particlesCurrent[id].EndOpacity = 0.0f;
+		particlesCurrent[id].SpawnTime = 10000.0f;
+		particlesCurrent[id].SpawnOrderInFrame = 0;
+		particlesCurrent[id].DistanceFromPrevious = 0.0f;
+		particlesCurrent[id].DistanceFromStart = 0.0f;
 	}
 }

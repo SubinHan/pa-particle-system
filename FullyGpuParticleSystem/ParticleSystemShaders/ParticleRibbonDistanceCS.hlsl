@@ -11,7 +11,7 @@ cbuffer cbPreRibbonDistanceConstants : register(b0)
 
 void addFromTo(uint from, uint to)
 {
-    if (aliveIndices[from] == 0 || aliveIndices[to] == 0)
+    if (from == 0 || to == 0)
         return;
 
     uint numAlives = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
@@ -19,7 +19,7 @@ void addFromTo(uint from, uint to)
     if (from >= numAlives || to >= numAlives)
         return;
 
-    particles[aliveIndices[to]].DistanceFromStart += particles[aliveIndices[from]].DistanceFromStart;
+    particlesCurrent[to].DistanceFromStart += particlesCurrent[from].DistanceFromStart;
 }
 
 [numthreads(1024, 1, 1)]

@@ -20,7 +20,7 @@ UINT HlslGeneratorSimulate::getPosition()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	auto newNode =
-		std::make_shared<ShaderStatementNodeGetFloat3ByVariableName>(newLocalVariableName, "particles[particleIndex].Position");
+		std::make_shared<ShaderStatementNodeGetFloat3ByVariableName>(newLocalVariableName, "currentPosition");
 	const UINT nodeIndex = _graph->addNode(newNode);
 
 
@@ -31,7 +31,7 @@ UINT HlslGeneratorSimulate::getVelocity()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	auto newNode =
-		std::make_shared<ShaderStatementNodeGetFloat3ByVariableName>(newLocalVariableName, "particles[particleIndex].Velocity");
+		std::make_shared<ShaderStatementNodeGetFloat3ByVariableName>(newLocalVariableName, "currentVelocity");
 	const UINT nodeIndex = _graph->addNode(newNode);
 
 
@@ -42,7 +42,7 @@ UINT HlslGeneratorSimulate::getAcceleration()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	auto newNode =
-		std::make_shared<ShaderStatementNodeGetFloat3ByVariableName>(newLocalVariableName, "particles[particleIndex].Acceleration");
+		std::make_shared<ShaderStatementNodeGetFloat3ByVariableName>(newLocalVariableName, "currentAcceleration");
 	const UINT nodeIndex = _graph->addNode(newNode);
 
 
@@ -108,7 +108,7 @@ UINT HlslGeneratorSimulate::drag(UINT prerequisite, float dragCoefficient)
 void HlslGeneratorSimulate::setPosition(UINT float3Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("particles[particleIndex].Position");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("currentPosition");
 	const UINT nodeIndex = _graph->addNode(newNode);
 	newNode->setInput(_graph->getNode(float3Index));
 
@@ -118,7 +118,7 @@ void HlslGeneratorSimulate::setPosition(UINT float3Index)
 void HlslGeneratorSimulate::setVelocity(UINT float3Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("particles[particleIndex].Velocity");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("currentVelocity");
 	const UINT nodeIndex = _graph->addNode(newNode);
 	newNode->setInput(_graph->getNode(float3Index));
 
@@ -128,7 +128,7 @@ void HlslGeneratorSimulate::setVelocity(UINT float3Index)
 void HlslGeneratorSimulate::setAcceleration(UINT float3Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("particles[particleIndex].Acceleration");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("currentAcceleration");
 	const UINT nodeIndex = _graph->addNode(newNode);
 	newNode->setInput(_graph->getNode(float3Index));
 
