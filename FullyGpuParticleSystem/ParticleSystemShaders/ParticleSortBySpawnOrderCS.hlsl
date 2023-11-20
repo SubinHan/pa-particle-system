@@ -16,14 +16,7 @@ bool compare(Particle p1, Particle p2)
 {
 	bool result;
 
-	if (p1.SpawnTime == p2.SpawnTime)
-	{
-		result = p1.SpawnOrderInFrame < p2.SpawnOrderInFrame;
-	}
-	else
-	{
-		result = p1.SpawnTime < p2.SpawnTime;
-	}
+	result = p1.SpawnTime < p2.SpawnTime;
 
 	return result;
 }

@@ -58,7 +58,13 @@ void ParticleDestroyer::destroyExpiredParticles(
 	_resource->uavBarrier(cmdList);
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
 
+	_resource->uavBarrier(cmdList);
+	_resource->uavBarrier(cmdList);
+	_resource->uavBarrier(cmdList);
 	_aliveMover->moveAlives(cmdList, numMayBeExpired, static_cast<float>(deltaTime));
+	_resource->uavBarrier(cmdList);
+	_resource->uavBarrier(cmdList);
+	_resource->uavBarrier(cmdList);
 	_postDestroyer->postDestroy(cmdList);
 
 	_resource->swapAliveIndicesBuffer();

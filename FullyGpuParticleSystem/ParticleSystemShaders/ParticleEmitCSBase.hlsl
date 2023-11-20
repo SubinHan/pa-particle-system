@@ -34,25 +34,25 @@ void EmitCS(
 	}
 	else
 	{
+		float4 initialColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+		float4 endColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+
 		Particle newParticle;
 		newParticle.Position = float3(0.0f, 0.0f, 0.0f);
 		newParticle.InitialSize = 1.0f;
 		newParticle.Velocity = float3(0.0f, 0.0f, 0.0f);
 		newParticle.InitialLifetime = 1.0f;
 		newParticle.Acceleration = float3(0.0f, 0.0f, 0.0f);
-		newParticle.InitialOpacity = 1.0f;
-		newParticle.InitialColor = float3(1.0f, 1.0f, 1.0f);
 		newParticle.EndColor = float3(1.0f, 1.0f, 1.0f);
 		newParticle.EndSize = 0.01f;
-		newParticle.EndOpacity = 0.0f;
 		newParticle.SpawnTime = TotalTime;
-		newParticle.SpawnOrderInFrame = dispatchThreadId.x;
 		newParticle.DistanceFromPrevious = 0.0f;
 		newParticle.DistanceFromStart = 0.0f;
-		newParticle.Pad = float3(0.0f, 0.0f, 0.0f);
 
 		%s
 
+		newParticle.InitialColor = packUnorm4ToUint(initialColor);
+		newParticle.EndColor = packUnorm4ToUint(endColor);
 		newParticle.RemainLifetime = newParticle.InitialLifetime;
 		// add particle into buffer
 

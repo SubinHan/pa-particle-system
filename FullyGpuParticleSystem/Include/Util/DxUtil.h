@@ -27,6 +27,7 @@
 #include "d3dx12.h"
 #include "MathHelper.h"
 #include "DxDebug.h"
+#include <dxcapi.h>
 
 extern const int gNumFrameResources;
 

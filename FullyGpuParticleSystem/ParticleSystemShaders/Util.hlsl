@@ -66,3 +66,30 @@ float3 dCatmullRom(float3 p0, float3 p1, float p2, float3 p3, float t)
 		(4.0f * p0 - 10.0f * p1 + 8.0f * p2 - 2.0f * p3) * t +
 		(-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t2);
 }
+
+uint packUnorm4ToUint(float4 unpackedData)
+{
+	uint result = 0;
+
+	result += uint(unpackedData.x * 255.0f);
+	result <<= 8;
+	result += uint(unpackedData.y * 255.0f);
+	result <<= 8;
+	result += uint(unpackedData.z * 255.0f);
+	result <<= 8;
+	result += uint(unpackedData.w * 255.0f);
+
+	return result;
+}
+
+float4 unpackUintToUnorm4(uint packedData)
+{
+	float4 result;
+
+	result.x = float( packedData				>> 24)	 * 0.00392156f;
+	result.y = float((packedData & 0x00FF0000)	>> 16)	 * 0.00392156f;
+	result.z = float((packedData & 0x0000FF00)	>> 8 )	 * 0.00392156f;
+	result.w = float( packedData & 0x000000FF        )	 * 0.00392156f;
+
+	return result;
+}

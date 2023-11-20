@@ -60,7 +60,7 @@ void HlslGeneratorEmit::setInitialSize(UINT float1Index)
 void HlslGeneratorEmit::setInitialOpacity(UINT float1Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("newParticle.InitialOpacity");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("initialColor.w");
 	const UINT nodeIndex = _graph->addNode(newNode);
 	newNode->setInput(_graph->getNode(float1Index));
 	_graph->linkNode(float1Index, nodeIndex);
@@ -69,7 +69,7 @@ void HlslGeneratorEmit::setInitialOpacity(UINT float1Index)
 void HlslGeneratorEmit::setInitialColor(UINT float3Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("newParticle.InitialColor");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("initialColor.xyz");
 	const UINT nodeIndex = _graph->addNode(newNode);
 	newNode->setInput(_graph->getNode(float3Index));
 	
@@ -89,7 +89,7 @@ void HlslGeneratorEmit::setEndSize(UINT float1Index)
 void HlslGeneratorEmit::setEndOpacity(UINT float1Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("newParticle.EndOpacity");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("endColor.w");
 	const UINT nodeIndex = _graph->addNode(newNode);
 	newNode->setInput(_graph->getNode(float1Index));
 	_graph->linkNode(float1Index, nodeIndex);
@@ -98,7 +98,7 @@ void HlslGeneratorEmit::setEndOpacity(UINT float1Index)
 void HlslGeneratorEmit::setEndColor(UINT float3Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("newParticle.EndColor");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("endColor.xyz");
 	const UINT nodeIndex = _graph->addNode(newNode);
 	newNode->setInput(_graph->getNode(float3Index));
 	

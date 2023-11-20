@@ -3,28 +3,22 @@
 
 struct Particle
 {
-	float3 Position;
-	float InitialSize;
+	min16float3 Position;
+	min16float InitialSize;
 
-	float3 Velocity;
-	float InitialLifetime;
+	min16float3 Velocity;
+	min16float InitialLifetime;
 
-	float3 Acceleration;
-	float InitialOpacity;
+	min16float3 Acceleration;
+	min16float EndSize;
 
-	float3 InitialColor;
-	float RemainLifetime;
+	uint InitialColor;
+	uint EndColor;
 
-	float3 EndColor;
-	float EndSize;
-
-	float EndOpacity;
-	float SpawnTime;
-	uint SpawnOrderInFrame;
-	float DistanceFromPrevious;
-
-	float DistanceFromStart;
-	float3 Pad;
+	min16float RemainLifetime;
+	min16float DistanceFromPrevious;
+	min16float DistanceFromStart;
+	min16float SpawnTime;
 };
 
 static const uint PARTICLECOUNTER_OFFSET_NEW_NUMALIVES = 0;

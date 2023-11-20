@@ -22,7 +22,7 @@ struct SpritePixelIn
 	float3 PosW : POSITION;
 	float3 NormalW : NORMAL;
 	float2 TexC : TEXCOORD;
-	uint ThreadId : THREADID;
+	nointerpolation uint ThreadId : THREADID;
 };
 
 float4 ParticlePS(SpritePixelIn pin) : SV_Target
@@ -34,15 +34,11 @@ float4 ParticlePS(SpritePixelIn pin) : SV_Target
 	float remainLifetime = particle.RemainLifetime;
 	float normalizedLifetimeInv = (initialLifetime - remainLifetime) / initialLifetime;
 
-	float3 initialColor = particle.InitialColor;
-	float3 endColor = particle.EndColor;
-	float3 interpolatedColor = lerp(initialColor, endColor, normalizedLifetimeInv);
+	float4 initialColor = unpackUintToUnorm4(particle.InitialColor);
+	float4 endColor = unpackUintToUnorm4(particle.EndColor);
+	float4 interpolatedColor = lerp(initialColor, endColor, normalizedLifetimeInv);
 
-	float initialOpacity = particle.InitialOpacity;
-	float endOpacity = particle.EndOpacity;
-	float interpolatedOpacity = lerp(initialOpacity, endOpacity, normalizedLifetimeInv);
-
-	color = float4(interpolatedColor, interpolatedOpacity);
+	color = interpolatedColor;
 
 	%s
 
@@ -56,7 +52,7 @@ struct RibbonPixelIn
 	float3 NormalW : NORMAL;
 	float2 TexC : TEXCOORD;
 	float2 LocalTexC : LOCALTEXCOORD;
-	uint ThreadId : THREADID;
+	nointerpolation uint ThreadId : THREADID;
 };
 
 float4 RibbonParticlePS(RibbonPixelIn pin) : SV_Target
@@ -68,13 +64,9 @@ float4 RibbonParticlePS(RibbonPixelIn pin) : SV_Target
 	float remainLifetime = particle.RemainLifetime;
 	float normalizedLifetimeInv = (initialLifetime - remainLifetime) / initialLifetime;
 
-	float3 initialColor = particle.InitialColor;
-	float3 endColor = particle.EndColor;
-	float3 interpolatedColor = lerp(initialColor, endColor, normalizedLifetimeInv);
-
-	float initialOpacity = particle.InitialOpacity;
-	float endOpacity = particle.EndOpacity;
-	float interpolatedOpacity = lerp(initialOpacity, endOpacity, normalizedLifetimeInv);
+	float4 initialColor = unpackUintToUnorm4(particle.InitialColor);
+	float4 endColor = unpackUintToUnorm4(particle.EndColor);
+	float4 interpolatedColor = lerp(initialColor, endColor, normalizedLifetimeInv);
 
 	// previous particle
 	uint previousThreadId = pin.ThreadId - 1;
@@ -89,18 +81,13 @@ float4 RibbonParticlePS(RibbonPixelIn pin) : SV_Target
 	float previousRemainLifetime = previousParticle.RemainLifetime;
 	float previousNormalizedLifetimeInv = (previousInitialLifetime - previousRemainLifetime) / previousInitialLifetime;
 
-	float3 previousInitialColor = previousParticle.InitialColor;
-	float3 previousEndColor = previousParticle.EndColor;
-	float3 previousInterpolatedColor = lerp(previousInitialColor, previousEndColor, previousNormalizedLifetimeInv);
-
-	float previousInitialOpacity = previousParticle.InitialOpacity;
-	float previousEndOpacity = previousParticle.EndOpacity;
-	float previousInterpolatedOpacity = lerp(previousInitialOpacity, previousEndOpacity, previousNormalizedLifetimeInv);
+	float4 previousInitialColor = unpackUintToUnorm4(previousParticle.InitialColor);
+	float4 previousEndColor = unpackUintToUnorm4(previousParticle.EndColor);
+	float4 previousInterpolatedColor = lerp(previousInitialColor, previousEndColor, previousNormalizedLifetimeInv);
 
 	interpolatedColor = lerp(previousInterpolatedColor, interpolatedColor, pin.LocalTexC.x);
-	interpolatedOpacity = lerp(previousInterpolatedOpacity, interpolatedOpacity, pin.LocalTexC.x);
 
-	color = float4(interpolatedColor, interpolatedOpacity);
+	color = interpolatedColor;
 
 	%s
 

@@ -66,7 +66,7 @@ UINT HlslGeneratorRender::getParticleColor()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	auto newNode =
-		std::make_shared<ShaderStatementNodeGetFloat3ByVariableName>(newLocalVariableName, "interpolatedColor");
+		std::make_shared<ShaderStatementNodeGetFloat3ByVariableName>(newLocalVariableName, "interpolatedColor.xyz");
 	const UINT nodeIndex = _graph->addNode(newNode);
 
 	return nodeIndex;
@@ -76,7 +76,7 @@ UINT HlslGeneratorRender::getParticleAlpha()
 {
 	std::string newLocalVariableName = getNewLocalVariableName();
 	auto newNode =
-		std::make_shared<ShaderStatementNodeGetFloatByVariableName>(newLocalVariableName, "interpolatedOpacity");
+		std::make_shared<ShaderStatementNodeGetFloatByVariableName>(newLocalVariableName, "interpolatedColor.w");
 	const UINT nodeIndex = _graph->addNode(newNode);
 
 	return nodeIndex;

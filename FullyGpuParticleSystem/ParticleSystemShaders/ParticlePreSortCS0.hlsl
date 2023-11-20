@@ -1,3 +1,4 @@
+#include "ParticleSystemShaders/Util.hlsl"
 #include "ParticleSystemShaders/Particle.hlsl"
 #include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
@@ -22,14 +23,11 @@ void PreSortCS(
 		particlesCurrent[id].Velocity = float3(0.0f, 0.0f, 0.0f);
 		particlesCurrent[id].InitialLifetime = 1.0f;
 		particlesCurrent[id].Acceleration = float3(0.0f, 0.0f, 0.0f);
-		particlesCurrent[id].InitialOpacity = 1.0f;
-		particlesCurrent[id].InitialColor = float3(1.0f, 1.0f, 1.0f);
+		particlesCurrent[id].InitialColor = packUnorm4ToUint(float4(1.0f, 1.0f, 1.0f, 1.0f));
 		particlesCurrent[id].RemainLifetime = 1.0f;
-		particlesCurrent[id].EndColor = float3(1.0f, 1.0f, 1.0f);
+		particlesCurrent[id].EndColor = packUnorm4ToUint(float4(1.0f, 1.0f, 1.0f, 1.0f));
 		particlesCurrent[id].EndSize = 0.01f;
-		particlesCurrent[id].EndOpacity = 0.0f;
 		particlesCurrent[id].SpawnTime = 10000.0f;
-		particlesCurrent[id].SpawnOrderInFrame = 0;
 		particlesCurrent[id].DistanceFromPrevious = 0.0f;
 		particlesCurrent[id].DistanceFromStart = 0.0f;
 	}
