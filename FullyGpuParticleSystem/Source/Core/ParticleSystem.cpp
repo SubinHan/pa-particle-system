@@ -17,7 +17,7 @@
 
 #include <iostream>
 
-constexpr double FIXED_DELTA_TIME = 1.0 / 120.0;
+constexpr double FIXED_DELTA_TIME = 1.0 / 60.0;
 
 ParticleSystem::ParticleSystem(DxDevice* device, std::string name) :
 	_device(device),

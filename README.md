@@ -312,8 +312,16 @@
   * 파티클 관리 방법 개선 구상
 * 금요일:
   * Instancing을 이용해서 커맨드를 제출하도록 수정
-    * 100만 개 sprite 렌더링 14ms -> 4ms
+    * 100만 개 sprite 렌더링 14ms -> 8ms
+
+
+##### 6주차: 성능 개선 (2023.11.20. ~ 2023.11.24.)
+* 월요일:
+  * 파티클 관리 방식 변경
+  * 파티클 데이터 패킹/언패킹 수행
+  * 픽셀 쉐이더에서 파티클 버퍼를 접근하지 않아도 되도록 파이프라인 수정
   * 
+
 
 <hr/>
 
@@ -602,14 +610,122 @@ compileShaders();
 
     | \# of Particles | Renderer Type | Blending Type | Ribbon UV Mode    | Emission | Simulation | Post-simulation | Pre-sort | Sort     | Pre-prefix Sum | Prefix Sum | Computing Indirect Commands | Indirect Drawing | Total     |
     | --------------- | ------------- | ------------- | ----------------- | -------- | ---------- | --------------- | -------- | -------- | -------------- | ---------- | --------------------------- | ---------------- | --------- |
-    | 1,000,000       | Sprite        | Opaque        | \-                | 0.074592 | <span style="color:red">11.902528</span>  | 0.001088        | 0.000000 | 0.000000 | 0.000000       | 0.000000   | 0.516608                    | <span style="color:red">13.619712</span>        | 26.114528 |
-    | 10,000          | Ribbon        | Opaque        | Segment based     | 0.005984 | 0.057088   | 0.001088        | 0.042048 | 0.450976 | 0.000000       | 0.000000   | 0.032448                    | <span style="color:red">4.077952</span>         | 4.667584  |
-    | 10,000          | Ribbon        | Opaque        | Distance based UV | 0.005216 | 0.059200   | 0.001088        | 0.042208 | 0.463328 | 0.038752       | 0.873888   | 0.032352                    | <span style="color:red">3.980608</span>         | 5.496640  |
+    | 1,000,000       | Sprite        | Opaque        | \-                | 0.074592 | <b>11.902528</b> | 0.001088        | 0.000000 | 0.000000 | 0.000000       | 0.000000   | 0.516608                    | <b>13.619712</b>        | 26.114528 |
+    | 10,000          | Ribbon        | Opaque        | Segment based     | 0.005984 | 0.057088   | 0.001088        | 0.042048 | 0.450976 | 0.000000       | 0.000000   | 0.032448                    | <b>4.077952</b>         | 4.667584  |
+    | 10,000          | Ribbon        | Opaque        | Distance based UV | 0.005216 | 0.059200   | 0.001088        | 0.042208 | 0.463328 | 0.038752       | 0.873888   | 0.032352                    | <b>3.980608</b>         | 5.496640  |
 
 * 파티클 시스템 구조
   * <img src="./img/particle_system_before.png">
-  * 1차적 목표: numDeads는 numAlives와 maxParticleCount에 의해서 유도될 수 있다. (atomic operation 필요 X)
-  * 질문: 지금은 인덱스만을 다루고 이를 기반으로 파티클 버퍼를 참조하고 있는데, 인덱스가 아니라 직접 파티클 버퍼를 다루고 값을 다루는 형태로 바꾸면 성능이 많이 개선될까?
+  * ~~1차적 목표: numDeads는 numAlives와 maxParticleCount에 의해서 유도될 수 있다. (atomic operation 필요 X)~~
+  * ~~질문: 지금은 인덱스만을 다루고 이를 기반으로 파티클 버퍼를 참조하고 있는데, 인덱스가 아니라 직접 파티클 버퍼를 다루고 값을 다루는 형태로 바꾸면 성능이 많이 개선될까?~~
+  * Spawnrate, lifetime을 알면 죽을 파티클들의 수를 예측할 수 있으므로 모든 파티클들에 대해서 죽음을 확인할 필요가 없다.
+    * 따라서 최소한의 파티클들만 atomic하게 ping-pong buffer로 옮기고 나머지는 parallel하게 이동
+    * <img src="./img/particle_system_after.png">
+    * 하지만 simulation 성능은 오히려 떨어짐: 파티클을 옮길 때, simulation을 할 때 두 번 particle 버퍼에 쓰기 연산을 하게 되었기 때문.
+    * 다만 파티클들이 평행하게 이동되므로 sort 소요가 없어짐.
+    * 변경 전:
+   
+    | \# of Particles | Renderer Type  | Ribbon UV Mode    | Emission | Simulation | Post-simulation | Pre-sort     | Sort       | Pre-prefix Sum | Prefix Sum | Computing Indirect Commands | Indirect Drawing | Total     |
+    | --------------- | -------------  | ----------------- | -------- | ---------- | --------------- | ------------ | ---------- | -------------- | ---------- | --------------------------- | ---------------- | --------- |
+    | 1,000,000       | Sprite         | \-                | 0.032384 | <b>7.684832</b>   | 0.001088        | 0.000000     | 0.000000   | 0.000000       | 0.000000   | 0.001728                    | <b>8.164768</b>         | 15.884800 |
+    | 10,000          | Ribbon         | Distance based UV | 0.005568 | 0.126208   | 0.001088        | <b>4.707200</b>     | <b>8.149344</b>   | 0.374080       | 0.521722   | 0.001888                    | <b>3.070464</b>         | 16.957562 |
+
+    * 변경 후:
+ 
+    | \# of Particles | Renderer Type | Ribbon UV Mode    | Emission | Destroy    | MoveAlives      | Post-Destroy | Simulation | Pre-prefix Sum | Prefix Sum | Computing Indirect Commands | Indirect Drawing | Total     |
+    | --------------- | ------------- | ----------------- | -------- | ---------- | --------------- | ------------ | ---------- | -------------- | ---------- | --------------------------- | ---------------- | --------- |
+    | 1,000,000       | Sprite        | \-                | 0.043008 | 0.035520   | <b>7.388256</b>        | 0.000445     | 1.781856   | 0.000000       | 0.000000   | 0.000992                    | <b>8.482816</b>         | 17.732893 |
+    | 10,000          | Ribbon        | Distance based UV | 0.005728 | 0.001600   | 0.087872        | 0.000544     | 0.046208   | 0.045984       | 0.567296   | 0.001120                    | <b>4.250624</b>         | 5.006976  |
+
+  * memory bandwidth를 최소화하기 위해 파티클 구조체의 크기를 줄임.
+    * 변경 전: 112 byte
+    ``` C++
+    struct Particle
+    {
+	    float3 Position;
+	    float InitialSize;
+
+	    float3 Velocity;
+	    float InitialLifetime;
+
+	    float3 Acceleration;
+	    float InitialOpacity;
+
+	    float3 InitialColor;
+	    float RemainLifetime;
+
+	    float3 EndColor;
+	    float EndSize;
+
+	    float EndOpacity;
+	    float SpawnTime;
+	    uint SpawnOrderInFrame;
+	    float DistanceFromPrevious;
+
+	    float DistanceFromStart;
+	    float3 Pad;
+    };
+    ```
+    * 변경 후: 40 byte
+
+    ``` C++
+    struct Particle
+    {
+	    min16float3 Position;
+	    min16float InitialSize;
+
+	    min16float3 Velocity;
+	    min16float InitialLifetime;
+
+	    min16float3 Acceleration;
+	    min16float EndSize;
+
+	    uint InitialColor;
+	    uint EndColor;
+
+	    min16float RemainLifetime;
+	    min16float DistanceFromPrevious;
+	    min16float DistanceFromStart;
+	    min16float SpawnTime;
+    };
+    ```
+    * Color의 경우 8bit 4개를 packing
+    ```
+    uint packUnorm4ToUint(float4 unpackedData)
+    {
+	    uint result = 0;
+
+	    result += uint(unpackedData.x * 255.0f);
+	    result <<= 8;
+	    result += uint(unpackedData.y * 255.0f);
+	    result <<= 8;
+	    result += uint(unpackedData.z * 255.0f);
+	    result <<= 8;
+	    result += uint(unpackedData.w * 255.0f);
+
+	    return result;
+    }
+
+    float4 unpackUintToUnorm4(uint packedData)
+    {
+	    float4 result;
+
+	    result.x = float( packedData		>> 24)	 * 0.00392156f;
+	    result.y = float((packedData & 0x00FF0000)	>> 16)	 * 0.00392156f;
+	    result.z = float((packedData & 0x0000FF00)	>> 8 )	 * 0.00392156f;
+	    result.w = float( packedData & 0x000000FF        )	 * 0.00392156f;
+
+	    return result;
+    }
+    ```
+    * 비교:
+
+    | \# of Particles | Renderer Type | Emission | Destroy  | MoveAlives | Post-Destroy | Simulation | Pre-prefix Sum | Prefix Sum | Computing Indirect Commands | Indirect Drawing | Total     |
+    | --------------- | ------------- | -------- | -------- | ---------- | ------------ | ---------- | -------------- | ---------- | --------------------------- | ---------------- | --------- |
+    | 1,000,000       | Sprite        | 0.043008 | 0.035520 | <b>7.388256</b>   | 0.000445     | 1.781856   | 0.000000       | 0.000000   | 0.000992                    | 8.482816         | 17.732893 |
+    | 1,000,000       | Sprite        | 0.017888 | 0.013472 | <b>3.995648</b>   | 0.000544     | 1.519712   | 0.000000       | 0.000000   | 0.000896                    | 8.191232         | 13.739392 |
+
+
 <hr/>
 
 ### 참고문헌 및 코드

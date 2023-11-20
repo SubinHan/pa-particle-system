@@ -22,23 +22,13 @@ struct SpritePixelIn
 	float3 PosW : POSITION;
 	float3 NormalW : NORMAL;
 	float2 TexC : TEXCOORD;
-	nointerpolation uint ThreadId : THREADID;
+	float4 Color : COLOR;
 };
 
 float4 ParticlePS(SpritePixelIn pin) : SV_Target
 {
-	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-	Particle particle = particles[pin.ThreadId];
-
-	float initialLifetime = particle.InitialLifetime;
-	float remainLifetime = particle.RemainLifetime;
-	float normalizedLifetimeInv = (initialLifetime - remainLifetime) / initialLifetime;
-
-	float4 initialColor = unpackUintToUnorm4(particle.InitialColor);
-	float4 endColor = unpackUintToUnorm4(particle.EndColor);
-	float4 interpolatedColor = lerp(initialColor, endColor, normalizedLifetimeInv);
-
-	color = interpolatedColor;
+	float4 color = pin.Color;
+	float4 interpolatedColor = pin.Color;
 
 	%s
 

@@ -9,7 +9,7 @@ struct SpriteVertexOut
 {
 	float3 CenterW	: POSITION;
 	float Size : SIZE;
-	uint ThreadId : THREADID;
+	float4 Color : COLOR;
 };
 
 struct SpritePixelIn
@@ -18,7 +18,7 @@ struct SpritePixelIn
 	float3 PosW : POSITION;
 	float3 NormalW : NORMAL;
 	float2 TexC : TEXCOORD;
-	uint ThreadId : THREADID;
+	float4 Color : COLOR;
 };
 
 SpriteVertexOut SpriteParticleVS(
@@ -41,8 +41,12 @@ SpriteVertexOut SpriteParticleVS(
 	float endSize = particle.EndSize;
 	float interpolatedSize = lerp(initialSize, endSize, normalizedLifetimeInv);
 
+	float4 initialColor = unpackUintToUnorm4(particle.InitialColor);
+	float4 endColor = unpackUintToUnorm4(particle.EndColor);
+	float4 interpolatedColor = lerp(initialColor, endColor, normalizedLifetimeInv);
+
 	vertexOut.Size = interpolatedSize;
-	vertexOut.ThreadId = threadId;
+	vertexOut.Color = interpolatedColor;
 
 	return vertexOut;
 }
@@ -84,7 +88,7 @@ void SpriteParticleGS(
 		geoOut.PosW = vertices[i].xyz;
 		geoOut.NormalW = look;
 		geoOut.TexC = texC[i];
-		geoOut.ThreadId = gin[0].ThreadId;
+		geoOut.Color = gin[0].Color;
 
 		triStream.Append(geoOut);
 	}
