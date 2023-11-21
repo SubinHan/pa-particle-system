@@ -10,6 +10,8 @@ public:
 
 	virtual std::string generateStatements() const override;
 	virtual float getEvaluatedFloat() const override;
+	virtual float getEvaluatedFloatMin() const override;
+	virtual float getEvaluatedFloatMax() const override;
 
 private:
 };

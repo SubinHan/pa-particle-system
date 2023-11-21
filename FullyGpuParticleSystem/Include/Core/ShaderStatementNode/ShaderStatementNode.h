@@ -28,6 +28,8 @@ public:
 	virtual CD3DX12_GPU_DESCRIPTOR_HANDLE getResourceGpuHandle(int index) const { return CD3DX12_GPU_DESCRIPTOR_HANDLE{}; }
 
 	virtual float getEvaluatedFloat() const { assert(0 && "Calling getEvaluatedFloat() is not expected on this node.");  return 0.0f; };
+	virtual float getEvaluatedFloatMin() const { assert(0 && "Calling getEvaluatedFloatMin() is not expected on this node.");  return 0.0f;  }
+	virtual float getEvaluatedFloatMax() const { assert(0 && "Calling getEvaluatedFloatMax() is not expected on this node.");  return 0.0f;  }
 
 protected:
 	std::string _variableName;

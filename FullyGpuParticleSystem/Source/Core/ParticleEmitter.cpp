@@ -9,6 +9,7 @@
 #include "Util/DxDebug.h"
 
 #include "d3dx12.h"
+#include <tuple>
 
 static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/Generated/";
 static const std::wstring BASE_EMITTER_SHADER_PATH = L"ParticleSystemShaders/ParticleEmitCSBase.hlsl";
@@ -102,6 +103,8 @@ int ParticleEmitter::getNum32BitsConstantsUsing()
 decltype(auto) findAverageLifetime(std::shared_ptr<ShaderStatementGraph> graph)
 {
 	float averageLifetime = 5.0f;
+	float minLifetime = 5.0f;
+	float maxLifetime = 5.0f;
 
 	for (int i = 0; i < graph->getSize(); ++i)
 	{
@@ -112,23 +115,32 @@ decltype(auto) findAverageLifetime(std::shared_ptr<ShaderStatementGraph> graph)
 		if (!maybeLifetimeNode)
 			continue;
 
-		if (maybeLifetimeNode->getVariableNameToSet() != "newParticle.InitialLifetime")
+		if (maybeLifetimeNode->getVariableNameToSet() != "initialLifetime")
 			continue;
+		averageLifetime = maybeLifetimeNode->getEvaluatedFloat();
+		minLifetime = maybeLifetimeNode->getEvaluatedFloatMin();
+		maxLifetime = maybeLifetimeNode->getEvaluatedFloatMax();
 
-		return maybeLifetimeNode->getEvaluatedFloat();
+		return std::make_tuple<>(averageLifetime, minLifetime, maxLifetime);
 	}
 
-	return averageLifetime;
+	return std::make_tuple<>(averageLifetime, minLifetime, maxLifetime);
 }
 
 void ParticleEmitter::onShaderStatementGraphChanged()
 {
-	auto averageLifetime = 
+	auto [averageLifetime, minLifetime, maxLifetime] = 
 		findAverageLifetime(getShaderStatementGraph());
 
 	_averageLifetime = averageLifetime;
+	_minLifetime = minLifetime;
+	_maxLifetime = maxLifetime;
 
-	_resource->onEmittingPolicyChanged(_spawnRate, _averageLifetime);
+	_resource->onEmittingPolicyChanged(
+		_spawnRate,
+		_averageLifetime, 
+		_minLifetime,
+		_maxLifetime);
 }
 
 void ParticleEmitter::initDefault()

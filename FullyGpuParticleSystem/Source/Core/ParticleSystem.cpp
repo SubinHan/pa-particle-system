@@ -72,8 +72,8 @@ void ParticleSystem::onDraw(
 			commandList,
 			_deltaTimeAcc,
 			getSpawnRate(),
-			3.0f,
-			3.0f);
+			_resource->getMinLifetimeOfParticles(),
+			_resource->getMaxLifetimeOfParticles());
 		PIXEndEvent(commandList);
 
 		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Simulation");

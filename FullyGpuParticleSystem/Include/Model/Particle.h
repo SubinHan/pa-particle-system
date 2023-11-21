@@ -4,16 +4,18 @@
 
 struct Particle
 {
-	DirectX::XMFLOAT4 PositionAndInitialSize;
-
-	DirectX::XMFLOAT4 VelocityAndInitialLifetime;
-
-	DirectX::XMFLOAT4 AccelerationAndEndSize;
-
+	UINT PositionXY;
+	UINT PositionZVelocityX;
+	UINT VelocityYZ;
+	UINT InitialLifetimeAndRemainLifetime;
+	//----//
+	UINT AccelerationXY;
+	UINT AccelerationZAndSpawnTime;
+	UINT InitialSizeAndEndSize;
+	UINT DistanceFromPreviousAndDistanceFromStart;
+	//----//
 	UINT InitialColor;
 	UINT EndColor;
-	float RemainLifetimeAndDistanceFromPrevious;
-	float DistanceFromStartAndSpawnTime;
 };
 
 //struct Particle

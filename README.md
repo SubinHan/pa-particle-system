@@ -672,22 +672,18 @@ compileShaders();
     ``` C++
     struct Particle
     {
-	    min16float3 Position;
-	    min16float InitialSize;
-
-	    min16float3 Velocity;
-	    min16float InitialLifetime;
-
-	    min16float3 Acceleration;
-	    min16float EndSize;
-
+	    uint PositionXY;
+	    uint PositionZVelocityX;
+	    uint VelocityYZ;
+	    uint InitialLifetimeAndRemainLifetime;
+	    //----//
+	    uint AccelerationXY;
+	    uint AccelerationZAndSpawnTime;
+	    uint InitialSizeAndEndSize;
+	    uint DistanceFromPreviousAndDistanceFromStart;
+	    //----//
 	    uint InitialColor;
 	    uint EndColor;
-
-	    min16float RemainLifetime;
-	    min16float DistanceFromPrevious;
-	    min16float DistanceFromStart;
-	    min16float SpawnTime;
     };
     ```
     * Color의 경우 8bit 4개를 packing
@@ -718,18 +714,31 @@ compileShaders();
 
 	    return result;
     }
+
+    uint packFloat2ToUint(float a, float b)
+    {
+	    uint a16 = f32tof16(a);
+	    uint b16 = f32tof16(b);
+	    return (a16 << 16) | b16;
+    }
+
+    void unpackUintToFloat2(uint input, out float a, out float b)
+    {
+	    a = f16tof32(input >> 16);
+	    b = f16tof32(input & 0x0000FFFF);
+    }
     ```
     * 비교:
 
     | \# of Particles | Renderer Type | Emission | Destroy  | MoveAlives | Post-Destroy | Simulation | Pre-prefix Sum | Prefix Sum | Computing Indirect Commands | Indirect Drawing | Total     |
     | --------------- | ------------- | -------- | -------- | ---------- | ------------ | ---------- | -------------- | ---------- | --------------------------- | ---------------- | --------- |
     | 1,000,000       | Sprite        | 0.043008 | 0.035520 | <b>7.388256</b>   | 0.000445     | 1.781856   | 0.000000       | 0.000000   | 0.000992                    | 8.482816         | 17.732893 |
-    | 1,000,000       | Sprite        | 0.017888 | 0.013472 | <b>3.995648</b>   | 0.000544     | 1.519712   | 0.000000       | 0.000000   | 0.000896                    | 8.191232         | 13.739392 |
+    | 1,000,000       | Sprite        | 0.015296 | 0.010144 | <b>1.737888</b>   | 0.001184     | 0.893024   | 0.000000       | 0.000000   | 0.000896                    | 8.191232         | 13.739392 |
 
-    * 단순히 파티클을 복사하는 비용에 대한 분석, 질문: 이게 적절한 분석인가요?
-      * 40Byte 크기의 100만 개 파티클: 40mb를 read and write하는 데 대략 3.5ms 소요.
+    * 파티클을 복사하는 비용에 대한 분석:
+      * 40Byte 크기의 100만 개 파티클: 40mb를 read and write하는 데 대략 1.2ms 소요.
       * Geforce 1050 Ti의 memory bandwidth는 112GB/s
-      * 3.5ms에 write/read 할 수 있는 용량은 392MB
+      * 1.2ms에 write/read 할 수 있는 용량은 약 134MB
 <hr/>
 
 ### 참고문헌 및 코드

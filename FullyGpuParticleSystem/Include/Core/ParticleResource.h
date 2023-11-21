@@ -49,9 +49,15 @@ public:
 	CD3DX12_GPU_DESCRIPTOR_HANDLE getCountersUavGpuHandle();
 	CD3DX12_GPU_DESCRIPTOR_HANDLE getIndirectCommandsUavGpuHandle();
 
-	void onEmittingPolicyChanged(float spawnRatePerSecond, float averageLifetime);
+	void onEmittingPolicyChanged(
+		float spawnRatePerSecond,
+		float averageLifetime,
+		float minLifetime, 
+		float maxLifetime);
 	UINT getEstimatedCurrentNumAliveParticles();
 	UINT getEstimatedCurrentNumAliveParticlesAlignedPowerOfTwo();
+	float getMinLifetimeOfParticles();
+	float getMaxLifetimeOfParticles();
 
 	void transitCommandBufferToIndirectArgument(ID3D12GraphicsCommandList* cmdList);
 	void transitCommandBufferToUav(ID3D12GraphicsCommandList* cmdList);
@@ -78,6 +84,8 @@ private:
 
 	float _spawnRatePerSecond;
 	float _averageLifetime;
+	float _minLifetime;
+	float _maxLifetime;
 	int _maxNumParticles;
 
 	int _currentParticlesBufferIndex = 0;

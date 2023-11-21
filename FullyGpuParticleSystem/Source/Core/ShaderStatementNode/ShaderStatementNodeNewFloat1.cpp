@@ -16,3 +16,13 @@ float ShaderStatementNodeNewFloat::getEvaluatedFloat() const
 {
 	return _x;
 }
+
+float ShaderStatementNodeNewFloat::getEvaluatedFloatMin() const
+{
+	return _x;
+}
+
+float ShaderStatementNodeNewFloat::getEvaluatedFloatMax() const
+{
+	return _x;
+}

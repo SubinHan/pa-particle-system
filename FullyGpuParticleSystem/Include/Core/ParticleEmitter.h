@@ -59,4 +59,6 @@ private:
 	double _deltaTimeAfterSpawn;
 
 	float _averageLifetime;
+	float _minLifetime;
+	float _maxLifetime;
 };

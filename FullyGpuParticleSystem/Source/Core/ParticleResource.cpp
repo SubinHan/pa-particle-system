@@ -132,10 +132,16 @@ CD3DX12_GPU_DESCRIPTOR_HANDLE ParticleResource::getIndirectCommandsUavGpuHandle(
 	return _hIndirectCommandGpuUav;
 }
 
-void ParticleResource::onEmittingPolicyChanged(float spawnRatePerSecond, float averageLifetime)
+void ParticleResource::onEmittingPolicyChanged(
+	float spawnRatePerSecond,
+	float averageLifetime,
+	float minLifetime,
+	float maxLifetime)
 {
 	_spawnRatePerSecond = spawnRatePerSecond;
 	_averageLifetime = averageLifetime;
+	_minLifetime = minLifetime;
+	_maxLifetime = maxLifetime;
 }
 
 UINT ParticleResource::getEstimatedCurrentNumAliveParticles()
@@ -153,6 +159,16 @@ UINT ParticleResource::getEstimatedCurrentNumAliveParticlesAlignedPowerOfTwo()
 	}
 
 	return result;
+}
+
+float ParticleResource::getMinLifetimeOfParticles()
+{
+	return _minLifetime;
+}
+
+float ParticleResource::getMaxLifetimeOfParticles()
+{
+	return _maxLifetime;
 }
 
 void ParticleResource::transitCommandBufferToIndirectArgument(ID3D12GraphicsCommandList* cmdList)

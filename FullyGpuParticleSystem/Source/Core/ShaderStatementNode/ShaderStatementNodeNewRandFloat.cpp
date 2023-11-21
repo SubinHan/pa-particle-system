@@ -19,3 +19,13 @@ float ShaderStatementNodeNewRandFloat::getEvaluatedFloat() const
 	// return average float value
 	return 0.5f;
 }
+
+float ShaderStatementNodeNewRandFloat::getEvaluatedFloatMin() const
+{
+	return 0.0f;
+}
+
+float ShaderStatementNodeNewRandFloat::getEvaluatedFloatMax() const
+{
+	return 1.0f;
+}
