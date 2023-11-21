@@ -31,7 +31,7 @@ RibbonVertexOut RibbonParticleVS(
 	float positionZ;
 	float velocityX;
 	unpackUintToFloat2(particle.PositionXY, positionX, positionY);
-	unpackUintToFloat2(particle.PositionZVelocitiyX, positionZ, velocityX);
+	unpackUintToFloat2(particle.PositionZVelocityX, positionZ, velocityX);
 
 	vertexOut.PosL = float3(positionX, positionY, positionZ);
 	vertexOut.ThreadId = threadId;
@@ -304,7 +304,7 @@ struct RibbonPixelIn
 	float3 NormalW : NORMAL;
 	float2 TexC : TEXCOORD;
 	float2 LocalTexC : LOCALTEXCOORD;
-	uint ThreadId : THREADID;
+	nointerpolation uint ThreadId : THREADID;
 };
 
 [domain("quad")]

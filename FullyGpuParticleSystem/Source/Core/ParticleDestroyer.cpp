@@ -5,6 +5,8 @@
 #include "Core/ParticlePostDestroyer.h"
 #include "Util/MathHelper.h"
 
+#include "pix3.h"
+
 std::unique_ptr<ParticleDestroyer> ParticleDestroyer::create(ParticleResource* resource, std::string name)
 {
 	auto created =
@@ -32,6 +34,8 @@ void ParticleDestroyer::destroyExpiredParticles(
 	float minLifetime,
 	float maxLifetime)
 {
+	PIXBeginEvent(cmdList, PIX_COLOR(0, 255, 0), "Particle Destruction");
+
 	float numMayBeExpired;
 	if (MathHelper::nearlyZero(minLifetime))
 	{
@@ -58,16 +62,12 @@ void ParticleDestroyer::destroyExpiredParticles(
 	_resource->uavBarrier(cmdList);
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
 
-	_resource->uavBarrier(cmdList);
-	_resource->uavBarrier(cmdList);
-	_resource->uavBarrier(cmdList);
 	_aliveMover->moveAlives(cmdList, numMayBeExpired, static_cast<float>(deltaTime));
-	_resource->uavBarrier(cmdList);
-	_resource->uavBarrier(cmdList);
-	_resource->uavBarrier(cmdList);
 	_postDestroyer->postDestroy(cmdList);
 
 	_resource->swapAliveIndicesBuffer();
+
+	PIXEndEvent(cmdList);
 }
 
 bool ParticleDestroyer::needsStaticSampler()

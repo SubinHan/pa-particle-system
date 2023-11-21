@@ -14,6 +14,8 @@ public:
 
 	ParticleSpriteRenderer(ParticleResource* resource, std::string name);
 
+	virtual std::string getPixelShaderEntryName() const override;
+
 	virtual void render(
 		ID3D12GraphicsCommandList* cmdList,
 		const ObjectConstants& objectConstants,

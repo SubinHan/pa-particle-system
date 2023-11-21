@@ -8,6 +8,7 @@
 #include "Model/RibbonTextureUvType.h"
 
 static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
+static const std::string PIXEL_SHADER_ENTRY_NAME = "ParticlePS";
 
 std::unique_ptr<ParticleSpriteRenderer> ParticleSpriteRenderer::create(ParticleResource* resource, std::string name)
 {
@@ -26,6 +27,11 @@ ParticleSpriteRenderer::ParticleSpriteRenderer(ParticleResource* resource, std::
 	buildShaders();
 	setShaders();
 	buildComputePsos();
+}
+
+std::string ParticleSpriteRenderer::getPixelShaderEntryName() const
+{
+	return PIXEL_SHADER_ENTRY_NAME;
 }
 
 void ParticleSpriteRenderer::render(
@@ -153,7 +159,7 @@ void ParticleSpriteRenderer::setShaders()
 {
 	setVertexShader(_vertexShader);
 	setGeometryShader(_geometryShader);
-	setPixelShader(HlslGeneratorRender::generateDefaultPixelShader("ParticlePS"));
+	setPixelShader(HlslGeneratorRender::generateDefaultPixelShader(PIXEL_SHADER_ENTRY_NAME));
 }
 
 void ParticleSpriteRenderer::buildComputePsos()

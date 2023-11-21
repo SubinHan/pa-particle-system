@@ -20,6 +20,8 @@ public:
 	ParticleRibbonRenderer(ParticleResource* resource, std::string name);
 	virtual ~ParticleRibbonRenderer();
 
+	virtual std::string getPixelShaderEntryName() const override;
+
 	virtual void render(
 		ID3D12GraphicsCommandList* cmdList,
 		const ObjectConstants& objectConstants,

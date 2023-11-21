@@ -232,6 +232,7 @@
     <ClInclude Include="Include\Core\TextureManager.h" />
     <ClInclude Include="Include\Core\UploadBuffer.h" />
     <ClInclude Include="Include\Io\ParticleSystemIo.h" />
+    <ClInclude Include="Include\Util\CppHlslMap.h" />
     <ClInclude Include="Include\Model\Emitter.h" />
     <ClInclude Include="Include\Model\Geometry.h" />
     <ClInclude Include="Include\Model\Material.h" />
@@ -267,6 +268,7 @@
     <ClInclude Include="Include\Core\ParticleResource.h" />
     <ClInclude Include="Include\Core\ParticleSimulator.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Include\Core\ParticleClearer.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Include\Util\DxDebug.h" />
     <ClInclude Include="Include\Util\DxUtil.h" />
@@ -283,6 +285,7 @@
     <ClCompile Include="..\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\include\imgui\imnodes.cpp" />
     <ClCompile Include="Source\Core\ParticleAliveMover.cpp" />
+    <ClCompile Include="Source\Core\ParticleClearer.cpp" />
     <ClCompile Include="Source\Core\ParticleComputePass.cpp" />
     <ClCompile Include="Source\Core\ParticleDestroyer.cpp" />
     <ClCompile Include="Source\Core\ParticleDistanceCalculator.cpp" />
@@ -387,6 +390,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ParticleSystemShaders\ParticleBuffers.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ParticleSystemShaders\ParticleClearCS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

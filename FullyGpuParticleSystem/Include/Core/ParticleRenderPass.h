@@ -35,6 +35,8 @@ public:
 	void setGeometryShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
 	void setPixelShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
 
+	virtual std::string getPixelShaderEntryName() const = 0;
+
 protected:
 	virtual std::vector<CD3DX12_ROOT_PARAMETER> buildRootParameter() override;
 	virtual int getNumSrvUsing() override;

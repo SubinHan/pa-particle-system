@@ -9,6 +9,7 @@
 #include "Util/DxDebug.h"
 
 #include "d3dx12.h"
+#include "pix3.h"
 #include <tuple>
 
 static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/Generated/";
@@ -50,7 +51,7 @@ void ParticleEmitter::setSpawnRate(float spawnRate)
 {
 	_spawnRate = spawnRate;
 	_spawnRateInv = 1.0 / _spawnRate;
-	_resource->onEmittingPolicyChanged(_spawnRate, _averageLifetime);
+	_resource->onEmittingPolicyChanged(_spawnRate, _averageLifetime, _minLifetime, _maxLifetime);
 }
 
 float ParticleEmitter::getSpawnRate()
@@ -64,6 +65,8 @@ void ParticleEmitter::emitParticles(
 	const double deltaTime,
 	const double totalTime)
 {
+	PIXBeginEvent(cmdList, PIX_COLOR(0, 255, 0), "Particle Emission");
+
 	_deltaTimeAfterSpawn += deltaTime;
 	unsigned int numSpawn = 0;
 
@@ -93,6 +96,8 @@ void ParticleEmitter::emitParticles(
 	const UINT numGroupsZ = 1;
 	_resource->uavBarrier(cmdList);
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
+
+	PIXEndEvent(cmdList);
 }
 
 int ParticleEmitter::getNum32BitsConstantsUsing()

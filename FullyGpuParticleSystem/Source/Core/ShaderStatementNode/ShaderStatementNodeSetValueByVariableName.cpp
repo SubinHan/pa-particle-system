@@ -21,6 +21,18 @@ float ShaderStatementNodeSetValueByVariableName::getEvaluatedFloat() const
 	return _input->getEvaluatedFloat();
 }
 
+float ShaderStatementNodeSetValueByVariableName::getEvaluatedFloatMin() const
+{
+	assert(_input && "getEvaluatedFloat() called before input set");
+	return _input->getEvaluatedFloatMin();;
+}
+
+float ShaderStatementNodeSetValueByVariableName::getEvaluatedFloatMax() const
+{
+	assert(_input && "getEvaluatedFloat() called before input set");
+	return _input->getEvaluatedFloatMax();
+}
+
 void ShaderStatementNodeSetValueByVariableName::setInput(std::shared_ptr<ShaderStatementNode> input)
 {
 	_input = input;

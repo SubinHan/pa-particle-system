@@ -1,12 +1,14 @@
 #include "Core/HlslTranslatorRenderPs.h"
 
+#include "Core/ParticleRenderPass.h"
 #include "Core/HlslGeneratorRender.h"
 #include "Ui/NodeType.h"
 
 static const std::wstring BASE_RENDERER_SHADER_PATH = L"ParticleSystemShaders/ParticleRenderBase.hlsl";
 
-HlslTranslatorRenderPs::HlslTranslatorRenderPs(std::vector<UiNode> nodes, std::vector<UiLink> links) :
-	HlslTranslator(nodes, links)
+HlslTranslatorRenderPs::HlslTranslatorRenderPs(std::vector<UiNode> nodes, std::vector<UiLink> links, ParticleRenderPass* renderer) :
+	HlslTranslator(nodes, links),
+	_renderer(renderer)
 {
 }
 
@@ -22,7 +24,7 @@ Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslatorRenderPs::compileShaderImpl(std::
 	return DxUtil::compileShader(
 		shaderPath,
 		nullptr,
-		"ParticlePS",
+		_renderer->getPixelShaderEntryName(),
 		"ps_5_1");
 }
 

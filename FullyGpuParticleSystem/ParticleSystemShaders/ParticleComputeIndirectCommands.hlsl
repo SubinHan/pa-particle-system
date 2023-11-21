@@ -35,7 +35,18 @@ void RibbonComputeIndirectCommandsCS(int3 dispatchThreadId : SV_DispatchThreadID
 
 	IndirectCommand command;
 	command.IndexCountPerInstance = 4;
-	command.InstanceCount = numAlives - 1;
+
+	uint instanceCount;
+	if (numAlives == 0)
+	{
+		instanceCount = 0;
+	}
+	else
+	{
+		instanceCount = numAlives - 1;
+	}
+
+	command.InstanceCount = instanceCount;
 	command.StartIndexLocation = id;
 	command.BaseVertexLocation = 0;
 	command.StartInstanceLocation = 0;

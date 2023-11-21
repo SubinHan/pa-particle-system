@@ -10,6 +10,7 @@
 #include "Model/RibbonTextureUvType.h"
 
 static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
+static const std::string PIXEL_SHADER_ENTRY_NAME = "RibbonParticlePS";
 
 std::unique_ptr<ParticleRibbonRenderer> ParticleRibbonRenderer::create(ParticleResource* resource, std::string name)
 {
@@ -33,6 +34,11 @@ ParticleRibbonRenderer::ParticleRibbonRenderer(ParticleResource* resource, std::
 }
 
 ParticleRibbonRenderer::~ParticleRibbonRenderer() = default;
+
+std::string ParticleRibbonRenderer::getPixelShaderEntryName() const
+{
+	return PIXEL_SHADER_ENTRY_NAME;
+}
 
 void ParticleRibbonRenderer::render(
 	ID3D12GraphicsCommandList* cmdList,
@@ -225,7 +231,7 @@ void ParticleRibbonRenderer::setShaders()
 	setVertexShader(_vertexShader);
 	setRibbonTextureUvType(RibbonTextureUvType::DistanceBased);
 	setDomainShader(_domainShader);
-	setPixelShader(HlslGeneratorRender::generateDefaultPixelShader("RibbonParticlePS"));
+	setPixelShader(HlslGeneratorRender::generateDefaultPixelShader(PIXEL_SHADER_ENTRY_NAME));
 }
 
 void ParticleRibbonRenderer::buildComputePsos()

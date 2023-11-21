@@ -7,6 +7,7 @@
 #include "Util/DxDebug.h"
 
 #include "d3dx12.h"
+#include "pix3.h"
 
 static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/Generated/";
 static const std::wstring BASE_SIMULATOR_SHADER_PATH = L"ParticleSystemShaders/ParticleSimulateCSBase.hlsl";
@@ -36,6 +37,8 @@ void ParticleSimulator::simulateParticles(
 	double deltaTime,
 	double totalTime)
 {
+	PIXBeginEvent(cmdList, PIX_COLOR(0, 255, 0), "Particle Simulation");
+
 	ParticleSimulateConstants c = { static_cast<float>(deltaTime), static_cast<float>(totalTime) };
 
 	readyDispatch(cmdList);
@@ -46,6 +49,8 @@ void ParticleSimulator::simulateParticles(
 	const UINT numGroupsZ = 1;
 	_resource->uavBarrier(cmdList);
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
+
+	PIXEndEvent(cmdList);
 }
 
 void ParticleSimulator::setDefaultShader()

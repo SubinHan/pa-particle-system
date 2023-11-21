@@ -9,6 +9,7 @@
 #include "Core/ParticleSimulator.h"
 #include "Core/ParticleSpriteRenderer.h"
 #include "Core/ParticleRibbonRenderer.h"
+#include "Core/ParticleClearer.h"
 #include "Model/ObjectConstants.h"
 #include "Model/Material.h"
 #include "Model/RendererType.h"
@@ -49,6 +50,12 @@ void ParticleSystem::onDraw(
 	if (!_canDraw)
 		return;
 
+	if (_shouldClear)
+	{
+		_shouldClear = false;
+		clearParticleSystem(commandList);
+	}
+
 	ObjectConstants objConstants = {};
 	
 	DirectX::XMMATRIX world = XMLoadFloat4x4(&_world);
@@ -59,26 +66,20 @@ void ParticleSystem::onDraw(
 
 	if (_deltaTimeAcc >= FIXED_DELTA_TIME)
 	{
-		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Emission");
 		_emitter->emitParticles(
 			commandList,
 			objConstants,
 			_deltaTimeAcc,
 			gt.totalTime());
-		PIXEndEvent(commandList);
 
-		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Destruction");
 		_destroyer->destroyExpiredParticles(
 			commandList,
 			_deltaTimeAcc,
 			getSpawnRate(),
 			_resource->getMinLifetimeOfParticles(),
 			_resource->getMaxLifetimeOfParticles());
-		PIXEndEvent(commandList);
 
-		PIXBeginEvent(commandList, PIX_COLOR(0, 255, 0), "Particle Simulation");
 		_simulator->simulateParticles(commandList, _deltaTimeAcc, gt.totalTime());
-		PIXEndEvent(commandList);
 
 		_deltaTimeAcc = 0.0;
 	}
@@ -95,7 +96,11 @@ void ParticleSystem::setWorldTransform(const DirectX::XMFLOAT4X4& newWorldTransf
 
 void ParticleSystem::setSpawnRate(float spawnRate)
 {
+	if (_emitter->getSpawnRate() == spawnRate)
+		return;
+
 	_emitter->setSpawnRate(spawnRate);
+	_shouldClear = true;
 }
 
 void ParticleSystem::setRendererType(RendererType type)
@@ -163,8 +168,14 @@ void ParticleSystem::init()
 
 	_resource = ParticleResource::create(commandList.Get());
 	_emitter = ParticleEmitter::create(_resource.get(), _name + "_Emitter");
-	//_sorter = ParticleSorter::create(_resource.get(), _name + "_Sorter");
 	_destroyer = ParticleDestroyer::create(_resource.get(), _name + "_Destroyer");
 	_simulator = ParticleSimulator::create(_resource.get(), _name + "_Simulator");
 	_renderer = ParticleSpriteRenderer::create(_resource.get(), _name + "_Renderer");
+	_clearer = ParticleClearer::create(_resource.get(), _name + "_Clearer");
+}
+
+void ParticleSystem::clearParticleSystem(ID3D12GraphicsCommandList* commandList)
+{
+	_deltaTimeAcc = 0;
+	_clearer->clear(commandList);
 }

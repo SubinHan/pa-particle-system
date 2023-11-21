@@ -1,3 +1,4 @@
+#include "ParticleSystemShaders/Util.hlsl"
 #include "ParticleSystemShaders/Particle.hlsl"
 #include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
@@ -23,7 +24,7 @@ void addFromTo(uint from, uint to)
     float distanceFromStart;
     unpackUintToFloat2(
         particlesCurrent[to].DistanceFromPreviousAndDistanceFromStart,
-        unused,
+        distanceFromPrevious,
         distanceFromStart);
 
     float unused;

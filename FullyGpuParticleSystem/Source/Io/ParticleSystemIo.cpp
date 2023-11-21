@@ -99,8 +99,8 @@ void ParticleSystemIo::loadInto(std::string filePath, ParticleSystem* particleSy
 			}
 			else if (!foundRendererEditorSaveFile && endsWith(filenameWithoutExtension, "Renderer"))
 			{
-				HlslTranslatorRenderPs translator(nodes, links);
 				auto renderer = particleSystem->getRenderer();
+				HlslTranslatorRenderPs translator(nodes, links, renderer);
 				translator.translateTo(renderer);
 				foundRendererEditorSaveFile = true;
 			}

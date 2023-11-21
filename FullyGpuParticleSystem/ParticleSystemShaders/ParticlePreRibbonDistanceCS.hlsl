@@ -1,3 +1,4 @@
+#include "ParticleSystemShaders/Util.hlsl"
 #include "ParticleSystemShaders/Particle.hlsl"
 #include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
@@ -23,10 +24,10 @@ void PreRibbonDistanceCS(
 		float previousPositionX;
 		float previousPositionY;
 		float previousPositionZ;
-		float previousVeloictyX;
+		float previousVelocityX;
 
 		unpackUintToFloat2(particlesCurrent[id].PositionXY, positionX, positionY);
-		unpackUintToFloat2(particlesCurrent[id].PositionZVelocitiyX, positionZ, velocityX);
+		unpackUintToFloat2(particlesCurrent[id].PositionZVelocityX, positionZ, velocityX);
 		unpackUintToFloat2(particlesCurrent[previousId].PositionXY, previousPositionX, previousPositionY);
 		unpackUintToFloat2(particlesCurrent[previousId].PositionZVelocityX, previousPositionZ, previousVelocityX);
 

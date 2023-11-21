@@ -339,6 +339,12 @@
     <ClInclude Include="Include\Core\ParticlePostDestroyer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Util\CppHlslMap.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\ParticleClearer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -632,6 +638,9 @@
     <ClCompile Include="Source\Core\ParticlePostDestroyer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Core\ParticleClearer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FullyGpuParticleSystem.rc">
@@ -667,6 +676,7 @@
     <FxCompile Include="ParticleSystemShaders\ParticleBuffers.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleDestroyCS.hlsl" />
     <FxCompile Include="ParticleSystemShaders\ParticleMoveAlivesCS.hlsl" />
+    <FxCompile Include="ParticleSystemShaders\ParticleClearCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

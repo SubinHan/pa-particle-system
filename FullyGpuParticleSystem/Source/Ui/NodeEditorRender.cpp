@@ -20,7 +20,7 @@ std::string NodeEditorRender::getName() const
 
 void NodeEditorRender::onCompileButtonClicked()
 {
-	HlslTranslatorRenderPs translator(_nodes, _links);
+	HlslTranslatorRenderPs translator(_nodes, _links, _renderer);
 	translator.translateTo(_renderer);
 }
 

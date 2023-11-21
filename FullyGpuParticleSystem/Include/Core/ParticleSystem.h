@@ -15,6 +15,7 @@ class ParticleSorter;
 class ParticleDestroyer;
 class ParticleSimulator;
 class ParticleRenderPass;
+class ParticleClearer;
 class PassConstantBuffer;
 
 struct ID3D12GraphicsCommandList;
@@ -53,6 +54,7 @@ public:
 
 private:
 	void init();
+	void clearParticleSystem(ID3D12GraphicsCommandList* commandList);
 
 private:
 	DxDevice* _device;
@@ -65,6 +67,7 @@ private:
 	std::unique_ptr<ParticleDestroyer> _destroyer;
 	std::unique_ptr<ParticleSimulator> _simulator;
 	std::unique_ptr<ParticleRenderPass> _renderer;
+	std::unique_ptr<ParticleClearer> _clearer;
 
 	DirectX::XMFLOAT4X4 _world = MathHelper::identity4x4();
 
@@ -73,4 +76,5 @@ private:
 	RendererType _currentRendererType;
 
 	bool _canDraw;
+	bool _shouldClear;
 };
