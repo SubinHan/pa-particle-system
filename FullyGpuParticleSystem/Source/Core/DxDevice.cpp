@@ -31,8 +31,7 @@ void DxDevice::createDevice()
         //debugController1->SetEnableGPUBasedValidation(true);
         //dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
         //dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
-
-        dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+        //dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
     }
 #endif
 
@@ -68,6 +67,32 @@ void DxDevice::checkMsaa()
 
     _msaaQuality = msQualityLevels.NumQualityLevels;
     assert(_msaaQuality > 0 && "Unexpected MSAA quality level.");
+
+    D3D12_FEATURE_DATA_D3D12_OPTIONS support = {};
+    _d3dDevice->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &support, sizeof(support));
+
+    D3D12_FEATURE_DATA_SHADER_MODEL shaderModel = {};
+    shaderModel.HighestShaderModel = D3D_SHADER_MODEL_6_7;
+    HRESULT hr = _d3dDevice->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &shaderModel, sizeof(shaderModel));
+    while (hr == E_INVALIDARG && shaderModel.HighestShaderModel > D3D_SHADER_MODEL_6_0)
+    {
+        shaderModel.HighestShaderModel = static_cast<D3D_SHADER_MODEL>(static_cast<int>(shaderModel.HighestShaderModel) - 1);
+        hr = _d3dDevice->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &shaderModel, sizeof(shaderModel));
+    }
+
+    if (FAILED(hr))
+    {
+        shaderModel.HighestShaderModel = D3D_SHADER_MODEL_5_1;
+    }
+
+    static const GUID D3D12ExperimentalShaderModelsID = { /* 76f5573e-f13a-40f5-b297-81ce9e18933f */
+    0x76f5573e,
+    0xf13a,
+    0x40f5,
+    { 0xb2, 0x97, 0x81, 0xce, 0x9e, 0x18, 0x93, 0x3f }
+    };
+
+   // ThrowIfFailed(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModelsID, nullptr, nullptr));
 }
 
 void DxDevice::createCommandQueueAndList()

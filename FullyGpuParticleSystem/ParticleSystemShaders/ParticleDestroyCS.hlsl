@@ -1,3 +1,4 @@
+#include "ParticleSystemShaders/Util.hlsl"
 #include "ParticleSystemShaders/Particle.hlsl"
 #include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
@@ -17,9 +18,17 @@ void DestroyCS(
 
 	if (id < NumParticlesMayBeExpired && id < numAlives)
 	{
-		particlesCurrent[id].RemainLifetime -= DeltaTime;
+		float initialLifetime;
+		float remainLifetime;
+		unpackUintToFloat2(
+			particlesCurrent[id].InitialLifetimeAndRemainLifetime, 
+			initialLifetime, 
+			remainLifetime);
+		remainLifetime -= DeltaTime;
+		particlesCurrent[id].InitialLifetimeAndRemainLifetime =
+			packFloat2ToUint(initialLifetime, remainLifetime);
 
-		bool isAlive = particlesCurrent[id].RemainLifetime > 0.f;
+		bool isAlive = remainLifetime > 0.f;
 
 		if (isAlive)
 		{

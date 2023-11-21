@@ -4,26 +4,34 @@
 
 struct Particle
 {
-	DirectX::XMFLOAT3 Position;
-	float InitialSize;
+	DirectX::XMFLOAT4 PositionAndInitialSize;
 
-	DirectX::XMFLOAT3 Velocity;
-	float InitialLifetime;
+	DirectX::XMFLOAT4 VelocityAndInitialLifetime;
 
-	DirectX::XMFLOAT3 Acceleration;
-	float InitialOpacity;
+	DirectX::XMFLOAT4 AccelerationAndEndSize;
 
-	DirectX::XMFLOAT3 InitialColor;
-	float RemainLifetime;
-
-	DirectX::XMFLOAT3 EndColor;
-	float EndSize;
-
-	float EndOpacity;
-	float SpawnTime;
-	UINT SpawnOrderInFrame;
-	float DistanceFromPrevious;
-
-	float DistanceFromStart;
-	DirectX::XMFLOAT3 Pad;
+	UINT InitialColor;
+	UINT EndColor;
+	float RemainLifetimeAndDistanceFromPrevious;
+	float DistanceFromStartAndSpawnTime;
 };
+
+//struct Particle
+//{
+//	DirectX::XMFLOAT3 Position;
+//	float InitialSize;
+//
+//	DirectX::XMFLOAT3 Velocity;
+//	float InitialLifetime;
+//	
+//	DirectX::XMFLOAT3 Acceleration;
+//	float EndSize;
+//
+//	UINT InitialColor;
+//	UINT EndColor;
+//	float RemainLifetime;
+//	float DistanceFromPrevious;
+//
+//	float DistanceFromStart;
+//	float SpawnTime;
+//};

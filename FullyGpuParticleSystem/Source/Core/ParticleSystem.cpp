@@ -163,7 +163,7 @@ void ParticleSystem::init()
 
 	_resource = ParticleResource::create(commandList.Get());
 	_emitter = ParticleEmitter::create(_resource.get(), _name + "_Emitter");
-	_sorter = ParticleSorter::create(_resource.get(), _name + "_Sorter");
+	//_sorter = ParticleSorter::create(_resource.get(), _name + "_Sorter");
 	_destroyer = ParticleDestroyer::create(_resource.get(), _name + "_Destroyer");
 	_simulator = ParticleSimulator::create(_resource.get(), _name + "_Simulator");
 	_renderer = ParticleSpriteRenderer::create(_resource.get(), _name + "_Renderer");

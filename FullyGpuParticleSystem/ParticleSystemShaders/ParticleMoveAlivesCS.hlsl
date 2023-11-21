@@ -1,3 +1,4 @@
+#include "ParticleSystemShaders/Util.hlsl"
 #include "ParticleSystemShaders/Particle.hlsl"
 #include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
@@ -23,14 +24,25 @@ void MoveAlivesCS(
 		min(numAlivesBeforeFrame, NumParticlesMayBeExpired) - numSurvived;
 
 	const uint id = NumParticlesMayBeExpired + dispatchThreadId.x;
-	const uint newNumAlives = numAlivesBeforeFrame - numDestroyed;
+	uint newNumAlives = numAlivesBeforeFrame - numDestroyed;
 
 	if (id < numAlivesBeforeFrame)
 	{
 		uint newIndex = numSurvived + dispatchThreadId.x;
 
-		particlesNext[newIndex] = particlesCurrent[id];
-		particlesNext[newIndex].RemainLifetime -= DeltaTime;
+		Particle current = particlesCurrent[id];
+
+		float initialLifetime;
+		float remainLifetime;
+		unpackUintToFloat2(
+			current.InitialLifetimeAndRemainLifetime,
+			initialLifetime,
+			remainLifetime);
+		remainLifetime -= DeltaTime;
+		current.InitialLifetimeAndRemainLifetime =
+			packFloat2ToUint(initialLifetime, remainLifetime);
+
+		particlesNext[newIndex] = current;
 	}
 
 	if (dispatchThreadId.x == 0)

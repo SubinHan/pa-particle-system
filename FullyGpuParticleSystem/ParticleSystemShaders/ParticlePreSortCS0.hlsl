@@ -18,17 +18,26 @@ void PreSortCS(
 
 	if (id < fillEndIndex)
 	{
-		particlesCurrent[id].Position = float3(0.0f, 0.0f, 0.0f);
-		particlesCurrent[id].InitialSize = 1.0f;
-		particlesCurrent[id].Velocity = float3(0.0f, 0.0f, 0.0f);
-		particlesCurrent[id].InitialLifetime = 1.0f;
-		particlesCurrent[id].Acceleration = float3(0.0f, 0.0f, 0.0f);
-		particlesCurrent[id].InitialColor = packUnorm4ToUint(float4(1.0f, 1.0f, 1.0f, 1.0f));
-		particlesCurrent[id].RemainLifetime = 1.0f;
-		particlesCurrent[id].EndColor = packUnorm4ToUint(float4(1.0f, 1.0f, 1.0f, 1.0f));
-		particlesCurrent[id].EndSize = 0.01f;
-		particlesCurrent[id].SpawnTime = 10000.0f;
-		particlesCurrent[id].DistanceFromPrevious = 0.0f;
-		particlesCurrent[id].DistanceFromStart = 0.0f;
+		float4 initialColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+		float4 endColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+		float3 position = float3(0.0f, 0.0f, 0.0f);
+		float3 velocity = float3(0.0f, 0.0f, 0.0f);
+		float3 acceleration = float3(0.0f, 0.0f, 0.0f);
+		float initialLifetime = 1.0f;
+		float remainLifetime = 1.0f;
+		float initialSize = 0.1f;
+		float endSize = 0.1f;
+		remainLifetime = initialLifetime;
+
+		Particle newParticle;
+		particlesCurrent[id].PositionXY = packFloat2ToUint(position.x, position.y);
+		particlesCurrent[id].PositionZVelocityX = packFloat2ToUint(position.z, velocity.x);
+		particlesCurrent[id].VelocityYZ = packFloat2ToUint(velocity.y, velocity.z);
+		particlesCurrent[id].InitialLifetimeAndRemainLifetime = packFloat2ToUint(initialLifetime, remainLifetime);
+		particlesCurrent[id].AccelerationXY = packFloat2ToUint(acceleration.x, acceleration.y);
+		particlesCurrent[id].AccelerationZAndSpawnTime = packFloat2ToUint(acceleration.z, 10000.0f);
+		particlesCurrent[id].InitialSizeAndEndSize = packFloat2ToUint(initialSize, endSize);
+		particlesCurrent[id].DistanceFromPreviousAndDistanceFromStart = packFloat2ToUint(0.0f, 0.0f);
+		particlesCurrent[id].InitialColor = packUnorm4ToUint(initialColor);
 	}
 }

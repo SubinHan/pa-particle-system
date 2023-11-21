@@ -50,8 +50,10 @@ float4 RibbonParticlePS(RibbonPixelIn pin) : SV_Target
 	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	Particle particle = particles[pin.ThreadId];
 
-	float initialLifetime = particle.InitialLifetime;
-	float remainLifetime = particle.RemainLifetime;
+	float initialLifetime;
+	float remainLifetime;
+
+	unpackUintToFloat2(particle.InitialLifetimeAndRemainLifetime, initialLifetime, remainLifetime);
 	float normalizedLifetimeInv = (initialLifetime - remainLifetime) / initialLifetime;
 
 	float4 initialColor = unpackUintToUnorm4(particle.InitialColor);
@@ -67,8 +69,12 @@ float4 RibbonParticlePS(RibbonPixelIn pin) : SV_Target
 
 	Particle previousParticle = particles[previousThreadId];
 
-	float previousInitialLifetime = previousParticle.InitialLifetime;
-	float previousRemainLifetime = previousParticle.RemainLifetime;
+	float previousInitialLifetime;
+	float previousRemainLifetime;
+	unpackUintToFloat2(
+		previousParticle.InitialLifetimeAndRemainLifetime, 
+		previousInitialLifetime,
+		previousRemainLifetime);
 	float previousNormalizedLifetimeInv = (previousInitialLifetime - previousRemainLifetime) / previousInitialLifetime;
 
 	float4 previousInitialColor = unpackUintToUnorm4(previousParticle.InitialColor);

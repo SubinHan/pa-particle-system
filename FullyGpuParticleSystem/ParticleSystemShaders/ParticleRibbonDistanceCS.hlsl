@@ -19,7 +19,24 @@ void addFromTo(uint from, uint to)
     if (from >= numAlives || to >= numAlives)
         return;
 
-    particlesCurrent[to].DistanceFromStart += particlesCurrent[from].DistanceFromStart;
+    float distanceFromPrevious;
+    float distanceFromStart;
+    unpackUintToFloat2(
+        particlesCurrent[to].DistanceFromPreviousAndDistanceFromStart,
+        unused,
+        distanceFromStart);
+
+    float unused;
+    float distanceFromStartAdder;
+    unpackUintToFloat2(
+        particlesCurrent[from].DistanceFromPreviousAndDistanceFromStart,
+        unused,
+        distanceFromStartAdder);
+
+    distanceFromStart += distanceFromStartAdder;
+
+    particlesCurrent[to].DistanceFromPreviousAndDistanceFromStart =
+        packFloat2ToUint(distanceFromPrevious, distanceFromStart);
 }
 
 [numthreads(1024, 1, 1)]

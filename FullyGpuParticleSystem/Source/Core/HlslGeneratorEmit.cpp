@@ -13,7 +13,7 @@ HlslGeneratorEmit::~HlslGeneratorEmit() = default;
 void HlslGeneratorEmit::setInitialPosition(UINT float3Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("newParticle.Position");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("position");
 	const UINT nodeIndex = _graph->addNode(newNode);;
 	newNode->setInput(_graph->getNode(float3Index));
 	_graph->linkNode(float3Index, nodeIndex);
@@ -22,7 +22,7 @@ void HlslGeneratorEmit::setInitialPosition(UINT float3Index)
 void HlslGeneratorEmit::setInitialVelocity(UINT float3Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("newParticle.Velocity");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("velocity");
 	const UINT nodeIndex = _graph->addNode(newNode);;
 	newNode->setInput(_graph->getNode(float3Index));
 	_graph->linkNode(float3Index, nodeIndex);
@@ -31,7 +31,7 @@ void HlslGeneratorEmit::setInitialVelocity(UINT float3Index)
 void HlslGeneratorEmit::setInitialAcceleration(UINT float3Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("newParticle.Acceleration");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("acceleration");
 	const UINT nodeIndex = _graph->addNode(newNode);;
 	newNode->setInput(_graph->getNode(float3Index));
 	_graph->linkNode(float3Index, nodeIndex);
@@ -40,7 +40,7 @@ void HlslGeneratorEmit::setInitialAcceleration(UINT float3Index)
 void HlslGeneratorEmit::setInitialLifetime(UINT float1Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("newParticle.InitialLifetime");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("initialLifetime");
 	const UINT nodeIndex = _graph->addNode(newNode);;
 	newNode->setInput(_graph->getNode(float1Index));
 	
@@ -50,7 +50,7 @@ void HlslGeneratorEmit::setInitialLifetime(UINT float1Index)
 void HlslGeneratorEmit::setInitialSize(UINT float1Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("newParticle.InitialSize");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("initialSize");
 	const UINT nodeIndex = _graph->addNode(newNode);
 	newNode->setInput(_graph->getNode(float1Index));
 	
@@ -79,7 +79,7 @@ void HlslGeneratorEmit::setInitialColor(UINT float3Index)
 void HlslGeneratorEmit::setEndSize(UINT float1Index)
 {
 	auto newNode =
-		std::make_shared<ShaderStatementNodeSetValueByVariableName>("newParticle.EndSize");
+		std::make_shared<ShaderStatementNodeSetValueByVariableName>("endSize");
 	const UINT nodeIndex = _graph->addNode(newNode);
 	newNode->setInput(_graph->getNode(float1Index));
 	

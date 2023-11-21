@@ -26,16 +26,32 @@ RibbonVertexOut RibbonParticleVS(
 
 	Particle particle = particles[threadId];
 
-	vertexOut.PosL = particle.Position;
-	vertexOut.ThreadId = threadId;
-	vertexOut.DistanceFromStart = particle.DistanceFromStart;
+	float positionX;
+	float positionY;
+	float positionZ;
+	float velocityX;
+	unpackUintToFloat2(particle.PositionXY, positionX, positionY);
+	unpackUintToFloat2(particle.PositionZVelocitiyX, positionZ, velocityX);
 
-	float initialLifetime = particle.InitialLifetime;
-	float remainLifetime = particle.RemainLifetime;
+	vertexOut.PosL = float3(positionX, positionY, positionZ);
+	vertexOut.ThreadId = threadId;
+
+	float distanceFromPrevious;
+	float distanceFromStart;
+	unpackUintToFloat2(
+		particle.DistanceFromPreviousAndDistanceFromStart,
+		distanceFromPrevious,
+		distanceFromStart);
+	vertexOut.DistanceFromStart = distanceFromStart;
+
+	float initialLifetime;
+	float remainLifetime;
+	unpackUintToFloat2(particle.InitialLifetimeAndRemainLifetime, initialLifetime, remainLifetime);
 	float normalizedLifetimeInv = (initialLifetime - remainLifetime) / initialLifetime;
 
-	float initialSize = particle.InitialSize;
-	float endSize = particle.EndSize;
+	float initialSize;
+	float endSize;
+	unpackUintToFloat2(particle.InitialSizeAndEndSize, initialSize, endSize);
 	float interpolatedSize = lerp(initialSize, endSize, normalizedLifetimeInv);
 	vertexOut.Size = interpolatedSize;
 

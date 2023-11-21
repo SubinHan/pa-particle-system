@@ -30,15 +30,24 @@ SpriteVertexOut SpriteParticleVS(
 
 	SpriteVertexOut vertexOut;
 
-	const float4 posW = mul(float4(particle.Position, 1.0f), gWorld);
+	float positionX;
+	float positionY;
+	float positionZ;
+	float velocityX;
+	unpackUintToFloat2(particle.PositionXY, positionX, positionY);
+	unpackUintToFloat2(particle.PositionZVelocityX, positionZ, velocityX);
+
+	const float4 posW = mul(float4(positionX, positionY, positionZ, 1.0f), gWorld);
 	vertexOut.CenterW = posW.xyz;
 
-	float initialLifetime = particle.InitialLifetime;
-	float remainLifetime = particle.RemainLifetime;
+	float initialLifetime;
+	float remainLifetime;
+	unpackUintToFloat2(particle.InitialLifetimeAndRemainLifetime, initialLifetime, remainLifetime);
 	float normalizedLifetimeInv = (initialLifetime - remainLifetime) / initialLifetime;
 
-	float initialSize = particle.InitialSize;
-	float endSize = particle.EndSize;
+	float initialSize;
+	float endSize;
+	unpackUintToFloat2(particle.InitialSizeAndEndSize, initialSize, endSize);
 	float interpolatedSize = lerp(initialSize, endSize, normalizedLifetimeInv);
 
 	float4 initialColor = unpackUintToUnorm4(particle.InitialColor);

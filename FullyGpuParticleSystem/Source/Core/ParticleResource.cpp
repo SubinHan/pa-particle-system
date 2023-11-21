@@ -203,7 +203,7 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 {
 	const auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 	{
-		const UINT64 particlesByteSize = PARTICLES_BUFFER_SIZE * sizeof(Particle);
+		const UINT64 particlesByteSize = PARTICLES_BUFFER_SIZE * (sizeof(Particle));
 		const auto buffer =
 			CD3DX12_RESOURCE_DESC::Buffer(particlesByteSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 		ThrowIfFailed(
@@ -216,6 +216,7 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 				IID_PPV_ARGS(&_particlesBuffer[0])
 			)
 		);
+		_particlesBuffer[0]->SetName(L"particlesBuffer0");
 
 		ThrowIfFailed(
 			_device->CreateCommittedResource(
@@ -227,6 +228,7 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 				IID_PPV_ARGS(&_particlesBuffer[1])
 			)
 		);
+		_particlesBuffer[0]->SetName(L"particlesBuffer1");
 	}
 
 	{

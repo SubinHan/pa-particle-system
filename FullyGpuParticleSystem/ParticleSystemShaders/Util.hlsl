@@ -93,3 +93,16 @@ float4 unpackUintToUnorm4(uint packedData)
 
 	return result;
 }
+
+uint packFloat2ToUint(float a, float b)
+{
+	uint a16 = f32tof16(a);
+	uint b16 = f32tof16(b);
+	return (a16 << 16) | b16;
+}
+
+void unpackUintToFloat2(uint input, out float a, out float b)
+{
+	a = f16tof32(input >> 16);
+	b = f16tof32(input & 0x0000FFFF);
+}

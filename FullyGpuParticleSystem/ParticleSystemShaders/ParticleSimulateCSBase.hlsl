@@ -32,15 +32,43 @@ void SimulateCS(
 
 	if (id < numAlives)
 	{
-		float3 currentVelocity = particlesCurrent[id].Velocity;
-		float3 currentPosition = particlesCurrent[id].Position;
-		float3 currentAcceleration = particlesCurrent[id].Acceleration;
+		float positionX;
+		float positionY;
+		float positionZ;
+		float velocityX;
+		float velocityY;
+		float velocityZ;
+		float accelerationX;
+		float accelerationY;
+		float accelerationZ;
+		float spawnTime;
+
+		unpackUintToFloat2(particlesCurrent[id].PositionXY, positionX, positionY);
+		unpackUintToFloat2(particlesCurrent[id].PositionZVelocityX, positionZ, velocityX);
+		unpackUintToFloat2(particlesCurrent[id].VelocityYZ, velocityY, velocityZ);
+		unpackUintToFloat2(particlesCurrent[id].AccelerationXY, accelerationX, accelerationY);
+		unpackUintToFloat2(particlesCurrent[id].AccelerationZAndSpawnTime, accelerationZ, spawnTime);
+
+		float3 currentVelocity = float3(velocityX, velocityY, velocityZ);
+		float3 currentPosition = float3(positionX, positionY, positionZ);
+		float3 currentAcceleration = float3(accelerationX, accelerationY, accelerationZ);
 
 		%s
-		
+
+		float3 beforeVelocity = currentVelocity;
 		currentVelocity += currentAcceleration * DeltaTime;
-		particlesCurrent[id].Position +=
-			(currentVelocity + particlesCurrent[id].Velocity) * DeltaTime * 0.5f;
-		particlesCurrent[id].Velocity = currentVelocity;
+		currentPosition +=
+			(currentVelocity + beforeVelocity) * DeltaTime * 0.5f;
+
+		particlesCurrent[id].PositionXY = 
+			packFloat2ToUint(currentPosition.x, currentPosition.y);
+		particlesCurrent[id].PositionZVelocityX = 
+			packFloat2ToUint(currentPosition.z, currentVelocity.x);
+		particlesCurrent[id].VelocityYZ =
+			packFloat2ToUint(currentVelocity.y, currentVelocity.z);
+		particlesCurrent[id].AccelerationXY =
+			packFloat2ToUint(currentAcceleration.x, currentAcceleration.y);
+		particlesCurrent[id].AccelerationZAndSpawnTime =
+			packFloat2ToUint(currentAcceleration.z, spawnTime);
 	}
 }

@@ -25,6 +25,8 @@ void EmitCS(
 	int3 dispatchThreadId : SV_DispatchThreadID)
 {
 	// should not emit if num of particles reached max.
+	// here is a concurrency issue because of loading numAlives,
+	// but it's not urgent issue because it only occurs just lack of emission.
 	uint numAlivesBeforeEmit = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
 
 	bool willOver = numAlivesBeforeEmit + EmitCount >= MaxNumParticles;
@@ -36,24 +38,30 @@ void EmitCS(
 	{
 		float4 initialColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
 		float4 endColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
-
-		Particle newParticle;
-		newParticle.Position = float3(0.0f, 0.0f, 0.0f);
-		newParticle.InitialSize = 1.0f;
-		newParticle.Velocity = float3(0.0f, 0.0f, 0.0f);
-		newParticle.InitialLifetime = 1.0f;
-		newParticle.Acceleration = float3(0.0f, 0.0f, 0.0f);
-		newParticle.EndColor = float3(1.0f, 1.0f, 1.0f);
-		newParticle.EndSize = 0.01f;
-		newParticle.SpawnTime = TotalTime;
-		newParticle.DistanceFromPrevious = 0.0f;
-		newParticle.DistanceFromStart = 0.0f;
+		float3 position = float3(0.0f, 0.0f, 0.0f);
+		float3 velocity = float3(0.0f, 0.0f, 0.0f);
+		float3 acceleration = float3(0.0f, 0.0f, 0.0f);
+		float initialLifetime = 1.0f;
+		float remainLifetime;
+		float initialSize = 0.1f;
+		float endSize = 0.1f;
 
 		%s
 
+		remainLifetime = initialLifetime;
+
+		Particle newParticle;
+		newParticle.PositionXY = packFloat2ToUint(position.x, position.y);
+		newParticle.PositionZVelocityX = packFloat2ToUint(position.z, velocity.x);
+		newParticle.VelocityYZ = packFloat2ToUint(velocity.y, velocity.z);
+		newParticle.InitialLifetimeAndRemainLifetime = packFloat2ToUint(initialLifetime, remainLifetime);
+		newParticle.AccelerationXY = packFloat2ToUint(acceleration.x, acceleration.y);
+		newParticle.AccelerationZAndSpawnTime = packFloat2ToUint(acceleration.z, TotalTime);
+		newParticle.InitialSizeAndEndSize = packFloat2ToUint(initialSize, endSize);
+		newParticle.DistanceFromPreviousAndDistanceFromStart = packFloat2ToUint(0.0f, 0.0f);
 		newParticle.InitialColor = packUnorm4ToUint(initialColor);
 		newParticle.EndColor = packUnorm4ToUint(endColor);
-		newParticle.RemainLifetime = newParticle.InitialLifetime;
+
 		// add particle into buffer
 
 		uint numAlives;
