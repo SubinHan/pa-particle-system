@@ -2,13 +2,15 @@
 #include "ParticleSystemShaders/Particle.hlsl"
 #include "ParticleSystemShaders/ParticleBuffers.hlsl"
 
+#define NUM_THREADS 256
+
 cbuffer cbUpdateConstants : register(b0)
 {
 	uint NumParticlesMayBeExpired;
 	float DeltaTime;
 }
 
-[numthreads(256, 1, 1)]
+[numthreads(NUM_THREADS, 1, 1)]
 void MoveAlivesCS(
 	uint3 dispatchThreadId : SV_DispatchThreadID)
 {
