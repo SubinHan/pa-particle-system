@@ -741,6 +741,9 @@ compileShaders();
       * 40Byte 크기의 100만 개 파티클: 40mb를 read and write하는 데(총 80mb) 대략 1.2ms 소요.
       * Geforce 1050 Ti의 memory bandwidth는 112GB/s
       * 약 1.2ms에 write/read 할 수 있는 용량은 134MB
+      * 다음에 따르면 4 byte stride를 지키는 것이 성능에 유리하다고 하는데, 이 경우에는 단순히 byte size가 작은 것이 유리했음.
+        * [Understanding Structured Buffer Performance](https://developer.nvidia.com/content/understanding-structured-buffer-performance)
+        * 질문: Cache line에 데이터 크기를 맞추지 않아도 그로 인한 memory bandwidth 이득이 더 커서라고 생각하는 것이 좋을지?
 <hr/>
 
 ### 참고문헌 및 코드
