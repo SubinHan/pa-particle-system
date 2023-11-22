@@ -732,18 +732,22 @@ compileShaders();
     ```
     * 비교:
 
-    | \# of Particles | Renderer Type | Emission | Destroy  | MoveAlives | Post-Destroy | Simulation | Pre-prefix Sum | Prefix Sum | Computing Indirect Commands | Indirect Drawing | Total     |
-    | --------------- | ------------- | -------- | -------- | ---------- | ------------ | ---------- | -------------- | ---------- | --------------------------- | ---------------- | --------- |
-    | 1,000,000       | Sprite        | 0.043008 | 0.035520 | <b>7.388256</b>   | 0.000445     | 1.781856   | 0.000000       | 0.000000   | 0.000992                    | 8.482816         | 17.732893 |
-    | 1,000,000       | Sprite        | 0.015296 | 0.010144 | <b>1.737888</b>   | 0.001184     | 0.893024   | 0.000000       | 0.000000   | 0.000896                    | 8.191232         | 13.739392 |
+    | Particle Size            | MoveAlives | Simulation |
+    | ------------------------ | ---------- | ---------- |
+    | 112byte (16byte aligned) | 7.388256   | 1.781856   |
+    | 80byte (16byte aligned)  | 4.612512   | 1.583840   |
+    | 72byte                   | 3.995648   | 1.902184   |
+    | 64byte (16byte aligned)  | 2.971968   | 0.891296   |
+    | 48byte (16byte aligned)  | 2.159088   | 0.994336   |
+    | 44byte                   | 2.040000   | 1.039904   |
+    | 40byte                   | 1.737888   | 0.893024   |
 
     * 파티클을 복사하는 비용에 대한 분석:
-      * 40Byte 크기의 100만 개 파티클: 40mb를 read and write하는 데(총 80mb) 대략 1.2ms 소요.
-      * Geforce 1050 Ti의 memory bandwidth는 112GB/s
-      * 약 1.2ms에 write/read 할 수 있는 용량은 134MB
-      * 다음에 따르면 4 byte stride를 지키는 것이 성능에 유리하다고 하는데, 이 경우에는 단순히 byte size가 작은 것이 유리했음.
+      * 다음에 따르면 16 byte stride를 지키는 것이 성능에 유리하다고 하는데, 이 경우에는 단순히 byte size가 작은 것이 유리했음.
         * [Understanding Structured Buffer Performance](https://developer.nvidia.com/content/understanding-structured-buffer-performance)
-        * 질문: Cache line에 데이터 크기를 맞추지 않아도 그로 인한 memory bandwidth 이득이 더 커서라고 생각하는 것이 좋을지?
+      * Memory transaction size, coalescing, access pattern 등 다양한 요소가 작용했다고 보이는데, 하드웨어의 지식 부족으로 명확하게 짚을 수는 없을 것 같음:
+        * simulation에서 112byte -> 80byte의 경우에는 큰 성능 향상이 없지만 80byte -> 64 byte에서 simulation의 속도가 급격히 상승하는 이유?
+        * 64, 48, 44, 40의 simluation 속도에 대해: memory access pattern이 영향을 준 것일지?
 <hr/>
 
 ### 참고문헌 및 코드
