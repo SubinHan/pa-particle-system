@@ -20,9 +20,12 @@ ParticlePostDestroyer::ParticlePostDestroyer(ParticleResource* resource, std::st
 
 ParticlePostDestroyer::~ParticlePostDestroyer() = default;
 
-void ParticlePostDestroyer::postDestroy(ID3D12GraphicsCommandList* cmdList)
+void ParticlePostDestroyer::postDestroy(ID3D12GraphicsCommandList* cmdList, UINT numMayBeExpired)
 {
+	UINT c = numMayBeExpired;
+
 	readyDispatch(cmdList);
+	setConstants(cmdList, &c);
 	_resource->uavBarrier(cmdList);
 	cmdList->Dispatch(1, 1, 1);
 }
@@ -34,7 +37,7 @@ bool ParticlePostDestroyer::needsStaticSampler()
 
 int ParticlePostDestroyer::getNum32BitsConstantsUsing()
 {
-	return 0;
+	return 1;
 }
 
 void ParticlePostDestroyer::setDefaultShader()

@@ -89,6 +89,16 @@ bool HlslTranslatorRenderPs::translateNode(UiNode node)
 			numSubTexturesY);
 		break;
 	}
+	case NodeType::Clip:
+	{
+		const int inputNodeId0 = findOppositeNodeIdByInputAttrbuteId(node.getInputId(0));
+		if (inputNodeId0 != -1)
+		{
+			UINT input0Index = indexMap[inputNodeId0];
+			hlslGeneratorRender->clip(input0Index);
+		}
+		break;
+	}
 	default:
 		hasGenerated = false;
 		break;

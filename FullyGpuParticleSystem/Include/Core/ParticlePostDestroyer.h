@@ -9,7 +9,7 @@ public:
 
 	ParticlePostDestroyer(ParticleResource* resource, std::string name);
 	virtual ~ParticlePostDestroyer();
-	void postDestroy(ID3D12GraphicsCommandList* cmdList);
+	void postDestroy(ID3D12GraphicsCommandList* cmdList, UINT numMayBeExpired);
 
 protected:
 	virtual bool needsStaticSampler() override;

@@ -282,6 +282,15 @@ void HlslTranslator::removeOrphanNodes()
 	_isOrphan.resize(_nodes.size(), true);
 	// IMPORTANT: 0 id node is always output node.
 	removeOrphanNodes0(0);
+
+	// find "clip" node because it even doesn't reach result node but not orphan.
+	for (int i = 0; i < _nodes.size(); ++i)
+	{
+		if (_nodes[i].getType() != NodeType::Clip)
+			continue;
+
+		removeOrphanNodes0(i);
+	}
 }
 
 void HlslTranslator::removeOrphanNodes0(const int nodeIndex)

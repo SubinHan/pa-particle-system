@@ -23,12 +23,15 @@ struct SpritePixelIn
 	float3 NormalW : NORMAL;
 	float2 TexC : TEXCOORD;
 	float4 Color : COLOR;
+	float NormalizedLifetimeInv : NORMALIZEDLIFETIMEINV;
 };
 
 float4 ParticlePS(SpritePixelIn pin) : SV_Target
 {
 	float4 color = pin.Color;
 	float4 interpolatedColor = pin.Color;
+	float normalizedLifetimeInv = pin.NormalizedLifetimeInv;
+
 
 	%s
 

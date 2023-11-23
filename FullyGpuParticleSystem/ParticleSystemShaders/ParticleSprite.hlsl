@@ -10,6 +10,7 @@ struct SpriteVertexOut
 	float3 CenterW	: POSITION;
 	float Size : SIZE;
 	float4 Color : COLOR;
+	float NormalizedLifetimeInv : NORMALIZEDLIFETIMEINV;
 };
 
 struct SpritePixelIn
@@ -19,6 +20,7 @@ struct SpritePixelIn
 	float3 NormalW : NORMAL;
 	float2 TexC : TEXCOORD;
 	float4 Color : COLOR;
+	float NormalizedLifetimeInv : NORMALIZEDLIFETIMEINV;
 };
 
 SpriteVertexOut SpriteParticleVS(
@@ -56,6 +58,7 @@ SpriteVertexOut SpriteParticleVS(
 
 	vertexOut.Size = interpolatedSize;
 	vertexOut.Color = interpolatedColor;
+	vertexOut.NormalizedLifetimeInv = normalizedLifetimeInv;
 
 	return vertexOut;
 }
@@ -83,11 +86,27 @@ void SpriteParticleGS(
 
 	float2 texC[4] =
 	{
-		float2(0.0f, 1.0f),
-		float2(0.0f, 0.0f),
+		float2(1.0f, 0.0f),
 		float2(1.0f, 1.0f),
-		float2(1.0f, 0.0f)
+		float2(0.0f, 0.0f),
+		float2(0.0f, 1.0f)
 	};
+
+	//float4 vertices[4];
+	//vertices[0] = float4(gin[0].CenterW - halfHeight * v, 1.0f);
+	//vertices[1] = float4(gin[0].CenterW + halfWidth * u, 1.0f);
+	//vertices[2] = float4(gin[0].CenterW - halfWidth * u, 1.0f);
+	//vertices[3] = float4(gin[0].CenterW + halfHeight * v, 1.0f);
+
+	//float2 texC[4] =
+	//{
+	//	float2(0.5f, 1.0f),
+	//	float2(0.0f, 0.5f),
+	//	float2(1.0f, 0.5f),
+	//	float2(0.5f, 0.0f)
+	//};
+
+
 
 	SpritePixelIn geoOut;
 	[unroll]
@@ -98,6 +117,7 @@ void SpriteParticleGS(
 		geoOut.NormalW = look;
 		geoOut.TexC = texC[i];
 		geoOut.Color = gin[0].Color;
+		geoOut.NormalizedLifetimeInv = gin[0].NormalizedLifetimeInv;
 
 		triStream.Append(geoOut);
 	}

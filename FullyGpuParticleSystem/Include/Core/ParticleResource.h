@@ -9,9 +9,9 @@
 
 struct ParticleCounters
 {
-	UINT NumAlives;
-	UINT NumDeads;
-	UINT NumAlivesPostUpdate;
+	UINT NumAlivesNext;
+	UINT NumAlivesCurrent;
+	UINT NumSurvived;
 };
 
 struct ParticleSortData

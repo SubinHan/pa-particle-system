@@ -16,6 +16,8 @@ struct Particle
 	//----//
 	uint InitialColor;
 	uint EndColor;
+
+
 };
 
 //struct Particle

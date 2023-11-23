@@ -226,7 +226,7 @@ void ParticleApp::loadTextures(ID3D12GraphicsCommandList* commandList)
 {
 	// parallel vectors:
 	const std::vector<std::string> texturesName = {
-		"default",
+		"circle",
 		"fire",
 		"uv_mapper"
 	};

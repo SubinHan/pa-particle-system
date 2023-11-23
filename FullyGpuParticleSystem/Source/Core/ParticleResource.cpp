@@ -250,12 +250,12 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 	{
 		ParticleCounters counters =
 		{
-			getMaxNumParticles(),
+			0,
 			0,
 			0
 		};
 
-		const UINT64 countersByteSize = sizeof(ParticleCounters);
+		const UINT64 countersByteSize = DxUtil::calcConstantBufferByteSize(sizeof(ParticleCounters));
 
 		auto heapPropertiesDefault = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(countersByteSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
@@ -293,7 +293,7 @@ void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 		// Describe the data we want to copy into the default buffer.
 		D3D12_SUBRESOURCE_DATA subResourceData = {};
 		subResourceData.pData = &counters;
-		subResourceData.RowPitch = countersByteSize;
+		subResourceData.RowPitch = sizeof(ParticleCounters);
 		subResourceData.SlicePitch = subResourceData.RowPitch;
 
 		// Schedule to copy the data to the default buffer resource.  At a high level, the helper function UpdateSubresources

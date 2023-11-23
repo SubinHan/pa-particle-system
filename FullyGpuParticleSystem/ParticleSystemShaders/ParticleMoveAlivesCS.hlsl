@@ -10,16 +10,21 @@ cbuffer cbUpdateConstants : register(b0)
 	float DeltaTime;
 }
 
+cbuffer cbCounters : register(b1)
+{
+	uint NumAlivesNext;
+	uint NumAlivesBeforeFrame;
+	uint NumSurvived;
+}
+
 [numthreads(NUM_THREADS, 1, 1)]
 void MoveAlivesCS(
 	uint3 dispatchThreadId : SV_DispatchThreadID)
 {
-	uint numAlivesBeforeFrame =
-		counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
+	uint numAlivesBeforeFrame = NumAlivesBeforeFrame;
 
 	// the number of survived particles in destroyCS phase before.
-	uint numSurvived =
-		counters.Load(PARTICLECOUNTER_OFFSET_NUMSURVIVED);
+	uint numSurvived = NumSurvived;
 
 	// the number of destroyed particles in destroyCS phase before.
 	uint numDestroyed =
@@ -45,10 +50,5 @@ void MoveAlivesCS(
 			packFloat2ToUint(initialLifetime, remainLifetime);
 
 		particlesNext[newIndex] = current;
-	}
-
-	if (dispatchThreadId.x == 0)
-	{
-		counters.Store(PARTICLECOUNTER_OFFSET_NEW_NUMALIVES, newNumAlives);
 	}
 }

@@ -43,4 +43,5 @@ public:
 	static UiNode createMaskZ(const int id);
 	static UiNode createMaskW(const int id);
 	static UiNode createSinByTime(const int id);
+	static UiNode createClip(const int id);
 };

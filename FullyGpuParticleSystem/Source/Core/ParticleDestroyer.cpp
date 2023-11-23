@@ -63,7 +63,7 @@ void ParticleDestroyer::destroyExpiredParticles(
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
 
 	_aliveMover->moveAlives(cmdList, numMayBeExpired, static_cast<float>(deltaTime));
-	_postDestroyer->postDestroy(cmdList);
+	_postDestroyer->postDestroy(cmdList, numMayBeExpired);
 
 	_resource->swapAliveIndicesBuffer();
 

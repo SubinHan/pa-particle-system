@@ -30,6 +30,7 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorRender::get
     {
 		"GetParticleColor",
 		"GetParticleAlpha",
+		"Clip",
 		"SampleTexture2D",
 		"SampleTexture2DSubUvAnmation",
 		"GrayscaleToTranslucent",
@@ -39,6 +40,7 @@ std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorRender::get
     {
 		NodeType::GetParticleColor,
 		NodeType::GetParticleAlpha,
+		NodeType::Clip,
         NodeType::SampleTexture2d,
 		NodeType::SampleTexture2dSubUvAnimation,
         NodeType::GrayscaleToTranslucent,

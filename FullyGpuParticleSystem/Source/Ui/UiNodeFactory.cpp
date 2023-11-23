@@ -79,6 +79,8 @@ UiNode UiNodeFactory::createNode(const int id, NodeType nodeType)
 		return createMakeFloat3(id);
 	case NodeType::MakeFloat4:
 		return createMakeFloat4(id);
+	case NodeType::Clip:
+		return createClip(id);
 	default:
 		// should never reach here.
 		assert(0 && "Unknown node type was given.");
@@ -713,4 +715,18 @@ UiNode UiNodeFactory::createSinByTime(const int id)
 
 	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
 	return UiNode(id, nodeName, emptyVector, emptyVector, emptyValueType, outputNames, nodeType);
+}
+
+UiNode UiNodeFactory::createClip(const int id)
+{
+	constexpr auto nodeType = NodeType::Clip;
+	std::vector<std::string> inputNames =
+	{
+		"opacity",
+	};
+	std::vector<std::string> emptyVector;
+	std::vector<ValueType> emptyValueType;
+
+	std::string nodeName = nodeNames[static_cast<int>(nodeType)];
+	return UiNode(id, nodeName, inputNames, emptyVector, emptyValueType, emptyVector, nodeType);
 }

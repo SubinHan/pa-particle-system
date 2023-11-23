@@ -11,7 +11,8 @@ constexpr int ROOT_SLOT_CONSTANTS_BUFFER = 0;
 constexpr int ROOT_SLOT_PARTICLES_CURRENT_BUFFER = 1;
 constexpr int ROOT_SLOT_PARTICLES_NEXT_BUFFER = ROOT_SLOT_PARTICLES_CURRENT_BUFFER + 1;
 constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_PARTICLES_NEXT_BUFFER + 1;
-constexpr int ROOT_SLOT_SIZE = ROOT_SLOT_COUNTERS_BUFFER + 1;
+constexpr int ROOT_SLOT_COUNTERS_CONSTANTS_BUFFER = ROOT_SLOT_COUNTERS_BUFFER + 1;
+constexpr int ROOT_SLOT_SIZE = ROOT_SLOT_COUNTERS_CONSTANTS_BUFFER + 1;
 
 ParticleComputePass::ParticleComputePass(ParticleResource* resource, std::string name) :
 	ParticlePass(resource, name)
@@ -25,6 +26,7 @@ void ParticleComputePass::setParticlesComputeRootUav(ID3D12GraphicsCommandList* 
 	commandList->SetComputeRootUnorderedAccessView(ROOT_SLOT_PARTICLES_CURRENT_BUFFER, _resource->getCurrentParticlesResource()->GetGPUVirtualAddress());
 	commandList->SetComputeRootUnorderedAccessView(ROOT_SLOT_PARTICLES_NEXT_BUFFER, _resource->getNextParticlesResource()->GetGPUVirtualAddress());
 	commandList->SetComputeRootDescriptorTable(ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersUavGpuHandle());
+	commandList->SetComputeRootConstantBufferView(ROOT_SLOT_COUNTERS_CONSTANTS_BUFFER, _resource->getCountersResource()->GetGPUVirtualAddress());
 }
 
 void ParticleComputePass::bindComputeResourcesOfRegisteredNodes(ID3D12GraphicsCommandList* commandList, int startRootSlot)
@@ -88,6 +90,9 @@ std::vector<CD3DX12_ROOT_PARAMETER> ParticleComputePass::buildRootParameter()
 	_counterUavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
 	slotRootParameter[ROOT_SLOT_COUNTERS_BUFFER]
 		.InitAsDescriptorTable(1, &_counterUavTable);
+
+	slotRootParameter[ROOT_SLOT_COUNTERS_CONSTANTS_BUFFER]
+		.InitAsConstantBufferView(1);
 
 	return slotRootParameter;
 }

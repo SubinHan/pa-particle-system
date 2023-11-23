@@ -90,7 +90,7 @@
 
 ##### 진행 중인 Task
 * 성능 최적화
-  * Caching을 고려한 파티클 버퍼 구성
+* sprite rendering 시 quad가 아닌 bounding n-gon으로 geometry generation
 
 ##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
@@ -129,6 +129,8 @@
 * 성능 최적화
   * ExecuteIndirect에서 적절한 maxCommandsCount를 넘기기 (관련 일지 - 4주차 목요일)
   * Instancing을 이용한 ExecuteIndirect로 commands 개수를 줄이기
+  * Caching을 고려한 파티클 버퍼 구성
+  * 파티클 크기를 줄이기 위한 data packing/unpacking
   * 
 
 <hr/>
@@ -745,8 +747,9 @@ compileShaders();
     * 파티클을 복사하는 비용에 대한 분석:
       * 다음에 따르면 16 byte stride를 지키는 것이 성능에 유리하다고 하는데, 이 경우에는 단순히 byte size가 작은 것이 유리했음.
         * [Understanding Structured Buffer Performance](https://developer.nvidia.com/content/understanding-structured-buffer-performance)
-      * Memory transaction size, coalescing, access pattern 등 다양한 요소가 작용했다고 보이는데, 하드웨어의 지식 부족으로 명확하게 짚을 수는 없을 것 같음:
-        * simulation에서 112byte -> 80byte의 경우에는 큰 성능 향상이 없지만 80byte -> 64 byte에서 simulation의 속도가 급격히 상승하는 이유?
+        * 다만 simulation쪽에서는 해당 원칙이 잘 지켜지는 것으로 보임.
+      * 위의 결과는 coalescing, access pattern 등 다양한 요소가 작용했다고 보이는데, 하드웨어의 지식 부족으로 명확하게 짚을 수는 없을 것 같음.
+      * 질문:
         * 64, 48, 44, 40의 simluation 속도에 대해: memory access pattern이 영향을 준 것일지?
 <hr/>
 
