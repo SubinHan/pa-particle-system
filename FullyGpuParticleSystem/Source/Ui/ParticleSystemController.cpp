@@ -3,6 +3,7 @@
 #include "Core/ParticleSystem.h"
 #include "Core/ParticleSystemManager.h"
 #include "Core/ParticleRenderPass.h"
+#include "Core/TextureManager.h"
 #include "Model/RendererType.h"
 #include "Ui/NodeEditorEmit.h"
 #include "Ui/NodeEditorSimulate.h"
@@ -46,9 +47,9 @@ void ParticleSystemController::show()
 		{
 			if (ImGui::TreeNode("Particle Emitter"))
 			{
-				_spawnRate[i] = particleSystem->getSpawnRate();
-				ImGui::DragFloat("Spawn rate", &_spawnRate[i], 1.0f, 0.0f, 10000.0f);
-				particleSystem->setSpawnRate(_spawnRate[i]);
+				float spawnRate = particleSystem->getSpawnRate();
+				ImGui::DragFloat("Spawn rate", &spawnRate, 1.0f, 0.0f, 10000.0f);
+				particleSystem->setSpawnRate(spawnRate);
 
 				if (ImGui::Button("Modify Shader"))
 				{
@@ -79,44 +80,11 @@ void ParticleSystemController::show()
 			}
 
 			if (ImGui::TreeNode("Particle Renderer"))
-			{
-				bool isOpaque = particleSystem->getRenderer()->isOpaque();
-				ImGui::Checkbox("isOpaque", &isOpaque);
-				particleSystem->getRenderer()->setOpaqueness(isOpaque);
-
-				const char* items[] = { "Sprite", "Ribbon" };
-				static int item_current_idx = 0; // Here we store our selection data as an index.
-				const char* combo_preview_value = items[item_current_idx];  // Pass in the preview value visible before opening the combo (it could be anything)
-
-				static ImGuiComboFlags flags = 0;
-				//flags &= ~(ImGuiComboFlags_HeightMask_ & ~ImGuiComboFlags_HeightRegular);
-
-				if (ImGui::BeginCombo("renderer", combo_preview_value, flags))
-				{
-					for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-					{
-						const bool is_selected = (item_current_idx == n);
-						if (ImGui::Selectable(items[n], is_selected))
-						{
-							item_current_idx = n;
-							if (item_current_idx == 0)
-							{
-								particleSystem->setRendererType(RendererType::Sprite);
-							}
-							if (item_current_idx == 1)
-							{
-								particleSystem->setRendererType(RendererType::Ribbon);
-							}
-						}
-
-						showConfigWidgetsOfRenderer(static_cast<RendererType>(item_current_idx));
-
-						// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-						if (is_selected)
-							ImGui::SetItemDefaultFocus();
-					}
-					ImGui::EndCombo();
-				}
+			{				
+				showCheckboxToSelectOpaqueness(particleSystem);
+				showCheckboxToSelectWireframe(particleSystem);
+				showComboToSelectBoundingMode(particleSystem);
+				showComboToSelectRenderer(particleSystem);
 
 				if (ImGui::Button("Modify Shader"))
 				{
@@ -173,6 +141,98 @@ void ParticleSystemController::show()
 	}
 }
 
+void ParticleSystemController::showComboToSelectBoundingMode(ParticleSystem* particleSystem)
+{
+	auto textureManager = TextureManager::getInstance();
+	auto textureNames = textureManager->getTextureNames();
+
+	std::vector<std::string> items = { "NoBounding" };
+	items.insert(items.end(), textureNames.begin(), textureNames.end());
+
+	int currentItemIndex = 0;
+
+	if (!particleSystem->getRenderer()->isBounding())
+	{
+		currentItemIndex = 0;
+	}
+	else
+	{
+		for (int i = 1; i < items.size(); ++i)
+		{
+			if (particleSystem->getRenderer()->getBoundingTextureName() == items[i])
+			{
+				currentItemIndex = i;
+			}
+		}
+	}
+
+	static ImGuiComboFlags flags = 0;
+
+	if (ImGui::BeginCombo("boundingMode", items[currentItemIndex].data(), flags))
+	{
+		for (int n = 0; n < items.size(); n++)
+		{
+			const bool isSelected = (currentItemIndex == n);
+			if (ImGui::Selectable(items[n].data(), isSelected))
+			{
+				currentItemIndex = n;
+
+				if (n == 0)
+				{
+					// no bounding
+					particleSystem->getRenderer()->setBoundingMode(false);
+				}
+				else
+				{
+					particleSystem->getRenderer()->setBoundingMode(true);
+					particleSystem->getRenderer()->setBoundingTextureName(items[n]);
+				}
+			}
+
+			// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+			if (isSelected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+}
+
+void ParticleSystemController::showComboToSelectRenderer(ParticleSystem* particleSystem)
+{
+	const char* items[] = { "Sprite", "Ribbon" };
+	int item_current_idx = static_cast<int>(particleSystem->getRendererType());
+	const char* combo_preview_value = items[item_current_idx];
+
+	static ImGuiComboFlags flags = 0;
+
+	if (ImGui::BeginCombo("renderer", combo_preview_value, flags))
+	{
+		for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+		{
+			const bool is_selected = (item_current_idx == n);
+			if (ImGui::Selectable(items[n], is_selected))
+			{
+				item_current_idx = n;
+				if (item_current_idx == 0)
+				{
+					particleSystem->setRendererType(RendererType::Sprite);
+				}
+				if (item_current_idx == 1)
+				{
+					particleSystem->setRendererType(RendererType::Ribbon);
+				}
+			}
+
+			showConfigWidgetsOfRenderer(static_cast<RendererType>(item_current_idx));
+
+			// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+			if (is_selected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+}
+
 bool ParticleSystemController::isAlive()
 {
 	return true;
@@ -204,7 +264,6 @@ ParticleSystem* ParticleSystemController::createNewParticleSystem(std::string na
 	int index = _particleSystemManager->getNumParticleSystems();
 	_particleSystemManager->createNewParticleSystem(name);
 	auto particleSystem = _particleSystemManager->getParticleSystemByIndex(index);
-	_spawnRate.push_back(particleSystem->getSpawnRate());
 
 	return particleSystem;
 }
@@ -214,6 +273,20 @@ void ParticleSystemController::deleteParticleSystemAndSaveFiles(int index)
 
 
 	// TODO
+}
+
+void ParticleSystemController::showCheckboxToSelectOpaqueness(ParticleSystem* particleSystem)
+{
+	bool isOpaque = particleSystem->getRenderer()->isOpaque();
+	ImGui::Checkbox("isOpaque", &isOpaque);
+	particleSystem->getRenderer()->setOpaqueness(isOpaque);
+}
+
+void ParticleSystemController::showCheckboxToSelectWireframe(ParticleSystem* particleSystem)
+{
+	bool isWireframe = particleSystem->getRenderer()->isWireframe();
+	ImGui::Checkbox("isWireframe", &isWireframe);
+	particleSystem->getRenderer()->setWireframe(isWireframe);
 }
 
 void ParticleSystemController::showConfigWidgetsOfRenderer(RendererType rendererType)

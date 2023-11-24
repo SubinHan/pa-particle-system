@@ -43,6 +43,7 @@ public:
 	/// <param name="spawnRate"></param>
 	void setSpawnRate(float spawnRate);
 
+	RendererType getRendererType();
 	void setRendererType(RendererType type);
 
 	ParticleEmitter* getEmitter();

@@ -6,19 +6,12 @@ cbuffer cbUpdateConstants : register(b0)
 	uint NumParticlesMayBeExpired;
 }
 
-cbuffer cbCounters : register(b1)
-{
-	uint NumAlivesNext;
-	uint NumAlivesBeforeFrame;
-	uint NumSurvived;
-}
-
 [numthreads(1, 1, 1)]
 void PostDestroyCS(
 	int3 dispatchThreadId : SV_DispatchThreadID)
 {
-	uint numAlivesBeforeFrame = NumAlivesBeforeFrame;
-	uint numSurvived = NumSurvived;
+	uint numAlivesBeforeFrame = counters.Load(PARTICLECOUNTER_OFFSET_NUMALIVES);
+	uint numSurvived = counters.Load(PARTICLECOUNTER_OFFSET_NUMSURVIVED);
 	uint numDestroyed =
 		min(numAlivesBeforeFrame, NumParticlesMayBeExpired) - numSurvived;
 	uint newNumAlives = numAlivesBeforeFrame - numDestroyed;

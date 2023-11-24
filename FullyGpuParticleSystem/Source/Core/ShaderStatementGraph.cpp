@@ -52,6 +52,7 @@ void ShaderStatementGraph::topologySort()
 	_topologicalOrder.clear();
 	_visited.clear();
 	_visited.resize(getSize());
+
 	for (int i = 0; i < getSize(); ++i)
 	{
 		if (_visited[i])

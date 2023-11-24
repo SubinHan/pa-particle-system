@@ -27,7 +27,14 @@ public:
 	void bindGraphicsResourcesOfRegisteredNodes(ID3D12GraphicsCommandList* commandList, int startRootSlot);
 
 	void setOpaqueness(bool newIsOpaque);
+	void setBoundingMode(bool newIsBounding);
+	void setWireframe(bool newIsWireframe);
 	bool isOpaque();
+	bool isBounding();
+	bool isWireframe();
+
+	std::string getBoundingTextureName();
+	void setBoundingTextureName(std::string textureName);
 
 	void setVertexShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
 	void setHullShader(Microsoft::WRL::ComPtr<ID3DBlob> shader);
@@ -50,6 +57,8 @@ protected:
 	ID3DBlob* getDomainShader() const;
 	ID3DBlob* getGeometryShader() const;
 	ID3DBlob* getPixelShader() const;
+
+	virtual void updateGeometryShader(bool isBounding) = 0;
 
 	const std::vector<D3D12_INPUT_ELEMENT_DESC>& getInputLayout();
 
@@ -91,6 +100,11 @@ private:
 	std::unique_ptr<MeshGeometry> _emptyGeometry = nullptr;
 
 	bool _isOpaque;
+	bool _isBounding;
+	bool _isWireframe;
+
+	std::string _boundingTextureName;
+	std::vector<DirectX::XMFLOAT2> _boundingPolygon;
 
 private:
 

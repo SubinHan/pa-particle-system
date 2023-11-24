@@ -751,6 +751,16 @@ compileShaders();
       * 위의 결과는 coalescing, access pattern 등 다양한 요소가 작용했다고 보이는데, 하드웨어의 지식 부족으로 명확하게 짚을 수는 없을 것 같음.
       * 질문:
         * 64, 48, 44, 40의 simluation 속도에 대해: memory access pattern이 영향을 준 것일지?
+
+
+### Bounding Mode
+* Sprite의 texture에는 opacity가 있고 이를 이용해 픽셀을 기각할 수 있음
+  * 하지만 텍스처에서 대부분 픽셀의 opacity가 0인 경우, quad로 화면을 그리는 것은 overdraw를 발생시킴.
+  * <img src="./img/trace.png">
+  * 따라서 quad가 아닌 bounding n-gon을 생성해 그리는 것이 더 유리할 수 있음:
+  * <img src="./img/bounding_trace_wireframe.png">
+  * 
+
 <hr/>
 
 ### 참고문헌 및 코드
@@ -777,3 +787,5 @@ compileShaders();
 * Perlin Noise
   * [Perlin Noise](https://en.wikipedia.org/wiki/Perlin_noise)
 
+* Particle Trimming (Bounding)
+  * [Alok Aggarwal, Minimum area circumscrbinig Polygons]

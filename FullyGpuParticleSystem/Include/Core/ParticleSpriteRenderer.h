@@ -22,11 +22,11 @@ public:
 		const PassConstantBuffer& passCb) override;
 
 protected:
+	virtual void updateGeometryShader(bool isBounding) override;
 
 private:
-	void buildShaders();
+	void initShaders();
 	void rebuildGraphicsPsos();
-	void setShaders();
 	void buildComputePsos();
 
 private:

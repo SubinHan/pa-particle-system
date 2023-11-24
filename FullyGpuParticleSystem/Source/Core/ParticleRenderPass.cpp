@@ -5,6 +5,7 @@
 #include "Core/ShaderStatementGraph.h"
 #include "Core/ShaderStatementNode/ShaderStatementNode.h"
 #include "Core/PassConstantBuffer.h"
+#include "Core/TextureManager.h"
 #include "Model/ObjectConstants.h"
 #include "Model/Geometry.h"
 
@@ -12,11 +13,15 @@ constexpr int ROOT_SLOT_OBJECT_CONSTANTS_BUFFER = 0;
 constexpr int ROOT_SLOT_PASS_CONSTANTS_BUFFER = ROOT_SLOT_OBJECT_CONSTANTS_BUFFER + 1;
 constexpr int ROOT_SLOT_PARTICLES_BUFFER = ROOT_SLOT_PASS_CONSTANTS_BUFFER + 1;
 constexpr int ROOT_SLOT_COUNTERS_BUFFER = ROOT_SLOT_PARTICLES_BUFFER + 1;
-constexpr int ROOT_SLOT_SIZE = ROOT_SLOT_COUNTERS_BUFFER + 1;
+constexpr int ROOT_SLOT_BOUNDING_CONSTANTS_BUFFER = ROOT_SLOT_COUNTERS_BUFFER + 1;
+constexpr int ROOT_SLOT_SIZE = ROOT_SLOT_BOUNDING_CONSTANTS_BUFFER + 1;
+constexpr int BOUNDING_POLYGON_N = 8;
 
 ParticleRenderPass::ParticleRenderPass(ParticleResource* resource, std::string name) :
 	ParticlePass(resource, name),
-	_isOpaque(true)
+	_isOpaque(true),
+	_isBounding(false),
+	_isWireframe(false)
 {
 	buildComputeIndirectRootSignature();
 	buildCommandSignature();
@@ -48,9 +53,54 @@ bool ParticleRenderPass::isOpaque()
 	return _isOpaque;
 }
 
+bool ParticleRenderPass::isBounding()
+{
+	return _isBounding;
+}
+
+bool ParticleRenderPass::isWireframe()
+{
+	return _isWireframe;
+}
+
+std::string ParticleRenderPass::getBoundingTextureName()
+{
+	return _boundingTextureName;
+}
+
+void ParticleRenderPass::setBoundingTextureName(std::string textureName)
+{
+	if (_boundingTextureName == textureName)
+		return;
+
+	_boundingTextureName = textureName;
+	auto textureManager = TextureManager::getInstance();
+	_boundingPolygon = textureManager->getBoundingPolygon(_boundingTextureName, BOUNDING_POLYGON_N);
+	setShaderDirty(true);
+}
+
 void ParticleRenderPass::setOpaqueness(bool newIsOpaque)
 {
 	_isOpaque = newIsOpaque;
+}
+
+void ParticleRenderPass::setBoundingMode(bool newIsBounding)
+{
+	if (_isBounding == newIsBounding)
+		return;
+
+	_isBounding = newIsBounding;
+	updateGeometryShader(_isBounding);
+	setShaderDirty(true);
+}
+
+void ParticleRenderPass::setWireframe(bool newIsWireframe)
+{
+	if (_isWireframe == newIsWireframe)
+		return;
+
+	_isWireframe = newIsWireframe;
+	setShaderDirty(true);
 }
 
 void ParticleRenderPass::setVertexShader(Microsoft::WRL::ComPtr<ID3DBlob> shader)
@@ -96,6 +146,8 @@ std::vector<CD3DX12_ROOT_PARAMETER> ParticleRenderPass::buildRootParameter()
 
 	_counterTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
 	slotRootParameter[ROOT_SLOT_COUNTERS_BUFFER].InitAsDescriptorTable(1, &_counterTable);
+
+	slotRootParameter[ROOT_SLOT_BOUNDING_CONSTANTS_BUFFER].InitAsConstants(16, 2);
 
 	buildComputeIndirectRootSignature();
 
@@ -196,6 +248,19 @@ void ParticleRenderPass::computeIndirectCommand(
 	cmdList->Dispatch(numDispatchBlocks, 1, 1);
 }
 
+// for a assertion
+bool textureManagerContains(std::string textureName)
+{
+	auto textureManager = TextureManager::getInstance();
+	for (auto containingTextureName : textureManager->getTextureNames())
+	{
+		if (containingTextureName == textureName)
+			return true;
+	}
+	
+	return false;
+}
+
 void ParticleRenderPass::executeIndirectCommand(
 	ID3D12GraphicsCommandList* cmdList,
 	ID3D12PipelineState* renderPso,
@@ -221,6 +286,14 @@ void ParticleRenderPass::executeIndirectCommand(
 		ROOT_SLOT_PARTICLES_BUFFER, _resource->getCurrentParticlesResource()->GetGPUVirtualAddress());
 	cmdList->SetGraphicsRootDescriptorTable(
 		ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersUavGpuHandle());
+
+	if (_isBounding)
+	{
+		assert(textureManagerContains(_boundingTextureName) && "isBounding is true but boundingTextureName is invalid.");
+
+		cmdList->SetGraphicsRoot32BitConstants(
+			ROOT_SLOT_BOUNDING_CONSTANTS_BUFFER, 16, _boundingPolygon.data(), 0);
+	}
 
 	bindGraphicsResourcesOfRegisteredNodes(cmdList, ROOT_SLOT_SIZE);
 
@@ -312,13 +385,6 @@ void ParticleRenderPass::generateEmptyGeometry()
 	using IndexType = std::uint32_t;
 
 	std::vector<VertexType> vertices(1);
-
-	//std::vector<IndexType> indices(_resource->getMaxNumParticles() + 1);
-	//indices[0] = 0;
-	//for (int i = 1; i < indices.size(); ++i)
-	//{
-	//	indices[i] = i - 1;
-	//}
 
 	std::vector<IndexType> indices(4);
 	for (int i = 0; i < indices.size(); ++i)

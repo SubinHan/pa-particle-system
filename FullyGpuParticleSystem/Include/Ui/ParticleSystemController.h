@@ -27,6 +27,10 @@ private:
 	ParticleSystem* createNewParticleSystem(std::string name);
 	void deleteParticleSystemAndSaveFiles(int index);
 
+	void showCheckboxToSelectOpaqueness(ParticleSystem* particleSystem);
+	void showCheckboxToSelectWireframe(ParticleSystem* particleSystem);
+	void showComboToSelectBoundingMode(ParticleSystem* particleSystem);
+	void showComboToSelectRenderer(ParticleSystem* particleSystem);
 	// rendere index is enum of RendererType.
 	void showConfigWidgetsOfRenderer(RendererType rendererType);
 
@@ -34,8 +38,6 @@ private:
 	ParticleSystemManager* _particleSystemManager;
 
 	std::unique_ptr<IWindow> _showingWindow;
-
-	std::vector<float> _spawnRate;
 
 	int _expandedParticleSystem;
 };

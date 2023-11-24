@@ -29,7 +29,7 @@ void ParticleAliveMover::moveAlives(ID3D12GraphicsCommandList* cmdList, UINT num
 		deltaTime,
 	};
 
-	readyDispatch(cmdList);
+	readyDispatch(cmdList, true);
 	setConstants(cmdList, &c);
 
 	const auto numGroupsX = static_cast<UINT>(ceilf(_resource->getEstimatedCurrentNumAliveParticles() / 256.0f));
@@ -37,6 +37,7 @@ void ParticleAliveMover::moveAlives(ID3D12GraphicsCommandList* cmdList, UINT num
 	const UINT numGroupsZ = 1;
 	_resource->uavBarrier(cmdList);
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
+	_resource->transitCountersCbvToUav(cmdList);
 }
 
 bool ParticleAliveMover::needsStaticSampler()

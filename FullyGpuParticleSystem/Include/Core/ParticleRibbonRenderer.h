@@ -29,6 +29,9 @@ public:
 
 	void setRibbonTextureUvType(RibbonTextureUvType type);
 
+protected:
+	virtual void updateGeometryShader(bool isBounding) override;
+
 private:
 	void buildShaders();
 	void rebuildGraphicsPsos();

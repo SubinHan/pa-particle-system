@@ -18,7 +18,7 @@ protected:
 	virtual int getNum32BitsConstantsUsing() = 0;
 
 	// particles root parameter uses slot 1~5
-	void setParticlesComputeRootUav(ID3D12GraphicsCommandList* commandList);
+	void setParticlesComputeRootUav(ID3D12GraphicsCommandList* commandList, bool countersAsCbv = false);
 	void bindComputeResourcesOfRegisteredNodes(ID3D12GraphicsCommandList* commandList, int startRootSlot);
 
 	// set 32bit constants. it dependes on getNum32BitsConstantsUsing().
@@ -26,7 +26,7 @@ protected:
 
 	// ready to dispatch except setting 32bit constants.
 	// you should invoke setConstants() before dispatch.
-	void readyDispatch(ID3D12GraphicsCommandList* commandList);
+	void readyDispatch(ID3D12GraphicsCommandList* commandList, bool countersAsCbv = false);
 
 protected:
 	ID3DBlob* getComputeShader() const;

@@ -215,6 +215,26 @@ void ParticleResource::uavBarrier(ID3D12GraphicsCommandList* cmdList)
 	cmdList->ResourceBarrier(_countof(barriers), barriers);
 }
 
+void ParticleResource::transitCountersToCbv(ID3D12GraphicsCommandList* cmdList)
+{
+	const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+			getCountersResource(),
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+
+	cmdList->ResourceBarrier(1, &barrier);
+}
+
+void ParticleResource::transitCountersCbvToUav(ID3D12GraphicsCommandList* cmdList)
+{
+	const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		getCountersResource(),
+		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
+	cmdList->ResourceBarrier(1, &barrier);
+}
+
 void ParticleResource::buildResources(ID3D12GraphicsCommandList* cmdList)
 {
 	const auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);

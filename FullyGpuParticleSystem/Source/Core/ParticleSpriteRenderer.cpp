@@ -9,6 +9,8 @@
 
 static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/";
 static const std::string PIXEL_SHADER_ENTRY_NAME = "ParticlePS";
+static const std::wstring SHADER_PATH = SHADER_ROOT_PATH + L"ParticleSprite.hlsl";
+static const std::wstring INDIRECT_COMMAND_SHADER_PATH = SHADER_ROOT_PATH + L"ParticleComputeIndirectCommands.hlsl";
 
 std::unique_ptr<ParticleSpriteRenderer> ParticleSpriteRenderer::create(ParticleResource* resource, std::string name)
 {
@@ -24,8 +26,7 @@ ParticleSpriteRenderer::ParticleSpriteRenderer(ParticleResource* resource, std::
 	ParticleRenderPass(resource, name),
 	_currentRibbonTextureUvType(RibbonTextureUvType::SegmentBased)
 {
-	buildShaders();
-	setShaders();
+	initShaders();
 	buildComputePsos();
 }
 
@@ -55,28 +56,38 @@ void ParticleSpriteRenderer::render(
 		passCb);
 }
 
-void ParticleSpriteRenderer::buildShaders()
+void ParticleSpriteRenderer::updateGeometryShader(bool isBounding)
 {
-	const std::wstring shaderPath = SHADER_ROOT_PATH + L"ParticleSprite.hlsl";
-	const std::wstring indirectCommandShaderPath = SHADER_ROOT_PATH + L"ParticleComputeIndirectCommands.hlsl";
+	static constexpr D3D_SHADER_MACRO defines[] =
+	{
+		"BOUNDING",
+		"1",
+		NULL,
+		NULL,
+	};
 
-	_vertexShader = DxUtil::compileShader(
-		shaderPath,
-		nullptr,
-		"SpriteParticleVS",
-		"vs_5_1");
-
-	_geometryShader = DxUtil::compileShader(
-		shaderPath,
-		nullptr,
+	setGeometryShader(DxUtil::compileShader(
+		SHADER_PATH,
+		isBounding ? defines : nullptr,
 		"SpriteParticleGS",
-		"gs_5_1");
+		"gs_5_1"));
+}
 
+void ParticleSpriteRenderer::initShaders()
+{
 	_indirectCommandShader = DxUtil::compileShader(
-		indirectCommandShaderPath,
+		INDIRECT_COMMAND_SHADER_PATH,
 		nullptr,
 		"ComputeIndirectCommandsCS",
 		"cs_5_1");
+
+	setVertexShader(DxUtil::compileShader(
+		SHADER_PATH,
+		nullptr,
+		"SpriteParticleVS",
+		"vs_5_1"));
+	updateGeometryShader(isBounding());
+	setPixelShader(HlslGeneratorRender::generateDefaultPixelShader(PIXEL_SHADER_ENTRY_NAME));
 }
 
 void ParticleSpriteRenderer::rebuildGraphicsPsos()
@@ -88,7 +99,8 @@ void ParticleSpriteRenderer::rebuildGraphicsPsos()
 	spriteOpaquePsoDesc.InputLayout = { getInputLayout().data(), static_cast<UINT>(getInputLayout().size()) };
 	spriteOpaquePsoDesc.pRootSignature = getRootSignature();
 	spriteOpaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	spriteOpaquePsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	spriteOpaquePsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+	spriteOpaquePsoDesc.RasterizerState.FillMode = isWireframe() ? D3D12_FILL_MODE_WIREFRAME : D3D12_FILL_MODE_SOLID;
 	spriteOpaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	spriteOpaquePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	spriteOpaquePsoDesc.SampleMask = UINT_MAX;
@@ -153,13 +165,6 @@ void ParticleSpriteRenderer::rebuildGraphicsPsos()
 			&spriteTranslucentPsoDesc, IID_PPV_ARGS(&_spriteTranslucentPso)
 		)
 	);
-}
-
-void ParticleSpriteRenderer::setShaders()
-{
-	setVertexShader(_vertexShader);
-	setGeometryShader(_geometryShader);
-	setPixelShader(HlslGeneratorRender::generateDefaultPixelShader(PIXEL_SHADER_ENTRY_NAME));
 }
 
 void ParticleSpriteRenderer::buildComputePsos()

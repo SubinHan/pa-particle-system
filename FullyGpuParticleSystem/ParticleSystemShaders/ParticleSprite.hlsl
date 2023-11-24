@@ -63,50 +63,42 @@ SpriteVertexOut SpriteParticleVS(
 	return vertexOut;
 }
 
+#ifndef BOUNDING
 [maxvertexcount(4)]
 void SpriteParticleGS(
 	point SpriteVertexOut gin[1],
 	inout TriangleStream<SpritePixelIn> triStream)
 {
 	float4 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
-	float3 up = mul(upView, gInvView).xyz;
-	float3 look = normalize(gEyePosW - gin[0].CenterW);
+	float3 up = normalize(mul(upView, gInvView).xyz);
+	float3 normal = normalize(gEyePosW - gin[0].CenterW);
 
-	float3 u = cross(look, up);
-	float3 v = cross(look, u);
+	// be careful that directx uses left-handed coordinate.
+	float3 u = cross(normal, up);
+	float3 v = cross(u, normal);
 
 	float halfWidth = 0.5f * gin[0].Size;
 	float halfHeight = 0.5f * gin[0].Size;
 
+	//
+	//	(0,0) - (1,0)
+	//	  -		  -
+	//	(0,1) - (1,1)
+	//
+
 	float4 vertices[4];
-	vertices[0] = float4(gin[0].CenterW + halfWidth * u - halfHeight * v, 1.0f);
+	vertices[0] = float4(gin[0].CenterW - halfWidth * u + halfHeight * v, 1.0f);
 	vertices[1] = float4(gin[0].CenterW + halfWidth * u + halfHeight * v, 1.0f);
 	vertices[2] = float4(gin[0].CenterW - halfWidth * u - halfHeight * v, 1.0f);
-	vertices[3] = float4(gin[0].CenterW - halfWidth * u + halfHeight * v, 1.0f);
+	vertices[3] = float4(gin[0].CenterW + halfWidth * u - halfHeight * v, 1.0f);
 
 	float2 texC[4] =
 	{
-		float2(1.0f, 0.0f),
-		float2(1.0f, 1.0f),
 		float2(0.0f, 0.0f),
-		float2(0.0f, 1.0f)
+		float2(1.0f, 0.0f),
+		float2(0.0f, 1.0f),
+		float2(1.0f, 1.0f)
 	};
-
-	//float4 vertices[4];
-	//vertices[0] = float4(gin[0].CenterW - halfHeight * v, 1.0f);
-	//vertices[1] = float4(gin[0].CenterW + halfWidth * u, 1.0f);
-	//vertices[2] = float4(gin[0].CenterW - halfWidth * u, 1.0f);
-	//vertices[3] = float4(gin[0].CenterW + halfHeight * v, 1.0f);
-
-	//float2 texC[4] =
-	//{
-	//	float2(0.5f, 1.0f),
-	//	float2(0.0f, 0.5f),
-	//	float2(1.0f, 0.5f),
-	//	float2(0.5f, 0.0f)
-	//};
-
-
 
 	SpritePixelIn geoOut;
 	[unroll]
@@ -114,7 +106,7 @@ void SpriteParticleGS(
 	{
 		geoOut.PosH = mul(vertices[i], gViewProj);
 		geoOut.PosW = vertices[i].xyz;
-		geoOut.NormalW = look;
+		geoOut.NormalW = normal;
 		geoOut.TexC = texC[i];
 		geoOut.Color = gin[0].Color;
 		geoOut.NormalizedLifetimeInv = gin[0].NormalizedLifetimeInv;
@@ -122,3 +114,104 @@ void SpriteParticleGS(
 		triStream.Append(geoOut);
 	}
 }
+#else
+cbuffer cbBoundingConstants : register(b2)
+{
+	float2 BoundingVertices0;
+	float2 BoundingVertices1;
+	float2 BoundingVertices2;
+	float2 BoundingVertices3;
+	float2 BoundingVertices4;
+	float2 BoundingVertices5;
+	float2 BoundingVertices6;
+	float2 BoundingVertices7;
+}
+
+[maxvertexcount(16)]
+void SpriteParticleGS(
+	point SpriteVertexOut gin[1],
+	inout TriangleStream<SpritePixelIn> triStream)
+{
+	float4 upView = float4(0.0f, 1.0f, 0.0f, 0.0f);
+	float3 up = mul(upView, gInvView).xyz;
+	float3 normal = normalize(gEyePosW - gin[0].CenterW);
+
+	// be careful that directx uses left-handed coordinate.
+	float3 u = cross(normal, up);
+	float3 v = cross(u, normal);
+
+	float width = gin[0].Size;
+	float height = gin[0].Size;
+	
+	float2 boundingVertices[9];
+
+	int i = 0;
+	boundingVertices[0] = BoundingVertices0;
+	boundingVertices[1] = BoundingVertices1;
+	boundingVertices[2] = BoundingVertices2;
+	boundingVertices[3] = BoundingVertices3;
+	boundingVertices[4] = BoundingVertices4;
+	boundingVertices[5] = BoundingVertices5;
+	boundingVertices[6] = BoundingVertices6;
+	boundingVertices[7] = BoundingVertices7;
+	boundingVertices[8] = BoundingVertices0;
+
+	float2 offsetFromCenter[9];
+	[unroll]
+	for (i = 0; i < 9; ++i)
+	{
+		offsetFromCenter[i] = boundingVertices[i] - float2(0.5f, 0.5f);
+	}
+
+	float4 center = float4(gin[0].CenterW, 1.0f);
+
+	float4 boundingVerticesW[9];
+	[unroll]
+	for (i = 0; i < 8; ++i)
+	{
+		boundingVerticesW[i] = float4(
+			gin[0].CenterW + width * offsetFromCenter[i].x * u + height * offsetFromCenter[i].y * v, 
+			1.0f);
+	}
+	boundingVerticesW[8] = boundingVerticesW[0];
+
+	SpritePixelIn geoOut;
+	[unroll]
+	for (i = 0; i < 4; ++i)
+	{
+		geoOut.PosH = mul(boundingVerticesW[i * 2], gViewProj);
+		geoOut.PosW = boundingVerticesW[i * 2].xyz;
+		geoOut.NormalW = normal;
+		geoOut.TexC = boundingVertices[i * 2];
+		geoOut.Color = gin[0].Color;
+		geoOut.NormalizedLifetimeInv = gin[0].NormalizedLifetimeInv;
+		triStream.Append(geoOut);
+
+		geoOut.PosH = mul(center, gViewProj);
+		geoOut.PosW = center.xyz;
+		geoOut.NormalW = normal;
+		geoOut.TexC = float2(0.5f, 0.5f);
+		geoOut.Color = gin[0].Color;
+		geoOut.NormalizedLifetimeInv = gin[0].NormalizedLifetimeInv;
+		triStream.Append(geoOut);
+
+		geoOut.PosH = mul(boundingVerticesW[i * 2 + 1], gViewProj);
+		geoOut.PosW = boundingVerticesW[i * 2 + 1].xyz;
+		geoOut.NormalW = normal;
+		geoOut.TexC = boundingVertices[i * 2 + 1];
+		geoOut.Color = gin[0].Color;
+		geoOut.NormalizedLifetimeInv = gin[0].NormalizedLifetimeInv;
+		triStream.Append(geoOut);
+
+		geoOut.PosH = mul(boundingVerticesW[i * 2 + 2], gViewProj);
+		geoOut.PosW = boundingVerticesW[i * 2 + 2].xyz;
+		geoOut.NormalW = normal;
+		geoOut.TexC = boundingVertices[i * 2 + 2];
+		geoOut.Color = gin[0].Color;
+		geoOut.NormalizedLifetimeInv = gin[0].NormalizedLifetimeInv;
+		triStream.Append(geoOut);
+
+		triStream.RestartStrip();
+	}
+}
+#endif

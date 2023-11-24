@@ -59,6 +59,8 @@ public:
 	float getMinLifetimeOfParticles();
 	float getMaxLifetimeOfParticles();
 
+	void transitCountersToCbv(ID3D12GraphicsCommandList* cmdList);
+	void transitCountersCbvToUav(ID3D12GraphicsCommandList* cmdList);
 	void transitCommandBufferToIndirectArgument(ID3D12GraphicsCommandList* cmdList);
 	void transitCommandBufferToUav(ID3D12GraphicsCommandList* cmdList);
 

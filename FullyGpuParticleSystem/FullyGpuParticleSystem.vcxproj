@@ -73,25 +73,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Projects\FullyGpuParticleSystem\include\dxc;$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Projects\FullyGpuParticleSystem\include\stbimg;$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\Projects\FullyGpuParticleSystem\include\dxc;$(SolutionDir);$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Projects\FullyGpuParticleSystem\include\stbimg;$(SolutionDir);$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Projects\FullyGpuParticleSystem\include\dxc;$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Projects\FullyGpuParticleSystem\include\stbimg;$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\Projects\FullyGpuParticleSystem\include\dxc;$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Projects\FullyGpuParticleSystem\include\stbimg;$(SolutionDir)include\imgui\backends;$(SolutionDir)include\imgui;$(SolutionDir)include\directx;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
@@ -232,6 +232,7 @@
     <ClInclude Include="Include\Core\TextureManager.h" />
     <ClInclude Include="Include\Core\UploadBuffer.h" />
     <ClInclude Include="Include\Io\ParticleSystemIo.h" />
+    <ClInclude Include="Include\Util\ConvexHull.h" />
     <ClInclude Include="Include\Util\CppHlslMap.h" />
     <ClInclude Include="Include\Model\Emitter.h" />
     <ClInclude Include="Include\Model\Geometry.h" />
@@ -263,6 +264,8 @@
     <ClInclude Include="Include\Util\GeometryGenerator.h" />
     <ClInclude Include="Include\Core\PassConstantBuffer.h" />
     <ClInclude Include="Include\Core\HlslGenerator.h" />
+    <ClInclude Include="Include\Util\ImageReader.h" />
+    <ClInclude Include="Include\Core\TextureTrimmer.h" />
     <ClInclude Include="ParticleApp\ParticleApp.h" />
     <ClInclude Include="Include\Core\ParticleEmitter.h" />
     <ClInclude Include="Include\Core\ParticleResource.h" />
@@ -358,6 +361,7 @@
     <ClCompile Include="Source\Core\TextureBuffer.cpp" />
     <ClCompile Include="Source\Core\HlslTranslatorSimulate.cpp" />
     <ClCompile Include="Source\Core\TextureManager.cpp" />
+    <ClCompile Include="Source\Core\TextureTrimmer.cpp" />
     <ClCompile Include="Source\Io\ParticleSystemIo.cpp" />
     <ClCompile Include="Source\Ui\NodeEditor.cpp" />
     <ClCompile Include="Source\Ui\NodeEditorEmit.cpp" />
@@ -368,11 +372,13 @@
     <ClCompile Include="Source\Ui\UiLink.cpp" />
     <ClCompile Include="Source\Ui\UiNode.cpp" />
     <ClCompile Include="Source\Ui\UiNodeFactory.cpp" />
+    <ClCompile Include="Source\Util\ConvexHull.cpp" />
     <ClCompile Include="Source\Util\DDSTextureLoader.cpp" />
     <ClCompile Include="Source\Util\DxDebug.cpp" />
     <ClCompile Include="Source\Util\DxUtil.cpp" />
     <ClCompile Include="Source\Util\GameTimer.cpp" />
     <ClCompile Include="Source\Util\GeometryGenerator.cpp" />
+    <ClCompile Include="Source\Util\ImageReader.cpp" />
     <ClCompile Include="Source\Util\MathHelper.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -103,6 +103,11 @@ void ParticleSystem::setSpawnRate(float spawnRate)
 	_shouldClear = true;
 }
 
+RendererType ParticleSystem::getRendererType()
+{
+	return _currentRendererType;
+}
+
 void ParticleSystem::setRendererType(RendererType type)
 {
 	if (_currentRendererType == type)

@@ -21,12 +21,20 @@ ParticleComputePass::ParticleComputePass(ParticleResource* resource, std::string
 
 ParticleComputePass::~ParticleComputePass() = default;
 
-void ParticleComputePass::setParticlesComputeRootUav(ID3D12GraphicsCommandList* commandList)
+void ParticleComputePass::setParticlesComputeRootUav(ID3D12GraphicsCommandList* commandList, bool countersAsCbv)
 {
 	commandList->SetComputeRootUnorderedAccessView(ROOT_SLOT_PARTICLES_CURRENT_BUFFER, _resource->getCurrentParticlesResource()->GetGPUVirtualAddress());
 	commandList->SetComputeRootUnorderedAccessView(ROOT_SLOT_PARTICLES_NEXT_BUFFER, _resource->getNextParticlesResource()->GetGPUVirtualAddress());
-	commandList->SetComputeRootDescriptorTable(ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersUavGpuHandle());
-	commandList->SetComputeRootConstantBufferView(ROOT_SLOT_COUNTERS_CONSTANTS_BUFFER, _resource->getCountersResource()->GetGPUVirtualAddress());
+	
+	if (countersAsCbv)
+	{
+		_resource->transitCountersToCbv(commandList);
+		commandList->SetComputeRootConstantBufferView(ROOT_SLOT_COUNTERS_CONSTANTS_BUFFER, _resource->getCountersResource()->GetGPUVirtualAddress());
+	}
+	else
+	{
+		commandList->SetComputeRootDescriptorTable(ROOT_SLOT_COUNTERS_BUFFER, _resource->getCountersUavGpuHandle());
+	}
 }
 
 void ParticleComputePass::bindComputeResourcesOfRegisteredNodes(ID3D12GraphicsCommandList* commandList, int startRootSlot)
@@ -55,7 +63,7 @@ void ParticleComputePass::setConstants(ID3D12GraphicsCommandList* commandList, c
 	commandList->SetComputeRoot32BitConstants(ROOT_SLOT_CONSTANTS_BUFFER, getNum32BitsConstantsUsing(), constants, 0);
 }
 
-void ParticleComputePass::readyDispatch(ID3D12GraphicsCommandList* commandList)
+void ParticleComputePass::readyDispatch(ID3D12GraphicsCommandList* commandList, bool countersAsCbv)
 {
 	if (isShaderDirty())
 	{
@@ -66,7 +74,7 @@ void ParticleComputePass::readyDispatch(ID3D12GraphicsCommandList* commandList)
 
 	commandList->SetComputeRootSignature(getRootSignature());
 	commandList->SetPipelineState(_pso.Get());
-	setParticlesComputeRootUav(commandList);
+	setParticlesComputeRootUav(commandList, countersAsCbv);
 	bindComputeResourcesOfRegisteredNodes(commandList, ROOT_SLOT_SIZE);
 }
 

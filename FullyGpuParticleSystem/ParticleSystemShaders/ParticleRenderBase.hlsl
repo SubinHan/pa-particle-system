@@ -29,9 +29,10 @@ struct SpritePixelIn
 float4 ParticlePS(SpritePixelIn pin) : SV_Target
 {
 	float4 color = pin.Color;
+	clip(color.a - 0.1f);
+
 	float4 interpolatedColor = pin.Color;
 	float normalizedLifetimeInv = pin.NormalizedLifetimeInv;
-
 
 	%s
 
