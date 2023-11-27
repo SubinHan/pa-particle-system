@@ -75,7 +75,7 @@ void SpriteParticleGS(
 
 	// be careful that directx uses left-handed coordinate.
 	float3 u = cross(normal, up);
-	float3 v = cross(u, normal);
+	float3 v = cross(normal, u);
 
 	float halfWidth = 0.5f * gin[0].Size;
 	float halfHeight = 0.5f * gin[0].Size;
@@ -87,10 +87,10 @@ void SpriteParticleGS(
 	//
 
 	float4 vertices[4];
-	vertices[0] = float4(gin[0].CenterW - halfWidth * u + halfHeight * v, 1.0f);
-	vertices[1] = float4(gin[0].CenterW + halfWidth * u + halfHeight * v, 1.0f);
-	vertices[2] = float4(gin[0].CenterW - halfWidth * u - halfHeight * v, 1.0f);
-	vertices[3] = float4(gin[0].CenterW + halfWidth * u - halfHeight * v, 1.0f);
+	vertices[0] = float4(gin[0].CenterW - halfWidth * u - halfHeight * v, 1.0f);
+	vertices[1] = float4(gin[0].CenterW + halfWidth * u - halfHeight * v, 1.0f);
+	vertices[2] = float4(gin[0].CenterW - halfWidth * u + halfHeight * v, 1.0f);
+	vertices[3] = float4(gin[0].CenterW + halfWidth * u + halfHeight * v, 1.0f);
 
 	float2 texC[4] =
 	{
@@ -138,7 +138,7 @@ void SpriteParticleGS(
 
 	// be careful that directx uses left-handed coordinate.
 	float3 u = cross(normal, up);
-	float3 v = cross(u, normal);
+	float3 v = cross(normal, u);
 
 	float width = gin[0].Size;
 	float height = gin[0].Size;
@@ -187,18 +187,18 @@ void SpriteParticleGS(
 		geoOut.NormalizedLifetimeInv = gin[0].NormalizedLifetimeInv;
 		triStream.Append(geoOut);
 
-		geoOut.PosH = mul(center, gViewProj);
-		geoOut.PosW = center.xyz;
-		geoOut.NormalW = normal;
-		geoOut.TexC = float2(0.5f, 0.5f);
-		geoOut.Color = gin[0].Color;
-		geoOut.NormalizedLifetimeInv = gin[0].NormalizedLifetimeInv;
-		triStream.Append(geoOut);
-
 		geoOut.PosH = mul(boundingVerticesW[i * 2 + 1], gViewProj);
 		geoOut.PosW = boundingVerticesW[i * 2 + 1].xyz;
 		geoOut.NormalW = normal;
 		geoOut.TexC = boundingVertices[i * 2 + 1];
+		geoOut.Color = gin[0].Color;
+		geoOut.NormalizedLifetimeInv = gin[0].NormalizedLifetimeInv;
+		triStream.Append(geoOut);
+
+		geoOut.PosH = mul(center, gViewProj);
+		geoOut.PosW = center.xyz;
+		geoOut.NormalW = normal;
+		geoOut.TexC = float2(0.5f, 0.5f);
 		geoOut.Color = gin[0].Color;
 		geoOut.NormalizedLifetimeInv = gin[0].NormalizedLifetimeInv;
 		triStream.Append(geoOut);
