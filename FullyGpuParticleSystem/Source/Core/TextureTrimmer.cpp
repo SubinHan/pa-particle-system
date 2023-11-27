@@ -212,8 +212,10 @@ float Simplifier::extra_area_balanced(int i, int j, int k, float2& p, float2& q)
 	float2 opt = next;
 	if (k != wrap(i + 1) && std::abs(cross(ab, cd)) > EPS_FLOAT)
 	{
+		// a + 2(e-a), c에서 각각 ab, cd방향 직선의 교점
 		float t = cross(ab, 2 * e - a - c) / cross(ab, cd);
 		opt = c + cd * t - e;
+		// 만약 convex hull을 뚫어버리는 balanced point라면, 그냥 prev or next로 조정
 		if (cross(prev, opt) < 0) opt = prev;
 		if (cross(next, opt) > 0) opt = next;
 	}

@@ -83,7 +83,7 @@ ParticleAliveMover* ParticleDestroyer::getParticleAliveMover()
 
 bool ParticleDestroyer::needsStaticSampler()
 {
-	return false;
+	return true;
 }
 
 int ParticleDestroyer::getNum32BitsConstantsUsing()

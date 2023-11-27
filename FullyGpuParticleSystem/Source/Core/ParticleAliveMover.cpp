@@ -51,7 +51,7 @@ void ParticleAliveMover::moveAlives(
 
 bool ParticleAliveMover::needsStaticSampler()
 {
-	return false;
+	return true;
 }
 
 int ParticleAliveMover::getNum32BitsConstantsUsing()

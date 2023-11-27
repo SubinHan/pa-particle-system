@@ -29,7 +29,7 @@ void NodeEditorSimulate::onCompileButtonClicked()
 	HlslTranslatorAliveMover translatorMoveAlives(_nodes, _links);
 
 	translatorDestroy.translateTo(_destroyer);
-	translatorDestroy.translateTo(_aliveMover);
+	translatorMoveAlives.translateTo(_aliveMover);
 }
 
 std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorSimulate::getCreatableNodes() const
