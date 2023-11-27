@@ -5,12 +5,11 @@
 class HlslTranslatorSimulate : public HlslTranslator
 {
 public:
-	HlslTranslatorSimulate(std::vector<UiNode> nodes, std::vector<UiLink> links);
+	HlslTranslatorSimulate(
+		std::vector<UiNode> nodes, 
+		std::vector<UiLink> links);
 	virtual ~HlslTranslatorSimulate();
 
 protected:
-	virtual std::unique_ptr<HlslGenerator> createHlslGenerator() override;
-	virtual Microsoft::WRL::ComPtr<ID3DBlob> compileShaderImpl(std::wstring shaderPath) override;
-
 	virtual bool translateNode(UiNode node) override;
 };

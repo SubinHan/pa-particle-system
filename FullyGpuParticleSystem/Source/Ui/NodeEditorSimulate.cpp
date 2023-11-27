@@ -1,13 +1,18 @@
 #include "Ui/NodeEditorSimulate.h"
 
-#include "Core/ParticleSimulator.h"
-#include "Core/HlslTranslatorSimulate.h"
+#include "Core/ParticleDestroyer.h"
+#include "Core/ParticleAliveMover.h"
+#include "Core/HlslTranslatorDestroyer.h"
+#include "Core/HlslTranslatorAliveMover.h"
 #include "Ui/UiNodeFactory.h"
 #include "Ui/NodeType.h"
 
-NodeEditorSimulate::NodeEditorSimulate(ParticleSimulator* simulator) :
+NodeEditorSimulate::NodeEditorSimulate(
+	ParticleDestroyer* destroyer,
+	ParticleAliveMover* aliveMover) :
 	NodeEditor(),
-	_simulator(simulator)
+	_destroyer(destroyer),
+	_aliveMover(aliveMover)
 {
 }
 
@@ -15,13 +20,16 @@ NodeEditorSimulate::~NodeEditorSimulate() = default;
 
 std::string NodeEditorSimulate::getName() const
 {
-	return _simulator->getName();
+	return _destroyer->getName();
 }
 
 void NodeEditorSimulate::onCompileButtonClicked()
 {
-	HlslTranslatorSimulate translator(_nodes, _links);
-	translator.translateTo(_simulator);
+	HlslTranslatorDestroyer translatorDestroy(_nodes, _links);
+	HlslTranslatorAliveMover translatorMoveAlives(_nodes, _links);
+
+	translatorDestroy.translateTo(_destroyer);
+	translatorDestroy.translateTo(_aliveMover);
 }
 
 std::pair<std::vector<std::string>, std::vector<NodeType>> NodeEditorSimulate::getCreatableNodes() const

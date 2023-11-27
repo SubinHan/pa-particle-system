@@ -12,7 +12,8 @@ public:
 	void moveAlives(
 		ID3D12GraphicsCommandList* cmdList,
 		UINT numMayBeExpired,
-		float deltaTime);
+		float deltaTime,
+		float totalTime);
 
 protected:
 	virtual bool needsStaticSampler() override;

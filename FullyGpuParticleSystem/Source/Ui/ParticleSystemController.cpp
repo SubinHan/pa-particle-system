@@ -4,6 +4,8 @@
 #include "Core/ParticleSystemManager.h"
 #include "Core/ParticleRenderPass.h"
 #include "Core/TextureManager.h"
+#include "Core/ParticleDestroyer.h"
+#include "Core/ParticleAliveMover.h"
 #include "Model/RendererType.h"
 #include "Ui/NodeEditorEmit.h"
 #include "Ui/NodeEditorSimulate.h"
@@ -70,8 +72,9 @@ void ParticleSystemController::show()
 				{
 					// open particle simulator editor
 
-					auto editor =
-						std::make_unique<NodeEditorSimulate>(particleSystem->getSimulator());
+					auto editor = std::make_unique<NodeEditorSimulate>(
+						particleSystem->getDestroyer(), 
+						particleSystem->getDestroyer()->getParticleAliveMover());
 					editor->load();
 					_showingWindow = std::move(editor);
 				}

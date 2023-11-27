@@ -3,9 +3,13 @@
 #include "Core/ParticleResource.h"
 #include "Core/ParticleAliveMover.h"
 #include "Core/ParticlePostDestroyer.h"
+#include "Core/HlslGeneratorSimulate.h"
 #include "Util/MathHelper.h"
 
 #include "pix3.h"
+
+static const std::wstring SHADER_ROOT_PATH = L"ParticleSystemShaders/Generated/";
+static const std::wstring BASE_SIMULATOR_SHADER_PATH = L"ParticleSystemShaders/ParticleDestroyCS.hlsl";
 
 std::unique_ptr<ParticleDestroyer> ParticleDestroyer::create(ParticleResource* resource, std::string name)
 {
@@ -29,7 +33,8 @@ ParticleDestroyer::~ParticleDestroyer() = default;
 
 void ParticleDestroyer::destroyExpiredParticles(
 	ID3D12GraphicsCommandList* cmdList,
-	double deltaTime, 
+	double deltaTime,
+	double totalTime,
 	float spawnRate, 
 	float minLifetime,
 	float maxLifetime)
@@ -51,6 +56,7 @@ void ParticleDestroyer::destroyExpiredParticles(
 	{ 
 		numMayBeExpired,
 		static_cast<float>(deltaTime),
+		static_cast<float>(totalTime),
 	};
 
 	readyDispatch(cmdList);
@@ -62,12 +68,17 @@ void ParticleDestroyer::destroyExpiredParticles(
 	_resource->uavBarrier(cmdList);
 	cmdList->Dispatch(numGroupsX, numGroupsY, numGroupsZ);
 
-	_aliveMover->moveAlives(cmdList, numMayBeExpired, static_cast<float>(deltaTime));
+	_aliveMover->moveAlives(cmdList, numMayBeExpired, static_cast<float>(deltaTime), static_cast<float>(totalTime));
 	_postDestroyer->postDestroy(cmdList, numMayBeExpired);
 
 	_resource->swapAliveIndicesBuffer();
 
 	PIXEndEvent(cmdList);
+}
+
+ParticleAliveMover* ParticleDestroyer::getParticleAliveMover()
+{
+	return _aliveMover.get();
 }
 
 bool ParticleDestroyer::needsStaticSampler()
@@ -82,9 +93,21 @@ int ParticleDestroyer::getNum32BitsConstantsUsing()
 
 void ParticleDestroyer::setDefaultShader()
 {
-	setComputeShader(DxUtil::compileShader(
-		L"ParticleSystemShaders\\ParticleDestroyCS.hlsl",
-		nullptr,
-		"DestroyCS",
-		"cs_5_1"));
+	HlslGeneratorSimulate hlslGenerator(BASE_SIMULATOR_SHADER_PATH);
+
+	UINT deltaTimeIndex = hlslGenerator.getDeltaTime();
+	UINT positionIndex = hlslGenerator.getPosition();
+	UINT randFloat3 = hlslGenerator.randFloat3();
+	UINT minusHalf = hlslGenerator.newFloat3(-0.5f, -0.5f, -0.5f);
+	UINT minusHalfToPlusHalf = hlslGenerator.addFloat3(randFloat3, minusHalf);
+	UINT noisedPositionOffset = hlslGenerator.multiplyFloat3ByScalar(minusHalfToPlusHalf, deltaTimeIndex);
+	UINT scaler = hlslGenerator.newFloat(5.0f);
+	UINT noisedPositionOffsetScaled = hlslGenerator.multiplyFloat3ByScalar(noisedPositionOffset, scaler);
+	UINT positionResult = hlslGenerator.addFloat3(positionIndex, noisedPositionOffsetScaled);
+
+	hlslGenerator.setPosition(positionResult);
+
+	hlslGenerator.generateShaderFile(SHADER_ROOT_PATH + L"temp.hlsl");
+	setComputeShader(DxUtil::compileShader(SHADER_ROOT_PATH + L"temp.hlsl", nullptr, "DestroyCS", "cs_5_1"));
+	setShaderStatementGraph(hlslGenerator.getShaderStatementGraph());
 }

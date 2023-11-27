@@ -225,7 +225,8 @@ void ParticleApp::drawUi()
 void ParticleApp::loadTextures(ID3D12GraphicsCommandList* commandList)
 {
 	// parallel vectors:
-	const std::vector<std::string> texturesName = {
+	const std::vector<std::string> texturesName = 
+	{
 		"circle",
 		"fire",
 		"uv_mapper",
@@ -234,7 +235,8 @@ void ParticleApp::loadTextures(ID3D12GraphicsCommandList* commandList)
 		"scratch",
 	};
 
-	const std::vector<std::wstring> texturesPath = {
+	const std::vector<std::wstring> texturesPath = 
+	{
 		L"textures/circle_05.dds",
 		L"textures/fire_subuv.dds",
 		L"textures/uv_mapper.dds",

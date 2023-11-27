@@ -47,7 +47,7 @@ public:
 	void setRendererType(RendererType type);
 
 	ParticleEmitter* getEmitter();
-	ParticleSimulator* getSimulator();
+	ParticleDestroyer* getDestroyer();
 	ParticleRenderPass* getRenderer();
 
 	std::string getName();
@@ -65,8 +65,7 @@ private:
 	std::unique_ptr<ParticleResource> _resource;
 	std::unique_ptr<ParticleEmitter> _emitter;
 	//std::unique_ptr<ParticleSorter> _sorter;
-	std::unique_ptr<ParticleDestroyer> _destroyer;
-	std::unique_ptr<ParticleSimulator> _simulator;
+	std::unique_ptr<ParticleDestroyer> _simulator;
 	std::unique_ptr<ParticleRenderPass> _renderer;
 	std::unique_ptr<ParticleClearer> _clearer;
 

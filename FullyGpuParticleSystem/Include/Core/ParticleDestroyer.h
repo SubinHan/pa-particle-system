@@ -6,6 +6,7 @@ struct ParticleDestroyerConstants
 {
 	UINT NumMayBeExpired;
 	float DeltaTime;
+	float TotalTime;
 };
 
 class ParticleAliveMover;
@@ -21,9 +22,12 @@ public:
 	void destroyExpiredParticles(
 		ID3D12GraphicsCommandList* cmdList,
 		double deltaTime,
+		double totalTime,
 		float spawnRate,
 		float minLifetime,
 		float maxLifetime);
+
+	ParticleAliveMover* getParticleAliveMover();
 
 protected:
 	virtual bool needsStaticSampler() override;

@@ -72,14 +72,13 @@ void ParticleSystem::onDraw(
 			_deltaTimeAcc,
 			gt.totalTime());
 
-		_destroyer->destroyExpiredParticles(
+		_simulator->destroyExpiredParticles(
 			commandList,
 			_deltaTimeAcc,
+			gt.totalTime(),
 			getSpawnRate(),
 			_resource->getMinLifetimeOfParticles(),
 			_resource->getMaxLifetimeOfParticles());
-
-		_simulator->simulateParticles(commandList, _deltaTimeAcc, gt.totalTime());
 
 		_deltaTimeAcc = 0.0;
 	}
@@ -147,7 +146,7 @@ ParticleEmitter* ParticleSystem::getEmitter()
 	return _emitter.get();
 }
 
-ParticleSimulator* ParticleSystem::getSimulator()
+ParticleDestroyer* ParticleSystem::getDestroyer()
 {
 	return _simulator.get();
 }
@@ -173,8 +172,7 @@ void ParticleSystem::init()
 
 	_resource = ParticleResource::create(commandList.Get());
 	_emitter = ParticleEmitter::create(_resource.get(), _name + "_Emitter");
-	_destroyer = ParticleDestroyer::create(_resource.get(), _name + "_Destroyer");
-	_simulator = ParticleSimulator::create(_resource.get(), _name + "_Simulator");
+	_simulator = ParticleDestroyer::create(_resource.get(), _name + "_Destroyer");
 	_renderer = ParticleSpriteRenderer::create(_resource.get(), _name + "_Renderer");
 	_clearer = ParticleClearer::create(_resource.get(), _name + "_Clearer");
 }

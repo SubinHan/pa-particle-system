@@ -2,9 +2,11 @@
 
 #include "Core/ParticleSystem.h"
 #include "Core/ParticleEmitter.h"
-#include "Core/ParticleSimulator.h"
+#include "Core/ParticleDestroyer.h"
+#include "Core/ParticleAliveMover.h"
 #include "Core/HlslTranslatorEmit.h"
-#include "Core/HlslTranslatorSimulate.h"
+#include "Core/HlslTranslatorDestroyer.h"
+#include "Core/HlslTranslatorAliveMover.h"
 #include "Core/HlslTranslatorRenderPs.h"
 #include "Io/NodeEditorIo.h"
 
@@ -93,8 +95,11 @@ void ParticleSystemIo::loadInto(std::string filePath, ParticleSystem* particleSy
 			}
 			else if (!foundSimulatorEditorSaveFile && endsWith(filenameWithoutExtension, "Simulator"))
 			{
-				HlslTranslatorSimulate translator(nodes, links);
-				translator.translateTo(particleSystem->getSimulator());
+				HlslTranslatorDestroyer translatorDestroy(nodes, links);
+				HlslTranslatorAliveMover translatorMoveAlives(nodes, links);
+
+				translatorDestroy.translateTo(particleSystem->getDestroyer());
+				translatorMoveAlives.translateTo(particleSystem->getDestroyer()->getParticleAliveMover());
 				foundSimulatorEditorSaveFile = true;
 			}
 			else if (!foundRendererEditorSaveFile && endsWith(filenameWithoutExtension, "Renderer"))

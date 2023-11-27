@@ -354,6 +354,12 @@
     <ClInclude Include="Include\Util\ConvexHull.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Core\HlslTranslatorDestroyer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Core\HlslTranslatorAliveMover.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FullyGpuParticleSystem.cpp">
@@ -657,6 +663,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\TextureTrimmer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HlslTranslatorDestroyer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HlslTranslatorAliveMover.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

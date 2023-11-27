@@ -12,20 +12,6 @@ HlslTranslatorSimulate::HlslTranslatorSimulate(std::vector<UiNode> nodes, std::v
 
 HlslTranslatorSimulate::~HlslTranslatorSimulate() = default;
 
-std::unique_ptr<HlslGenerator> HlslTranslatorSimulate::createHlslGenerator()
-{
-	return std::make_unique<HlslGeneratorSimulate>(BASE_SIMULATOR_SHADER_PATH);
-}
-
-Microsoft::WRL::ComPtr<ID3DBlob> HlslTranslatorSimulate::compileShaderImpl(std::wstring shaderPath)
-{
-	return DxUtil::compileShader(
-		shaderPath,
-		nullptr,
-		"SimulateCS",
-		"cs_5_1");
-}
-
 bool HlslTranslatorSimulate::translateNode(UiNode node)
 {
 	if (HlslTranslator::translateNode(node))
