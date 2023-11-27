@@ -755,11 +755,42 @@ compileShaders();
 
 ### Bounding Mode
 * Sprite의 texture에는 opacity가 있고 이를 이용해 픽셀을 기각할 수 있음
-  * 하지만 텍스처에서 대부분 픽셀의 opacity가 0인 경우, quad로 화면을 그리는 것은 overdraw를 발생시킴.
-  * <img src="./img/trace.png">
+  * 하지만 화면에서 그려지는 대부분 픽셀의 opacity가 0인 경우, overdraw를 발생시킴.
+  * <img src="./img/scratch.png">
   * 따라서 quad가 아닌 bounding n-gon을 생성해 그리는 것이 더 유리할 수 있음:
-  * <img src="./img/bounding_trace_wireframe.png">
-  * 
+  * <img src="./img/bounding_scratch_wireframe.png">
+  * 절차:
+    * 텍스처로부터 경계라 할 수 있는 픽셀들을 선정
+      * 각 행마다 양쪽 끝에서 opacity가 threshold 이상인 픽셀을 선정 (N by N 텍스처일 경우 최대 2N 개의 픽셀 선택)
+    * 선택된 픽셀들을 기반으로 convex hull 생성
+      * Braham scan 알고리즘을 기반으로 하였음
+    * 생성된 convex hull을 기반으로 bounding n-gon을 생성
+      * 현재 n은 8로 hard-coded
+    * 성능 비교
+      * 상황1: 전체 파티클은 3500개, 하나의 파티클은 quad 기준으로 대략 화면을 15% 이상 채우고, 반절 이상은 기각됨. 다음 그림 참고:
+        * <img src="./img/bounding_example.png">
+        * 텍스처:
+          * <img src="./img/circle.png">
+        * 성능표:
+
+        |              | \# of Particles | Renderer Type | Blending Type | Indirect Drawing |
+        | ------------ | --------------- | ------------- | ------------- | ---------------- |
+        | Bounding 적용X | 3,500           | Sprite        | Additive      | 20.674528        |
+        | Bounding 적용O | 3,500           | Sprite        | Additive      | 16.544576        |
+
+      * 상황2: 전체 파티클은 100만 개, 전체적으로 퍼져있어 하나의 파티클은 화면을 몇 픽셀 차지하지 않음.
+        * <img src="./img/bounding_example_2.png">
+
+        |                | \# of Particles | Renderer Type | Blending Type | Indirect Drawing |
+        | -------------- | --------------- | ------------- | ------------- | ---------------- |
+        | Bounding 적용X | 1,000,000       | Sprite        | Additive      | 7.412736         |
+        | Bounding 적용O | 1,000,000       | Sprite        | Additive      | 9.781248         |
+
+  * 결론
+    * 렌더링 시 실질적으로 기각되는 픽셀이 많고 텍스처 및 파티클 효과와 관련한 아티스트의 지원이 제한적인 경우에 유용할 수 있음.
+
+
+
 
 <hr/>
 
