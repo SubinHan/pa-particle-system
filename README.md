@@ -821,3 +821,4 @@ compileShaders();
 
 * Particle Trimming (Bounding)
   * [Alok Aggarwal, Minimum area circumscrbinig Polygons]
+  * [smallest-k-gon - Open Source in Github](https://github.com/atyuwen/smallest-k-gon)
