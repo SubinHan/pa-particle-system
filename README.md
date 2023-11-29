@@ -26,7 +26,7 @@
 
 <hr/>
 
-### 목표 및 계획
+### 초기 목표 및 계획
 
 ##### 1주차: 계획 선정 및 개발 환경 구성
 * 주제 선정 및 조사
@@ -71,35 +71,13 @@
 <hr/>
 
 ### Tasks
-
-##### Backlogs
-* Mesh(i.e. cube) render
-* Particle에 Orientation 속성 추가
-* Opaque particles를 먼저 draw해야 함
-* Angular Velocity, Orientation 개념
-* 프레임 통계 모듈
-* Motion blur
-* Collision
-* Lighting
-* Curl Noise를 Perlin Noise 기반으로
-* Shader generation에서 node dependency 무결성 확인
-  * i.e.) float3에 float4를 대입하지는 않는지?
-  * 각 node들이 type 정보를 유지하여 적절한 input임을 검증해야 함
-* 성능 이슈:
-  *
-
-##### 진행 중인 Task
-* 성능 최적화
-* sprite rendering 시 quad가 아닌 bounding n-gon으로 geometry generation
-
-##### 완료된 Tasks
 * D3D12 개발 환경 구성 (+PIX 디버거)
 * D3D12 기초적 렌더러 구현
 * 간단한 수준의 Particle 생성/파괴, 시뮬레이션을 위한 Computing Shader 작성
 * 간단한 수준의 Particle System을 위한 렌더링 파이프라인 구성
 * 간단한 수준의 emitter, particle 등 핵심 기능 설계 및 구현
 * Texture mapping 수행
-* alpha blending 수행
+* additive blending 수행
 * Sorting 구현 확인
   + Batcher's odd-even merge sort 학습
   + Bitonic sort 학습
@@ -131,7 +109,8 @@
   * Instancing을 이용한 ExecuteIndirect로 commands 개수를 줄이기
   * Caching을 고려한 파티클 버퍼 구성
   * 파티클 크기를 줄이기 위한 data packing/unpacking
-  * 
+  * 파티클 패스 통합
+* Bounding k-gon
 
 <hr/>
 
@@ -325,6 +304,24 @@
 * 화요일:
   * 파티클 관리 방식 변경에 따른 버그 및 기능 변경 요구사항 해결
   * half type 미지원에 따라 직접 16 bit float packing 구현
+    * shader model 6.2부터 활용할 수 있는데, fxc를 쓰고 있어 해당 버전으로 컴파일 불가능
+* 수요일:
+  * 성능 측정 및 결과 분석
+  * bounding k-gon을 찾는 방법론에 대해 공부
+* 목요일:
+  * 파티클들을 ping-pong할 때 UAV로 uniform하게 접근하는 값들을 CBV 통해서 접근하도록 바꿔보았으나 큰 성능 이득은 없었음
+  * [Alok Aggrwal, Minimum area circumscribing Polygons] 학습
+* 금요일:
+  * 논문 학습 후 적용했으나 버그가 여전히 많음
+
+
+##### 8주차: 성능 개선 및 마무리 (2023.11.27. ~ 2023.11.28.)
+* 월요일:
+  * Bounding k-gon 적용 및 성능 측정
+  * 파티클을 ping-pong하는 패스와 시뮬레이션 패스를 통합함으로써 메모리 접근을 줄임
+* 화요일:
+  * 발표 자료 준비 및 최종 발표
+
 
 
 <hr/>
