@@ -1,22 +1,22 @@
 ## Particle System
 
-### ¸ñÂ÷
-[ÇÁ·ÎÁ§Æ® °³¿ä](#ÇÁ·ÎÁ§Æ®-°³¿ä) <br>
-[¸ñÇ¥ ¹× °èÈ¹](#¸ñÇ¥-¹×-°èÈ¹) <br>
+### ëª©ì°¨
+[í”„ë¡œì íŠ¸ ê°œìš”](#í”„ë¡œì íŠ¸-ê°œìš”) <br>
+[ì´ˆê¸° ëª©í‘œ ë° ê³„íš](#ì´ˆê¸°-ëª©í‘œ-ë°-ê³„íš) <br>
 [Tasks](#Tasks) <br>
-[ÀÏÁö](#ÀÏÁö) <br>
-[¼¼ºÎ ±¸Çö ¼³¸í](#¼¼ºÎ-±¸Çö-¼³¸í) <br>
-[Âü°í¹®Çå](#Âü°í¹®Çå)
+[ì¼ì§€](#ì¼ì§€) <br>
+[ì„¸ë¶€ êµ¬í˜„ ì„¤ëª…](#ì„¸ë¶€-êµ¬í˜„-ì„¤ëª…) <br>
+[ì°¸ê³ ë¬¸í—Œ ë° ì°¸ê³  ì½”ë“œ](#ì°¸ê³ ë¬¸í—Œ-ë°-ì½”ë“œ)
 
 <hr/>
 
-### ÇÁ·ÎÁ§Æ® °³¿ä
+### í”„ë¡œì íŠ¸ ê°œìš”
 
-´Ü¼øÇÑ ¼öÁØÀÇ ÆÄÆ¼Å¬ ½Ã½ºÅÛÀ» D3D12·Î ±¸ÇöÇÕ´Ï´Ù. <br>
-Æ¯È÷, **SimulationÀÌ ¾Æ´Ñ Particle Control¿¡ ÁýÁß**ÇÕ´Ï´Ù. <br>
+ë‹¨ìˆœí•œ ìˆ˜ì¤€ì˜ íŒŒí‹°í´ ì‹œìŠ¤í…œì„ D3D12ë¡œ êµ¬í˜„í•©ë‹ˆë‹¤. <br>
+íŠ¹ížˆ, **Simulationì´ ì•„ë‹Œ Particle Controlì— ì§‘ì¤‘**í•©ë‹ˆë‹¤. <br>
 
 
-#### ±¸Çö ¸ñÇ¥ Reference
+#### êµ¬í˜„ ëª©í‘œ Reference
 * ***Unreal Engine 5 Niagara*** <br>
 * [YouTube: ncParticleEditor](https://www.youtube.com/watch?v=RLNI5NMCJ1E) <br>
 * [YouTube: OpenGL/Imgui Engine Build Stage 3.5: Particle System](https://www.youtube.com/watch?v=rZ3ztv7u0Yk) <br>
@@ -26,202 +26,202 @@
 
 <hr/>
 
-### ÃÊ±â ¸ñÇ¥ ¹× °èÈ¹
+### ì´ˆê¸° ëª©í‘œ ë° ê³„íš
 
-##### 1ÁÖÂ÷: °èÈ¹ ¼±Á¤ ¹× °³¹ß È¯°æ ±¸¼º
-* ÁÖÁ¦ ¼±Á¤ ¹× Á¶»ç
-* D3D12 °³¹ß È¯°æ ±¸¼º
-
-
-##### 2~4ÁÖÂ÷: ÇÙ½É ±â´É ±¸Çö ¹× Particle System ÇÐ½À
-
-* ÇÐ½À
-* D3D12 ±âÃÊÀû ·»´õ·¯ ±¸Çö
-* emnitter, particle µî ÇÙ½É ±â´É ¼³°è ¹× ±¸Çö
-* Computing Shader ÀÛ¼º
-  + EmitterCS ÀÛ¼º
-  + SimulateCS ÀÛ¼º
-* Particle Rendering ±¸Çö
-  + VS, GS, PS ÀÛ¼º
-* ´Ü¼øÇÑ ¼öÁØÀÇ particle simulation ±¸Çö (i.e. sprinkler)
-* z-buffer¿¡ ÀÇÇÑ particle occlusion
-* *motion blur ±¸Çö (ÁøÇà »óÈ²¿¡ µû¶ó ¼öÇà)*
-* *alpha-blending (ÁøÇà »óÈ²¿¡ µû¶ó ¼öÇà)*
-  + *SortingCS ÀÛ¼º*
-  + *alpha-blending ±¸Çö*
-* *geometry¿ÍÀÇ collision (ÁøÇà »óÈ²¿¡ µû¶ó ¼öÇà)*
-
-##### 5~7ÁÖÂ÷: UI µµÀÔ ¹× »ç¿ë¼º, È®Àå¼º, À¯Áöº¸¼ö¼º Áõ´ë
-
-* imgui µµÀÔ
-* hard coding µÇ¾î ÀÖÀ» ´Ù¾çÇÑ °ªµé parameterÈ­
-* À¯¿¬ÇÑ particle controlÀ» À§ÇÑ, ÇÙ½É ±â´ÉÀÇ ±¸Á¶ °³¼±
-* ´Ù¾çÇÑ particle contorlÀ» À§ÇÑ, ±â´É ±¸Çö (i.e. gravity, drag, noise, wind, ...)
+##### 1ì£¼ì°¨: ê³„íš ì„ ì • ë° ê°œë°œ í™˜ê²½ êµ¬ì„±
+* ì£¼ì œ ì„ ì • ë° ì¡°ì‚¬
+* D3D12 ê°œë°œ í™˜ê²½ êµ¬ì„±
 
 
-##### 8ÁÖÂ÷: ¸¶¹«¸®
+##### 2~4ì£¼ì°¨: í•µì‹¬ ê¸°ëŠ¥ êµ¬í˜„ ë° Particle System í•™ìŠµ
+
+* í•™ìŠµ
+* D3D12 ê¸°ì´ˆì  ë Œë”ëŸ¬ êµ¬í˜„
+* emnitter, particle ë“± í•µì‹¬ ê¸°ëŠ¥ ì„¤ê³„ ë° êµ¬í˜„
+* Computing Shader ìž‘ì„±
+  + EmitterCS ìž‘ì„±
+  + SimulateCS ìž‘ì„±
+* Particle Rendering êµ¬í˜„
+  + VS, GS, PS ìž‘ì„±
+* ë‹¨ìˆœí•œ ìˆ˜ì¤€ì˜ particle simulation êµ¬í˜„ (i.e. sprinkler)
+* z-bufferì— ì˜í•œ particle occlusion
+* *motion blur êµ¬í˜„ (ì§„í–‰ ìƒí™©ì— ë”°ë¼ ìˆ˜í–‰)*
+* *alpha-blending (ì§„í–‰ ìƒí™©ì— ë”°ë¼ ìˆ˜í–‰)*
+  + *SortingCS ìž‘ì„±*
+  + *alpha-blending êµ¬í˜„*
+* *geometryì™€ì˜ collision (ì§„í–‰ ìƒí™©ì— ë”°ë¼ ìˆ˜í–‰)*
+
+##### 5~7ì£¼ì°¨: UI ë„ìž… ë° ì‚¬ìš©ì„±, í™•ìž¥ì„±, ìœ ì§€ë³´ìˆ˜ì„± ì¦ëŒ€
+
+* imgui ë„ìž…
+* hard coding ë˜ì–´ ìžˆì„ ë‹¤ì–‘í•œ ê°’ë“¤ parameterí™”
+* ìœ ì—°í•œ particle controlì„ ìœ„í•œ, í•µì‹¬ ê¸°ëŠ¥ì˜ êµ¬ì¡° ê°œì„ 
+* ë‹¤ì–‘í•œ particle contorlì„ ìœ„í•œ, ê¸°ëŠ¥ êµ¬í˜„ (i.e. gravity, drag, noise, wind, ...)
+
+
+##### 8ì£¼ì°¨: ë§ˆë¬´ë¦¬
 * refactoring
-* visuality °³¼±
+* visuality ê°œì„ 
 
-#### À§Çè ¿ä¼Ò
-* NativeÇÑ D3D12·Î ÁøÇà (Mini Engine µî »ç¿ë X)
-* Particle System ÇÐ½À ¹Ìºñ
-* imgui »ç¿ë °æÇè ¾øÀ½
+#### ìœ„í—˜ ìš”ì†Œ
+* Nativeí•œ D3D12ë¡œ ì§„í–‰ (Mini Engine ë“± ì‚¬ìš© X)
+* Particle System í•™ìŠµ ë¯¸ë¹„
+* imgui ì‚¬ìš© ê²½í—˜ ì—†ìŒ
 
 <hr/>
 
 ### Tasks
-* D3D12 °³¹ß È¯°æ ±¸¼º (+PIX µð¹ö°Å)
-* D3D12 ±âÃÊÀû ·»´õ·¯ ±¸Çö
-* °£´ÜÇÑ ¼öÁØÀÇ Particle »ý¼º/ÆÄ±«, ½Ã¹Ä·¹ÀÌ¼ÇÀ» À§ÇÑ Computing Shader ÀÛ¼º
-* °£´ÜÇÑ ¼öÁØÀÇ Particle SystemÀ» À§ÇÑ ·»´õ¸µ ÆÄÀÌÇÁ¶óÀÎ ±¸¼º
-* °£´ÜÇÑ ¼öÁØÀÇ emitter, particle µî ÇÙ½É ±â´É ¼³°è ¹× ±¸Çö
-* Texture mapping ¼öÇà
-* additive blending ¼öÇà
-* Sorting ±¸Çö È®ÀÎ
-  + Batcher's odd-even merge sort ÇÐ½À
-  + Bitonic sort ÇÐ½À
-  + °£´ÜÇÑ ±¸Çö ¼öÇà ¹× °á°ú È®ÀÎ
-* HLSL Generator ±¸Çö
-  * Ãß»óÈ­µÈ ÀÛ¾÷µéÀ» HLSL ÄÚµå·Î º¯È¯½ÃÄÑÁÖ´Â Å¬·¡½º
-  * °¡·É float4 º¯¼ö¸¦ ÃÊ±âÈ­ÇÏ°í, µÎ °³ÀÇ float4 º¯¼ö¸¦ ´õÇÏ´Â °Í µî
-  * ÀÌ¸¦ ±â¹ÝÀ¸·Î À¯¿¬ÇÑ Emit, Simulate process ±¸ÇöÀÇ ±â¹Ý ¸¶·Ã
-* DrawIndexedIndirect(), ExecuteIndirect() ÇÐ½À ¹× Àû¿ë
+* D3D12 ê°œë°œ í™˜ê²½ êµ¬ì„± (+PIX ë””ë²„ê±°)
+* D3D12 ê¸°ì´ˆì  ë Œë”ëŸ¬ êµ¬í˜„
+* ê°„ë‹¨í•œ ìˆ˜ì¤€ì˜ Particle ìƒì„±/íŒŒê´´, ì‹œë®¬ë ˆì´ì…˜ì„ ìœ„í•œ Computing Shader ìž‘ì„±
+* ê°„ë‹¨í•œ ìˆ˜ì¤€ì˜ Particle Systemì„ ìœ„í•œ ë Œë”ë§ íŒŒì´í”„ë¼ì¸ êµ¬ì„±
+* ê°„ë‹¨í•œ ìˆ˜ì¤€ì˜ emitter, particle ë“± í•µì‹¬ ê¸°ëŠ¥ ì„¤ê³„ ë° êµ¬í˜„
+* Texture mapping ìˆ˜í–‰
+* additive blending ìˆ˜í–‰
+* Sorting êµ¬í˜„ í™•ì¸
+  + Batcher's odd-even merge sort í•™ìŠµ
+  + Bitonic sort í•™ìŠµ
+  + ê°„ë‹¨í•œ êµ¬í˜„ ìˆ˜í–‰ ë° ê²°ê³¼ í™•ì¸
+* HLSL Generator êµ¬í˜„
+  * ì¶”ìƒí™”ëœ ìž‘ì—…ë“¤ì„ HLSL ì½”ë“œë¡œ ë³€í™˜ì‹œì¼œì£¼ëŠ” í´ëž˜ìŠ¤
+  * ê°€ë ¹ float4 ë³€ìˆ˜ë¥¼ ì´ˆê¸°í™”í•˜ê³ , ë‘ ê°œì˜ float4 ë³€ìˆ˜ë¥¼ ë”í•˜ëŠ” ê²ƒ ë“±
+  * ì´ë¥¼ ê¸°ë°˜ìœ¼ë¡œ ìœ ì—°í•œ Emit, Simulate process êµ¬í˜„ì˜ ê¸°ë°˜ ë§ˆë ¨
+* DrawIndexedIndirect(), ExecuteIndirect() í•™ìŠµ ë° ì ìš©
 * UI:
-  * Spawn rate Á¶Àý °¡´É
-  * Emitter Shader ÀÛ¼º °¡´É
-  * Simulator Shader ÀÛ¼º °¡´É
-  * Renderer Shader ÀÛ¼º °¡´É
-  * »õ·Î¿î Particle System Ãß°¡ °¡´É
-  * Particle SystemÀÇ »óÅÂ¸¦ ÀúÀå ¹× ·Îµå
-  * Opaque/Translucent º¯È¯ °¡´É
-  * input node°¡ À¯È¿ÇÏÁö ¾Ê´Ù¸é ÄÄÆÄÀÏÇÏÁö ¾ÊÀ½
+  * Spawn rate ì¡°ì ˆ ê°€ëŠ¥
+  * Emitter Shader ìž‘ì„± ê°€ëŠ¥
+  * Simulator Shader ìž‘ì„± ê°€ëŠ¥
+  * Renderer Shader ìž‘ì„± ê°€ëŠ¥
+  * ìƒˆë¡œìš´ Particle System ì¶”ê°€ ê°€ëŠ¥
+  * Particle Systemì˜ ìƒíƒœë¥¼ ì €ìž¥ ë° ë¡œë“œ
+  * Opaque/Translucent ë³€í™˜ ê°€ëŠ¥
+  * input nodeê°€ ìœ íš¨í•˜ì§€ ì•Šë‹¤ë©´ ì»´íŒŒì¼í•˜ì§€ ì•ŠìŒ
 * Simulation Node:
   * Vortex Force
   * Point Attraction Force
   * Drag Force
   * Curl Noise Force
-* ºÒ ·»´õ¸µ
-* Orphan nodeµéÀ» shader code·Î º¯È¯ÇÏÁö ¾ÊÀ½
-* Ribbon ·»´õ¸µ
-* ¼º´É ÃÖÀûÈ­
-  * ExecuteIndirect¿¡¼­ ÀûÀýÇÑ maxCommandsCount¸¦ ³Ñ±â±â (°ü·Ã ÀÏÁö - 4ÁÖÂ÷ ¸ñ¿äÀÏ)
-  * InstancingÀ» ÀÌ¿ëÇÑ ExecuteIndirect·Î commands °³¼ö¸¦ ÁÙÀÌ±â
-  * CachingÀ» °í·ÁÇÑ ÆÄÆ¼Å¬ ¹öÆÛ ±¸¼º
-  * ÆÄÆ¼Å¬ Å©±â¸¦ ÁÙÀÌ±â À§ÇÑ data packing/unpacking
-  * ÆÄÆ¼Å¬ ÆÐ½º ÅëÇÕ
+* ë¶ˆ ë Œë”ë§
+* Orphan nodeë“¤ì„ shader codeë¡œ ë³€í™˜í•˜ì§€ ì•ŠìŒ
+* Ribbon ë Œë”ë§
+* ì„±ëŠ¥ ìµœì í™”
+  * ExecuteIndirectì—ì„œ ì ì ˆí•œ maxCommandsCountë¥¼ ë„˜ê¸°ê¸° (ê´€ë ¨ ì¼ì§€ - 4ì£¼ì°¨ ëª©ìš”ì¼)
+  * Instancingì„ ì´ìš©í•œ ExecuteIndirectë¡œ commands ê°œìˆ˜ë¥¼ ì¤„ì´ê¸°
+  * Cachingì„ ê³ ë ¤í•œ íŒŒí‹°í´ ë²„í¼ êµ¬ì„±
+  * íŒŒí‹°í´ í¬ê¸°ë¥¼ ì¤„ì´ê¸° ìœ„í•œ data packing/unpacking
+  * íŒŒí‹°í´ íŒ¨ìŠ¤ í†µí•©
 * Bounding k-gon
 
 <hr/>
 
-### ÀÏÁö
+### ì¼ì§€
  
-##### 1ÁÖÂ÷: °èÈ¹ ¼±Á¤ ¹× °³¹ß È¯°æ ±¸¼º (2023.10.10. ~ 2023.10.13.)
-* ¼ö¿äÀÏ:
-* ¸ñ¿äÀÏ:
-  + D3D12 È¯°æ ±¸¼º
-  + ·»´õ¸µ ÆÄÀÌÇÁ¶óÀÎ ±¸¼º
-* ±Ý¿äÀÏ: 
-  + PIX µð¹ö°Å ¼÷Áö ¹× È¯°æ ±¸¼º
-  + Á¤À°¸éÃ¼ ·»´õ¸µ ¿Ï·á
-  + ÀÇ»ç ³­¼ö (https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl)
-  + Emitter, Particle ÀÚ·á±¸Á¶ prototype
+##### 1ì£¼ì°¨: ê³„íš ì„ ì • ë° ê°œë°œ í™˜ê²½ êµ¬ì„± (2023.10.10. ~ 2023.10.13.)
+* ìˆ˜ìš”ì¼:
+* ëª©ìš”ì¼:
+  + D3D12 í™˜ê²½ êµ¬ì„±
+  + ë Œë”ë§ íŒŒì´í”„ë¼ì¸ êµ¬ì„±
+* ê¸ˆìš”ì¼: 
+  + PIX ë””ë²„ê±° ìˆ™ì§€ ë° í™˜ê²½ êµ¬ì„±
+  + ì •ìœ¡ë©´ì²´ ë Œë”ë§ ì™„ë£Œ
+  + ì˜ì‚¬ ë‚œìˆ˜ (https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl)
+  + Emitter, Particle ìžë£Œêµ¬ì¡° prototype
   + ParticleEmitterCS, ParticleSimulateCS prototype
 
 <br> 
 
-##### 2ÁÖÂ÷: ÇÙ½É ±â´É ±¸Çö ¹× Particle System ÇÐ½À (2023.10.16. ~ 2023.10.20.)
-* ¿ù¿äÀÏ:
-  + ParticleEmitterCS, ParticleSimulateCS ÀÛ¼º
-  + Particle ·»´õ¸µÀ» À§ÇÑ ½¦ÀÌ´õ ÀÏºÎ ÀÛ¼º
-  + ParticleSimulateCS ¹ö±×: RWByteAddressBufferÀÇ InterlockedAdd, Store, Load »ç¿ë ÄÚµå¿¡ ¹®Á¦°¡ ÀÖ¾î µ¿±âÈ­°¡ Á¦´ë·Î ¼öÇàµÇÁö ¾ÊÀ½ - ÇØ°á: ½¦ÀÌ´õ ÄÚµå°¡ ¾Æ´Ñ CPU ÄÚµå¿¡ ¹®Á¦°¡ ÀÖ¾úÀ½. ¸Þ¸ð¸® ÁÖ¼Ò¸¦ Àß¸ø ³Ñ°ÜÁÖ¾î ºñÁ¤»óÀûÀÎ °ªÀÌ µ¤¾î ¾º¿öÁö°í ÀÖ¾úÀ½.
-* È­¿äÀÏ:
-  + ¿©ÀüÈ÷ RWByteAddressBuffer¿Í °ü·ÃÇÑ ¹®Á¦°¡ ÀÖ¾úÀ½: ´Ü¼øÈ÷ UnorderedAccessBuffer·Î¼­ RootSiganture¿¡¼­ ´Ù·ç¾îÁ³Áö¸¸, RawBuffer´Â ¹Ýµå½Ã UnorderedAccessView¸¦ ÅëÇØ DXGI_FORMAT_R32_TYPELESS Å¸ÀÔ°ú D3D12_BUFFER_UAV_FLAG_RAW ÇÃ·¡±×¸¦ ÁöÁ¤ÇØ ´Ù·ç¾î¾ß ÇÔ! Áö½ÄÀÌ ºÎÁ·ÇØ ÀÌ¸¦ Àû¿ëÇÏÁö ¾Ê¾Ò°í ¹®Á¦°¡ ¹ß»ýÇÏ¿´´ø °ÍÀÌ¾úÀ½.
-  + ±âº»ÀûÀÎ ÆÄÆ¼Å¬ ·»´õ¸µ ¼öÇà ¿Ï·á (100¸¸ °³)
+##### 2ì£¼ì°¨: í•µì‹¬ ê¸°ëŠ¥ êµ¬í˜„ ë° Particle System í•™ìŠµ (2023.10.16. ~ 2023.10.20.)
+* ì›”ìš”ì¼:
+  + ParticleEmitterCS, ParticleSimulateCS ìž‘ì„±
+  + Particle ë Œë”ë§ì„ ìœ„í•œ ì‰ì´ë” ì¼ë¶€ ìž‘ì„±
+  + ParticleSimulateCS ë²„ê·¸: RWByteAddressBufferì˜ InterlockedAdd, Store, Load ì‚¬ìš© ì½”ë“œì— ë¬¸ì œê°€ ìžˆì–´ ë™ê¸°í™”ê°€ ì œëŒ€ë¡œ ìˆ˜í–‰ë˜ì§€ ì•ŠìŒ - í•´ê²°: ì‰ì´ë” ì½”ë“œê°€ ì•„ë‹Œ CPU ì½”ë“œì— ë¬¸ì œê°€ ìžˆì—ˆìŒ. ë©”ëª¨ë¦¬ ì£¼ì†Œë¥¼ ìž˜ëª» ë„˜ê²¨ì£¼ì–´ ë¹„ì •ìƒì ì¸ ê°’ì´ ë®ì–´ ì”Œì›Œì§€ê³  ìžˆì—ˆìŒ.
+* í™”ìš”ì¼:
+  + ì—¬ì „ížˆ RWByteAddressBufferì™€ ê´€ë ¨í•œ ë¬¸ì œê°€ ìžˆì—ˆìŒ: ë‹¨ìˆœížˆ UnorderedAccessBufferë¡œì„œ RootSigantureì—ì„œ ë‹¤ë£¨ì–´ì¡Œì§€ë§Œ, RawBufferëŠ” ë°˜ë“œì‹œ UnorderedAccessViewë¥¼ í†µí•´ DXGI_FORMAT_R32_TYPELESS íƒ€ìž…ê³¼ D3D12_BUFFER_UAV_FLAG_RAW í”Œëž˜ê·¸ë¥¼ ì§€ì •í•´ ë‹¤ë£¨ì–´ì•¼ í•¨! ì§€ì‹ì´ ë¶€ì¡±í•´ ì´ë¥¼ ì ìš©í•˜ì§€ ì•Šì•˜ê³  ë¬¸ì œê°€ ë°œìƒí•˜ì˜€ë˜ ê²ƒì´ì—ˆìŒ.
+  + ê¸°ë³¸ì ì¸ íŒŒí‹°í´ ë Œë”ë§ ìˆ˜í–‰ ì™„ë£Œ (100ë§Œ ê°œ)
     <img src="./img/20231017_particles.png">
-  + Á¤ÇØÁø ÃÖ´ë ÆÄÆ¼Å¬ ¼ö·®À» ³ÑÀ» ½Ã »ý¼ºÇÏÁö ¾Êµµ·Ï Á¦ÇÑ
-* ¼ö¿äÀÏ:
-  + Index Buffer Å¸ÀÔÀÌ 16bit uint¶ó 2^16 ÀÌ»óÀÇ ÆÄÆ¼Å¬À» ´Ù·ç¸é ¹®Á¦°¡ ¹ß»ýÇÏ¿© ÇØ°á.
-  + ParticleÀÇ Æò¸éÀÌ Ç×»ó Camera¸¦ ¹Ù¶óº¸µµ·Ï ÇÔ
-  + ParticleSystem Å¬·¡½º ¼³°è ¹× ±¸Çö
-  + ¿©·¯ °³ÀÇ ParticleSystemÀ» °ü¸®ÇÒ ¼ö ÀÖÀ½ (¾ÆÁ÷Àº °¢°¢ÀÇ particle systemÀÌ ¼­·Î ´Ù¸¥ world transform¸¸ °¡Áú ¼ö ÀÖÀ½)
-  + °£´ÜÇÑ ÅØ½ºÃ³ ¸ÅÇÎ (¼º´É: ´ë·« 10¸¸ °³)
+  + ì •í•´ì§„ ìµœëŒ€ íŒŒí‹°í´ ìˆ˜ëŸ‰ì„ ë„˜ì„ ì‹œ ìƒì„±í•˜ì§€ ì•Šë„ë¡ ì œí•œ
+* ìˆ˜ìš”ì¼:
+  + Index Buffer íƒ€ìž…ì´ 16bit uintë¼ 2^16 ì´ìƒì˜ íŒŒí‹°í´ì„ ë‹¤ë£¨ë©´ ë¬¸ì œê°€ ë°œìƒí•˜ì—¬ í•´ê²°.
+  + Particleì˜ í‰ë©´ì´ í•­ìƒ Cameraë¥¼ ë°”ë¼ë³´ë„ë¡ í•¨
+  + ParticleSystem í´ëž˜ìŠ¤ ì„¤ê³„ ë° êµ¬í˜„
+  + ì—¬ëŸ¬ ê°œì˜ ParticleSystemì„ ê´€ë¦¬í•  ìˆ˜ ìžˆìŒ (ì•„ì§ì€ ê°ê°ì˜ particle systemì´ ì„œë¡œ ë‹¤ë¥¸ world transformë§Œ ê°€ì§ˆ ìˆ˜ ìžˆìŒ)
+  + ê°„ë‹¨í•œ í…ìŠ¤ì²˜ ë§¤í•‘ (ì„±ëŠ¥: ëŒ€ëžµ 10ë§Œ ê°œ)
     <img src="./img/20231018_particles.png">
-* ¸ñ¿äÀÏ:
-  + ¾ËÆÄ ºí·»µù ¼öÇà
+* ëª©ìš”ì¼:
+  + ì•ŒíŒŒ ë¸”ë Œë”© ìˆ˜í–‰
     <img src="./img/20231019_particles_alphablending.png">
-  + Spawn rate Á¶Àý °¡´É
-  + Batcher's odd-even merge sort ÇÐ½À
-  + Bitonic sort ÇÐ½À
-  + Bitonic sort prototype (´Ü¼øÈ÷ ÀÎµ¦½º¸¦ ±âÁØÀ¸·Î Á¤·ÄÇØº¸¾ÒÀ½)
-* ±Ý¿äÀÏ:
-  * ·»´õ¸µ°ú °ü·Ã ¾ø´Â utilsÀÇ ÀÚµ¿È­ À¯´Ö Å×½ºÆ® È¯°æ ±¸Ãà
-  * HlslTranslator (ParticleEmitter¿¡¸¸ ½ÃÇèÀûÀ¸·Î Àû¿ë)
-    * Graph ÀÚ·á±¸Á¶ ±â¹ÝÀ¸·Î hlslÀ» »ý¼ºÇÏ´Â Å¬·¡½º
-    * base shader ÆÄÀÏÀ» ±â¹ÝÀ¸·Î Æ¯Á¤ ÁöÁ¡¿¡ µ¿ÀûÀ¸·Î ÄÚµå »ðÀÔ ÈÄ ÄÄÆÄÀÏ
+  + Spawn rate ì¡°ì ˆ ê°€ëŠ¥
+  + Batcher's odd-even merge sort í•™ìŠµ
+  + Bitonic sort í•™ìŠµ
+  + Bitonic sort prototype (ë‹¨ìˆœížˆ ì¸ë±ìŠ¤ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ì •ë ¬í•´ë³´ì•˜ìŒ)
+* ê¸ˆìš”ì¼:
+  * ë Œë”ë§ê³¼ ê´€ë ¨ ì—†ëŠ” utilsì˜ ìžë™í™” ìœ ë‹› í…ŒìŠ¤íŠ¸ í™˜ê²½ êµ¬ì¶•
+  * HlslTranslator (ParticleEmitterì—ë§Œ ì‹œí—˜ì ìœ¼ë¡œ ì ìš©)
+    * Graph ìžë£Œêµ¬ì¡° ê¸°ë°˜ìœ¼ë¡œ hlslì„ ìƒì„±í•˜ëŠ” í´ëž˜ìŠ¤
+    * base shader íŒŒì¼ì„ ê¸°ë°˜ìœ¼ë¡œ íŠ¹ì • ì§€ì ì— ë™ì ìœ¼ë¡œ ì½”ë“œ ì‚½ìž… í›„ ì»´íŒŒì¼
   * Object hashing
-    * °¢ particle system ¸¶´ÙÀÇ shader °ü¸®¸¦ À§ÇÑ object ¼öÁØ¿¡¼­ÀÇ hashing ±¸Çö
-    * °´Ã¼ »ý¼º ½ÃÁ¡À» ÀÌ¿ëÇØ hashing 
-  * DrawIndexedIndirect(), ExecuteIndirect() ÇÐ½À
+    * ê° particle system ë§ˆë‹¤ì˜ shader ê´€ë¦¬ë¥¼ ìœ„í•œ object ìˆ˜ì¤€ì—ì„œì˜ hashing êµ¬í˜„
+    * ê°ì²´ ìƒì„± ì‹œì ì„ ì´ìš©í•´ hashing 
+  * DrawIndexedIndirect(), ExecuteIndirect() í•™ìŠµ
 
 <br>
 
-##### 3ÁÖÂ÷: µ¿Àû ½¦ÀÌ´õ ÄÄÆÄÀÏ ±¸Çö ¹× UI µµÀÔ (2023.10.23. ~ 2023.10.27.)
-* ¿ù¿äÀÏ:
-  + Indirect Drawing µµÀÔ (±âÁ¸¿¡´Â ¹«Á¶°Ç ÃÖ´ë ÆÄÆ¼Å¬ ¼ö¸¸Å­ draw call »ý¼º)
-  + µ¿Àû ½¦ÀÌ´õ ÄÄÆÄÀÏ Àû¿ë
-    + Emit, Simulate, Render ´Ü°è¿¡¼­ÀÇ ¿¬»êÀ» µ¿ÀûÀ¸·Î Á¦¾î °¡´É
-  + Imgui ÇÐ½À ¹× ¿¹Á¦ Àû¿ë
-* È­¿äÀÏ:
-  * imgui µµÀÔ (+node graph °ü·Ã libraryÀÎ imnodes)
-  * Emitter¿¡ ½ÃÇèÀû node editor Àû¿ë
-    * node editor ±â¹ÝÀ¸·Î ½¦ÀÌ´õ ¼öÁ¤ °¡´É
-* ¼ö¿äÀÏ:
-  * UI Àû¿ë
-    * Particle Emission, Simulation, Rendering º¯°æ °¡´É
-    * ³ëµå ¿¡µðÅÍÀÇ Á¤º¸µéÀº ÀúÀåµÊ
+##### 3ì£¼ì°¨: ë™ì  ì‰ì´ë” ì»´íŒŒì¼ êµ¬í˜„ ë° UI ë„ìž… (2023.10.23. ~ 2023.10.27.)
+* ì›”ìš”ì¼:
+  + Indirect Drawing ë„ìž… (ê¸°ì¡´ì—ëŠ” ë¬´ì¡°ê±´ ìµœëŒ€ íŒŒí‹°í´ ìˆ˜ë§Œí¼ draw call ìƒì„±)
+  + ë™ì  ì‰ì´ë” ì»´íŒŒì¼ ì ìš©
+    + Emit, Simulate, Render ë‹¨ê³„ì—ì„œì˜ ì—°ì‚°ì„ ë™ì ìœ¼ë¡œ ì œì–´ ê°€ëŠ¥
+  + Imgui í•™ìŠµ ë° ì˜ˆì œ ì ìš©
+* í™”ìš”ì¼:
+  * imgui ë„ìž… (+node graph ê´€ë ¨ libraryì¸ imnodes)
+  * Emitterì— ì‹œí—˜ì  node editor ì ìš©
+    * node editor ê¸°ë°˜ìœ¼ë¡œ ì‰ì´ë” ìˆ˜ì • ê°€ëŠ¥
+* ìˆ˜ìš”ì¼:
+  * UI ì ìš©
+    * Particle Emission, Simulation, Rendering ë³€ê²½ ê°€ëŠ¥
+    * ë…¸ë“œ ì—ë””í„°ì˜ ì •ë³´ë“¤ì€ ì €ìž¥ë¨
       <img src="./img/20231025_ui.png">
-* ¸ñ¿äÀÏ:
-  * UI Àû¿ë
-    * Particle SystemµéÀÇ »óÅÂ¸¦ ÀúÀåÇÒ ¼ö ÀÖÀ½
-      * ´Ù½Ã ÇÁ·Î±×·¥ ½ÃÀÛ ½Ã ÀÚµ¿ÀûÀ¸·Î load
-* ±Ý¿äÀÏ:
-  * Simulation Node Ãß°¡
+* ëª©ìš”ì¼:
+  * UI ì ìš©
+    * Particle Systemë“¤ì˜ ìƒíƒœë¥¼ ì €ìž¥í•  ìˆ˜ ìžˆìŒ
+      * ë‹¤ì‹œ í”„ë¡œê·¸ëž¨ ì‹œìž‘ ì‹œ ìžë™ì ìœ¼ë¡œ load
+* ê¸ˆìš”ì¼:
+  * Simulation Node ì¶”ê°€
     * Drag Force
     * Vortex Force
     * Point Attraction Force
-  * Simulation ¹æ½Ä º¯°æ
-    * Velocity, Acceleration, PositionÀ» ´©ÀûÇØ º¯°æÇÏ°í ¸¶Áö¸·¿¡ Solving µÊ
-  * UI Àû¿ë
-    * Node¸¦ »èÁ¦ÇÒ ¼ö ÀÖÀ½
-    * °¢ Emitter, Simulator, Renderer Editor¿¡¼­ »ç¿ëÇÒ ¼ö ÀÖ´Â nodeµé¸¸ »ý¼ºÇÒ ¼ö ÀÖÀ½
+  * Simulation ë°©ì‹ ë³€ê²½
+    * Velocity, Acceleration, Positionì„ ëˆ„ì í•´ ë³€ê²½í•˜ê³  ë§ˆì§€ë§‰ì— Solving ë¨
+  * UI ì ìš©
+    * Nodeë¥¼ ì‚­ì œí•  ìˆ˜ ìžˆìŒ
+    * ê° Emitter, Simulator, Renderer Editorì—ì„œ ì‚¬ìš©í•  ìˆ˜ ìžˆëŠ” nodeë“¤ë§Œ ìƒì„±í•  ìˆ˜ ìžˆìŒ
   * <img src="./img/20231027_particles.webp">
-  * ¹è°æ º¯°æ(ÇÏ´Ã»ö -> °ËÀº»ö)
+  * ë°°ê²½ ë³€ê²½(í•˜ëŠ˜ìƒ‰ -> ê²€ì€ìƒ‰)
 
 
-##### 4ÁÖÂ÷: °¢Á¾ Simulation Èû Àû¿ë ¹× Fire ·»´õ¸µ (2023.10.30. ~ 2023.11.03.)
-* ¿ù¿äÀÏ:
-  + Perlin Noise ÇÐ½À
-  + Curl Noise¸¦ È°¿ëÇÏ±â À§ÇÑ ±¸Á¶Àû °³¼±
-    + °¢ Pass(Emitter, Simulator, Renderer)´Â µ¿ÀûÀ¸·Î ¸®¼Ò½º(ÅØ½ºÃ³)¸¦ È°¿ëÇÒ ¼ö ÀÖÀ½.
-    + ¾î¶² Shader statement nodes·Î ±¸¼ºµÇ¾ú´À³Ä¿¡ µû¶ó¼­ µ¿ÀûÀ¸·Î root signature, pso, shader¸¦ ºôµå
-* È­¿äÀÏ:
-  * Curl Noise Àû¿ë
-  * ÄÚµå ¸®ÆÑÅä¸µ ¹× ±¸Á¶Àû °³¼±
+##### 4ì£¼ì°¨: ê°ì¢… Simulation íž˜ ì ìš© ë° Fire ë Œë”ë§ (2023.10.30. ~ 2023.11.03.)
+* ì›”ìš”ì¼:
+  + Perlin Noise í•™ìŠµ
+  + Curl Noiseë¥¼ í™œìš©í•˜ê¸° ìœ„í•œ êµ¬ì¡°ì  ê°œì„ 
+    + ê° Pass(Emitter, Simulator, Renderer)ëŠ” ë™ì ìœ¼ë¡œ ë¦¬ì†ŒìŠ¤(í…ìŠ¤ì²˜)ë¥¼ í™œìš©í•  ìˆ˜ ìžˆìŒ.
+    + ì–´ë–¤ Shader statement nodesë¡œ êµ¬ì„±ë˜ì—ˆëŠëƒì— ë”°ë¼ì„œ ë™ì ìœ¼ë¡œ root signature, pso, shaderë¥¼ ë¹Œë“œ
+* í™”ìš”ì¼:
+  * Curl Noise ì ìš©
+  * ì½”ë“œ ë¦¬íŒ©í† ë§ ë° êµ¬ì¡°ì  ê°œì„ 
   * <img src="./img/curl_noise.webp">
-  * À§¿¡¼­ ÆÄÆ¼Å¬µéÀÌ ÃÊ±â¿¡ burst µÇ´Â °ÍÀº ÀÇµµµÈ °ÍÀÌ ¾Æ´Ï¸ç, º¯°æµÇ´Â deltaTimeÀ¸·Î ÀÎÇØ¼­ Á¤È®ÇÑ ÆÄÆ¼Å¬ÀÇ ¿òÁ÷ÀÓÀÌ °è»êµÇÁö ¾ÊÀº °á°úÀÓ
-* ¼ö¿äÀÏ:
-  * ÀÌÁ¦ ÆÄÆ¼Å¬ÀÇ size, color, opacity µîÀ» lifetime ±â¹ÝÀ¸·Î ¼±ÇüÀûÀ¸·Î º¸°£ÇÔ
-  * ³ëµå ¿¡µðÅÍ ¾ÈÁ¤¼º °³¼±
-    * ÀûÀýÈ÷ ¿¬°áµÇÁö ¾ÊÀº ³ëµå´Â ÄÄÆÄÀÏµÇÁö ¾ÊÀ½
-  * °¢Á¾ ³ëµåµé Ãß°¡
-  * ºÒ ·»´õ¸µ ½ÃÀÛ
-* ¸ñ¿äÀÏ:
-  * ºÒ ·»´õ¸µ
-  * ¿¹½Ã1: <img src="./img/fire_example1.webp">
-  * ¿¹½Ã2: <img src="./img/fire_example2.webp">
-  * ÆÄÆ¼Å¬ÀÌ º°·Î ¾øÀ½¿¡µµ À¯µ¶ ·»´õ¸µÀÌ ´À·ÁÁö´Â Çö»óÀ» °æÇèÇÔ.
-    * ¿øÀÎ: ExecuteIndirect È£Ãâ ½Ã ÀûÀýÇÏÁö ¾ÊÀº ÃÖ´ë maxCommandsCount¸¦ Á¤ÀÇÇÔ. (2¹øÂ° ÀÎÀÚ)
+  * ìœ„ì—ì„œ íŒŒí‹°í´ë“¤ì´ ì´ˆê¸°ì— burst ë˜ëŠ” ê²ƒì€ ì˜ë„ëœ ê²ƒì´ ì•„ë‹ˆë©°, ë³€ê²½ë˜ëŠ” deltaTimeìœ¼ë¡œ ì¸í•´ì„œ ì •í™•í•œ íŒŒí‹°í´ì˜ ì›€ì§ìž„ì´ ê³„ì‚°ë˜ì§€ ì•Šì€ ê²°ê³¼ìž„
+* ìˆ˜ìš”ì¼:
+  * ì´ì œ íŒŒí‹°í´ì˜ size, color, opacity ë“±ì„ lifetime ê¸°ë°˜ìœ¼ë¡œ ì„ í˜•ì ìœ¼ë¡œ ë³´ê°„í•¨
+  * ë…¸ë“œ ì—ë””í„° ì•ˆì •ì„± ê°œì„ 
+    * ì ì ˆížˆ ì—°ê²°ë˜ì§€ ì•Šì€ ë…¸ë“œëŠ” ì»´íŒŒì¼ë˜ì§€ ì•ŠìŒ
+  * ê°ì¢… ë…¸ë“œë“¤ ì¶”ê°€
+  * ë¶ˆ ë Œë”ë§ ì‹œìž‘
+* ëª©ìš”ì¼:
+  * ë¶ˆ ë Œë”ë§
+  * ì˜ˆì‹œ1: <img src="./img/fire_example1.webp">
+  * ì˜ˆì‹œ2: <img src="./img/fire_example2.webp">
+  * íŒŒí‹°í´ì´ ë³„ë¡œ ì—†ìŒì—ë„ ìœ ë… ë Œë”ë§ì´ ëŠë ¤ì§€ëŠ” í˜„ìƒì„ ê²½í—˜í•¨.
+    * ì›ì¸: ExecuteIndirect í˜¸ì¶œ ì‹œ ì ì ˆí•˜ì§€ ì•Šì€ ìµœëŒ€ maxCommandsCountë¥¼ ì •ì˜í•¨. (2ë²ˆì§¸ ì¸ìž)
     ``` c++
     // TODO: Optimization - Set proper NumMaxCommands.
     cmdList->ExecuteIndirect(
@@ -232,132 +232,132 @@
 	    _resource->getIndirectCommandsResource(),
 	    _resource->getCommandBufferCounterOffset());
     ```
-    * ExecuteIndirect È£Ãâ¿¡¼­ commandsÀÇ ¼ö¸¦ ¼¼´Â counter buffer¸¦ ÇÔ²² ³Ñ±â¹Ç·Î, maxCommandsCount°¡ ½ÇÁ¦ indirectComamndsÀÇ °³¼ö¿¡ ºñÇØ ÇöÀúÈ÷ Àû´õ¶óµµ º° ¹®Á¦ ¾øÀ» °ÍÀÌ¶ó°í »ý°¢ÇÏ¿´À¸³ª, Æ¯Á¤ GPU µå¶óÀÌ¹öµéÀº ÀûÀýÇÑ maxCommandsCount¸¦ ³Ñ°ÜÁÖ¾î¾ß¸¸ ÁÁÀº ¼º´ÉÀ» ³¾ ¼ö ÀÖÀ½(ÃâÃ³: PIX µð¹ö°Å ºÐ¼® µµ±¸)
-    * ÀÌ¿Í °ü·ÃÇÑ tasks´Â Â÷ÈÄ ÃÖÀûÈ­ ´Ü°è¿¡¼­ ÇØ°áÇÒ ¿¹Á¤
-  * Ribbon, Trail rendering ÁØºñ: Spline ÇÐ½À
-* ±Ý¿äÀÏ:
-  * Bitonic SortÀÇ µ¿ÀÛÀ» PIX Debugger·Î È®ÀÎÇÏ´Âµ¥ ÀÚ²Ù ÀÌ»óÇÑ °á°ú°¡ ³ª¿È
-    * ½Ã°¢ÀûÀ¸·Î´Â ±¦Âú¾Æ º¸ÀÌ´Âµ¥, µð¹ö°Å·Î Á÷Á¢ °ªµéÀ» º¸¸é Á¤·ÄÀÌ Á¦´ë·Î ¾È µÇ¾î ÀÖ´Â °Í
-    * ¾Ë°íº¸´Ï GPU¿Í °ü·ÃÇØ¼­ Nvidia Control PanelÀ» ÅëÇØ ±ÇÇÑ ¼³Á¤À» ÇØÁÖ¾î¾ß ÇÏ´Â °ÍÀÌ ÀÖ¾ú°í, ÀÌ°ÍÀÌ Á¦´ë·Î ÀÌ·ç¾îÁöÁö ¾Ê¾Æ µð¹ö°ÅÀÇ ÃÊ±âÈ­¿¡ ¹®Á¦°¡ »ý°Ü¼­ ¹ß»ýÇÑ Çö»óÀ¸·Î ÃßÃøµÊ.
-  * Bitonic Sort´Â 2ÀÇ n½Â ²Ã·Î¸¸ ¼öÇàÀÌ µÇ¾î¼­, ÀÌ¸¦ ÀÓÀÇÀÇ n Å©±â¿¡¼­ ¼öÇàÇÒ ¼ö ÀÖ´Â ¹æ¹ýÀ» Ã£¾Æº¸¾ÒÀ¸³ª..
-    * [Arbitrary n size bitonic sort](https://hwlang.de/algorithmen/sortieren/bitonic/oddn.html) => ÀÌ°É ÀÀ¿ëÇØº¼ ¼ö ÀÖÀ»±î? ¸Ó¸®°¡ ¾ÆÆÄ¼­ »ý°¢À» ±×¸¸µÎ¾úÀ½.
-  * ¾îÂ·°Å³ª Bitonic sort¸¦ ¸¸µé¾î³ùÀ¸´Ï ÀÌ¸¦ ÀÏ´Ü È°¿ëÇÏ±â·Î ÇÔ
-    * 2^n¿¡¼­ ³²´Â ÀÚ¸®µéÀº Á¤·ÄÀÇ ÃÖÈÄ¼øÀ§ °ªÀ¸·Î padding
+    * ExecuteIndirect í˜¸ì¶œì—ì„œ commandsì˜ ìˆ˜ë¥¼ ì„¸ëŠ” counter bufferë¥¼ í•¨ê»˜ ë„˜ê¸°ë¯€ë¡œ, maxCommandsCountê°€ ì‹¤ì œ indirectComamndsì˜ ê°œìˆ˜ì— ë¹„í•´ í˜„ì €ížˆ ì ë”ë¼ë„ ë³„ ë¬¸ì œ ì—†ì„ ê²ƒì´ë¼ê³  ìƒê°í•˜ì˜€ìœ¼ë‚˜, íŠ¹ì • GPU ë“œë¼ì´ë²„ë“¤ì€ ì ì ˆí•œ maxCommandsCountë¥¼ ë„˜ê²¨ì£¼ì–´ì•¼ë§Œ ì¢‹ì€ ì„±ëŠ¥ì„ ë‚¼ ìˆ˜ ìžˆìŒ(ì¶œì²˜: PIX ë””ë²„ê±° ë¶„ì„ ë„êµ¬)
+    * ì´ì™€ ê´€ë ¨í•œ tasksëŠ” ì°¨í›„ ìµœì í™” ë‹¨ê³„ì—ì„œ í•´ê²°í•  ì˜ˆì •
+  * Ribbon, Trail rendering ì¤€ë¹„: Spline í•™ìŠµ
+* ê¸ˆìš”ì¼:
+  * Bitonic Sortì˜ ë™ìž‘ì„ PIX Debuggerë¡œ í™•ì¸í•˜ëŠ”ë° ìžê¾¸ ì´ìƒí•œ ê²°ê³¼ê°€ ë‚˜ì˜´
+    * ì‹œê°ì ìœ¼ë¡œëŠ” ê´œì°®ì•„ ë³´ì´ëŠ”ë°, ë””ë²„ê±°ë¡œ ì§ì ‘ ê°’ë“¤ì„ ë³´ë©´ ì •ë ¬ì´ ì œëŒ€ë¡œ ì•ˆ ë˜ì–´ ìžˆëŠ” ê²ƒ
+    * ì•Œê³ ë³´ë‹ˆ GPUì™€ ê´€ë ¨í•´ì„œ Nvidia Control Panelì„ í†µí•´ ê¶Œí•œ ì„¤ì •ì„ í•´ì£¼ì–´ì•¼ í•˜ëŠ” ê²ƒì´ ìžˆì—ˆê³ , ì´ê²ƒì´ ì œëŒ€ë¡œ ì´ë£¨ì–´ì§€ì§€ ì•Šì•„ ë””ë²„ê±°ì˜ ì´ˆê¸°í™”ì— ë¬¸ì œê°€ ìƒê²¨ì„œ ë°œìƒí•œ í˜„ìƒìœ¼ë¡œ ì¶”ì¸¡ë¨.
+  * Bitonic SortëŠ” 2ì˜ nìŠ¹ ê¼´ë¡œë§Œ ìˆ˜í–‰ì´ ë˜ì–´ì„œ, ì´ë¥¼ ìž„ì˜ì˜ n í¬ê¸°ì—ì„œ ìˆ˜í–‰í•  ìˆ˜ ìžˆëŠ” ë°©ë²•ì„ ì°¾ì•„ë³´ì•˜ìœ¼ë‚˜..
+    * [Arbitrary n size bitonic sort](https://hwlang.de/algorithmen/sortieren/bitonic/oddn.html) => ì´ê±¸ ì‘ìš©í•´ë³¼ ìˆ˜ ìžˆì„ê¹Œ? ë¨¸ë¦¬ê°€ ì•„íŒŒì„œ ìƒê°ì„ ê·¸ë§Œë‘ì—ˆìŒ.
+  * ì–´ì¨Œê±°ë‚˜ Bitonic sortë¥¼ ë§Œë“¤ì–´ë†¨ìœ¼ë‹ˆ ì´ë¥¼ ì¼ë‹¨ í™œìš©í•˜ê¸°ë¡œ í•¨
+    * 2^nì—ì„œ ë‚¨ëŠ” ìžë¦¬ë“¤ì€ ì •ë ¬ì˜ ìµœí›„ìˆœìœ„ ê°’ìœ¼ë¡œ padding
 
 
-##### 5ÁÖÂ÷: Ribbon ·»´õ¸µ (2023.11.06. ~ 2023.11.10.)
-* ¿ù¿äÀÏ:
-  + °£´ÜÇÑ ¸®º» ·»´õ¸µ ¼öÇà
+##### 5ì£¼ì°¨: Ribbon ë Œë”ë§ (2023.11.06. ~ 2023.11.10.)
+* ì›”ìš”ì¼:
+  + ê°„ë‹¨í•œ ë¦¬ë³¸ ë Œë”ë§ ìˆ˜í–‰
   + <img src="./img/20231106_ribbon.png">
-  + ÀÌÁ¦ Orphan nodes¸¦ shader statements·Î º¯È¯ÇÏÁö ¾ÊÀ½
-* È­¿äÀÏ:
-  * ¿¬Â÷
-* ¼ö¿äÀÏ:
-  * ¸®º» ·»´õ¸µ ÅØ½ºÃ³ ¸ÅÇÎ °øºÎ
-* ¸ñ¿äÀÏ:
-  * ¸®º» ·»´õ¸µ¿¡¼­ distance based texture mapping ¼öÇà
-  * brent-kung parallel prefix sum ÇÐ½À ¹× Àû¿ë
-* ±Ý¿äÀÏ:
-  * ÄÚµå ¸®ÆÑÅä¸µ
+  + ì´ì œ Orphan nodesë¥¼ shader statementsë¡œ ë³€í™˜í•˜ì§€ ì•ŠìŒ
+* í™”ìš”ì¼:
+  * ì—°ì°¨
+* ìˆ˜ìš”ì¼:
+  * ë¦¬ë³¸ ë Œë”ë§ í…ìŠ¤ì²˜ ë§¤í•‘ ê³µë¶€
+* ëª©ìš”ì¼:
+  * ë¦¬ë³¸ ë Œë”ë§ì—ì„œ distance based texture mapping ìˆ˜í–‰
+  * brent-kung parallel prefix sum í•™ìŠµ ë° ì ìš©
+* ê¸ˆìš”ì¼:
+  * ì½”ë“œ ë¦¬íŒ©í† ë§
 
 
-##### 6ÁÖÂ÷: ¸®ÆÑÅä¸µ ¹× ¼º´É ÃøÁ¤ È¯°æ ±¸¼º (2023.11.13. ~ 2023.11.17.)
-* ¿ù¿äÀÏ:
-  * ÄÚµå ¸®ÆÑÅä¸µ
-  * 4ÁÖÂ÷ ¸ñ¿äÀÏ¿¡ Á¦½ÃµÇ¾ú´ø ¼º´É ÀÌ½´ ÇØ°á
-  * ¼º´É ÃøÁ¤ È¯°æ ±¸¼º
-* È­¿äÀÏ:
-  * ÀÌ½´ ¹ß»ý:
-    * Çö»ó:
-      * reservedµÈ ÆÄÆ¼Å¬ ¹öÆÛÀÇ ±æÀÌ¸¦ ³Ñ¾î°¡´Â ¼öÁØÀ¸·Î ÆÄÆ¼Å¬ÀÌ »ý¼ºµÈ ½ÃÁ¡ ÀüÈÄ¿¡ µð¹ÙÀÌ½º°¡ Á¦°ÅµÊ.
-      * °¡·É ÇÑ particle systemÀÌ ÃÖ´ë 1¸¸ °³ÀÇ ÆÄÆ¼Å¬À» °ü¸®ÇÒ ¼ö ÀÖ´Ù¸é, ÇöÀç ÆÄÆ¼Å¬ÀÇ ¼ö¿Í »ó°ü ¾øÀÌ ´ë·« 1¸¸ °³ÀÇ ÆÄÆ¼Å¬À» »ý¼ºÇÑ ½ÃÁ¡ ÀÌÈÄ¿¡ µð¹ÙÀÌ½º°¡ Á¦°ÅµÊ.
-    * ÀçÇö ¹æ¹ý:
-      * DebugLayer¿¡¼­ [GPUbaseValidation È¤Àº DRED auto-breadcrumb]¸¦ ÇÏ³ª¶óµµ È°¼ºÈ­ÇÏÁö ¾ÊÀ» ½Ã(µÑ ´Ù ºñÈ°¼ºÈ­ ½Ã) ÀÌ»ó Çö»ó ¹ß»ý
-      * À§ Á¶°ÇÀÌ´õ¶óµµ, ¼öÁ÷µ¿±âÈ­¸¦ »ç¿ë ½Ã ¹®Á¦°¡ ¹ß»ýÇÏÁö ¾ÊÀ½
-      * ÇÁ·¹ÀÓ ÃÖÃÊÀÇ compute shader dispatchÀÎ particle emissionÀº Á¤»ó µ¿ÀÛ ÇÔ.
-    * Á÷Á¢ÀûÀÎ ¿øÀÎ: 
-      * UAVÀÇ °ª °»½ÅÀÌ Á¦´ë·Î µÇÁö ¾Ê´Â °ÍÀ¸·Î ÃßÁ¤
-      * »ì¾ÆÀÖ´Â ÆÄÆ¼Å¬ÀÇ ¼ö¸¦ °ü¸®ÇÏ´Â counter°¡ ºñÁ¤»óÀûÀÎ UAV °ª °»½ÅÀ¸·Î ÀÎÇØ ÃÖ´ë ÆÄÆ¼Å¬ ¼ö¸¦ ³Ñ¾î°¡°Ô µÇ°í, ÀÌ·Î ÀÎÇØ out of bounds access°¡ ÀÏ¾î³ª´Â °ÍÀ¸·Î ÃßÁ¤
-* ¼ö¿äÀÏ:
-  * ÀÌ½´ ÇØ°á:
-    * ¿øÀÎ: UAV¸¦ »ç¿ëÇÏ´Â Dispatch »çÀÌ¿¡ UAV Resource Barrier¸¦ µÎÁö ¾ÊÀ½
-    * Áú¹®: GPU based validationÀÌ³ª auto-breadcrumb¸¦ »ç¿ë ½Ã ÀÚ¿øµéÀÇ »óÅÂ¸¦ °ü¸®ÇÏ±â À§ÇØ¼­ »ðÀÔµÇ´Â ÄÚµåµé·Î ÀÎÇØ ÀÌ·¯ÇÑ ¹®Á¦°¡ µå·¯³ªÁö ¾ÊÀº °ÍÀÏ±î?
+##### 6ì£¼ì°¨: ë¦¬íŒ©í† ë§ ë° ì„±ëŠ¥ ì¸¡ì • í™˜ê²½ êµ¬ì„± (2023.11.13. ~ 2023.11.17.)
+* ì›”ìš”ì¼:
+  * ì½”ë“œ ë¦¬íŒ©í† ë§
+  * 4ì£¼ì°¨ ëª©ìš”ì¼ì— ì œì‹œë˜ì—ˆë˜ ì„±ëŠ¥ ì´ìŠˆ í•´ê²°
+  * ì„±ëŠ¥ ì¸¡ì • í™˜ê²½ êµ¬ì„±
+* í™”ìš”ì¼:
+  * ì´ìŠˆ ë°œìƒ:
+    * í˜„ìƒ:
+      * reservedëœ íŒŒí‹°í´ ë²„í¼ì˜ ê¸¸ì´ë¥¼ ë„˜ì–´ê°€ëŠ” ìˆ˜ì¤€ìœ¼ë¡œ íŒŒí‹°í´ì´ ìƒì„±ëœ ì‹œì  ì „í›„ì— ë””ë°”ì´ìŠ¤ê°€ ì œê±°ë¨.
+      * ê°€ë ¹ í•œ particle systemì´ ìµœëŒ€ 1ë§Œ ê°œì˜ íŒŒí‹°í´ì„ ê´€ë¦¬í•  ìˆ˜ ìžˆë‹¤ë©´, í˜„ìž¬ íŒŒí‹°í´ì˜ ìˆ˜ì™€ ìƒê´€ ì—†ì´ ëŒ€ëžµ 1ë§Œ ê°œì˜ íŒŒí‹°í´ì„ ìƒì„±í•œ ì‹œì  ì´í›„ì— ë””ë°”ì´ìŠ¤ê°€ ì œê±°ë¨.
+    * ìž¬í˜„ ë°©ë²•:
+      * DebugLayerì—ì„œ [GPUbaseValidation í˜¹ì€ DRED auto-breadcrumb]ë¥¼ í•˜ë‚˜ë¼ë„ í™œì„±í™”í•˜ì§€ ì•Šì„ ì‹œ(ë‘˜ ë‹¤ ë¹„í™œì„±í™” ì‹œ) ì´ìƒ í˜„ìƒ ë°œìƒ
+      * ìœ„ ì¡°ê±´ì´ë”ë¼ë„, ìˆ˜ì§ë™ê¸°í™”ë¥¼ ì‚¬ìš© ì‹œ ë¬¸ì œê°€ ë°œìƒí•˜ì§€ ì•ŠìŒ
+      * í”„ë ˆìž„ ìµœì´ˆì˜ compute shader dispatchì¸ particle emissionì€ ì •ìƒ ë™ìž‘ í•¨.
+    * ì§ì ‘ì ì¸ ì›ì¸: 
+      * UAVì˜ ê°’ ê°±ì‹ ì´ ì œëŒ€ë¡œ ë˜ì§€ ì•ŠëŠ” ê²ƒìœ¼ë¡œ ì¶”ì •
+      * ì‚´ì•„ìžˆëŠ” íŒŒí‹°í´ì˜ ìˆ˜ë¥¼ ê´€ë¦¬í•˜ëŠ” counterê°€ ë¹„ì •ìƒì ì¸ UAV ê°’ ê°±ì‹ ìœ¼ë¡œ ì¸í•´ ìµœëŒ€ íŒŒí‹°í´ ìˆ˜ë¥¼ ë„˜ì–´ê°€ê²Œ ë˜ê³ , ì´ë¡œ ì¸í•´ out of bounds accessê°€ ì¼ì–´ë‚˜ëŠ” ê²ƒìœ¼ë¡œ ì¶”ì •
+* ìˆ˜ìš”ì¼:
+  * ì´ìŠˆ í•´ê²°:
+    * ì›ì¸: UAVë¥¼ ì‚¬ìš©í•˜ëŠ” Dispatch ì‚¬ì´ì— UAV Resource Barrierë¥¼ ë‘ì§€ ì•ŠìŒ
+    * ì§ˆë¬¸: GPU based validationì´ë‚˜ auto-breadcrumbë¥¼ ì‚¬ìš© ì‹œ ìžì›ë“¤ì˜ ìƒíƒœë¥¼ ê´€ë¦¬í•˜ê¸° ìœ„í•´ì„œ ì‚½ìž…ë˜ëŠ” ì½”ë“œë“¤ë¡œ ì¸í•´ ì´ëŸ¬í•œ ë¬¸ì œê°€ ë“œëŸ¬ë‚˜ì§€ ì•Šì€ ê²ƒì¼ê¹Œ?
   * IndirectDrawing Timing?
     * <img src="./img/pix_indirect_drawing_timing.png">
-    * ExecuteIndirect ¸í·É ÀÌÀü¿¡ ºñÁ¤»óÀûÀ¸·Î ±ä gpu À¯ÈÞ°¡ È®ÀÎµÊ (¸¶¿ì½º Ä¿¼­ ºÎºÐÀÌ ExecuteIndirect)
-    * 100¸¸ °³ÀÇ ÆÄÆ¼Å¬À» ±×¸° ¿¹ÀÎµ¥, drawing ½Ã°£ÀÌ ºñÁ¤»óÀûÀ¸·Î ÂªÀº °ÍÀ¸·Î º¸¾Æ gpu À¯ÈÞ·Î º¸ÀÌ´Â ºÎºÐµéÀÌ ÀüºÎ drawing¿¡ È°¿ëµÇ´Â ½Ã°£ÀÌ¶ó ÃßÁ¤
-    * È®ÀÎÀ» À§ÇØ Indirect DrawingÀ» ½Ã¿¬ÇÏ´Â DirectX12 SampleÀÇ timing ¿ª½Ã ÃøÁ¤ÇØº¸¾Ò°í °°Àº Çö»óÀ» º¼ ¼ö ÀÖ¾úÀ½.
+    * ExecuteIndirect ëª…ë ¹ ì´ì „ì— ë¹„ì •ìƒì ìœ¼ë¡œ ê¸´ gpu ìœ íœ´ê°€ í™•ì¸ë¨ (ë§ˆìš°ìŠ¤ ì»¤ì„œ ë¶€ë¶„ì´ ExecuteIndirect)
+    * 100ë§Œ ê°œì˜ íŒŒí‹°í´ì„ ê·¸ë¦° ì˜ˆì¸ë°, drawing ì‹œê°„ì´ ë¹„ì •ìƒì ìœ¼ë¡œ ì§§ì€ ê²ƒìœ¼ë¡œ ë³´ì•„ gpu ìœ íœ´ë¡œ ë³´ì´ëŠ” ë¶€ë¶„ë“¤ì´ ì „ë¶€ drawingì— í™œìš©ë˜ëŠ” ì‹œê°„ì´ë¼ ì¶”ì •
+    * í™•ì¸ì„ ìœ„í•´ Indirect Drawingì„ ì‹œì—°í•˜ëŠ” DirectX12 Sampleì˜ timing ì—­ì‹œ ì¸¡ì •í•´ë³´ì•˜ê³  ê°™ì€ í˜„ìƒì„ ë³¼ ìˆ˜ ìžˆì—ˆìŒ.
   * 
-* ¸ñ¿äÀÏ:
-  * ¼º´É ÃøÁ¤
-  * ÆÄÆ¼Å¬ °ü¸® ¹æ¹ý °³¼± ±¸»ó
-* ±Ý¿äÀÏ:
-  * InstancingÀ» ÀÌ¿ëÇØ¼­ Ä¿¸Çµå¸¦ Á¦ÃâÇÏµµ·Ï ¼öÁ¤
-    * 100¸¸ °³ sprite ·»´õ¸µ 14ms -> 8ms
+* ëª©ìš”ì¼:
+  * ì„±ëŠ¥ ì¸¡ì •
+  * íŒŒí‹°í´ ê´€ë¦¬ ë°©ë²• ê°œì„  êµ¬ìƒ
+* ê¸ˆìš”ì¼:
+  * Instancingì„ ì´ìš©í•´ì„œ ì»¤ë§¨ë“œë¥¼ ì œì¶œí•˜ë„ë¡ ìˆ˜ì •
+    * 100ë§Œ ê°œ sprite ë Œë”ë§ 14ms -> 8ms
 
 
-##### 7ÁÖÂ÷: ¼º´É °³¼± (2023.11.20. ~ 2023.11.24.)
-* ¿ù¿äÀÏ:
-  * ÆÄÆ¼Å¬ °ü¸® ¹æ½Ä º¯°æ
-  * ÆÄÆ¼Å¬ µ¥ÀÌÅÍ ÆÐÅ·/¾ðÆÐÅ· ¼öÇà
-  * ÇÈ¼¿ ½¦ÀÌ´õ¿¡¼­ ÆÄÆ¼Å¬ ¹öÆÛ¸¦ Á¢±ÙÇÏÁö ¾Ê¾Æµµ µÇµµ·Ï ÆÄÀÌÇÁ¶óÀÎ ¼öÁ¤
-* È­¿äÀÏ:
-  * ÆÄÆ¼Å¬ °ü¸® ¹æ½Ä º¯°æ¿¡ µû¸¥ ¹ö±× ¹× ±â´É º¯°æ ¿ä±¸»çÇ× ÇØ°á
-  * half type ¹ÌÁö¿ø¿¡ µû¶ó Á÷Á¢ 16 bit float packing ±¸Çö
-    * shader model 6.2ºÎÅÍ È°¿ëÇÒ ¼ö ÀÖ´Âµ¥, fxc¸¦ ¾²°í ÀÖ¾î ÇØ´ç ¹öÀüÀ¸·Î ÄÄÆÄÀÏ ºÒ°¡´É
-* ¼ö¿äÀÏ:
-  * ¼º´É ÃøÁ¤ ¹× °á°ú ºÐ¼®
-  * bounding k-gonÀ» Ã£´Â ¹æ¹ý·Ð¿¡ ´ëÇØ °øºÎ
-* ¸ñ¿äÀÏ:
-  * ÆÄÆ¼Å¬µéÀ» ping-pongÇÒ ¶§ UAV·Î uniformÇÏ°Ô Á¢±ÙÇÏ´Â °ªµéÀ» CBV ÅëÇØ¼­ Á¢±ÙÇÏµµ·Ï ¹Ù²ãº¸¾ÒÀ¸³ª Å« ¼º´É ÀÌµæÀº ¾ø¾úÀ½
-  * [Alok Aggrwal, Minimum area circumscribing Polygons] ÇÐ½À
-* ±Ý¿äÀÏ:
-  * ³í¹® ÇÐ½À ÈÄ Àû¿ëÇßÀ¸³ª ¹ö±×°¡ ¿©ÀüÈ÷ ¸¹À½
+##### 7ì£¼ì°¨: ì„±ëŠ¥ ê°œì„  (2023.11.20. ~ 2023.11.24.)
+* ì›”ìš”ì¼:
+  * íŒŒí‹°í´ ê´€ë¦¬ ë°©ì‹ ë³€ê²½
+  * íŒŒí‹°í´ ë°ì´í„° íŒ¨í‚¹/ì–¸íŒ¨í‚¹ ìˆ˜í–‰
+  * í”½ì…€ ì‰ì´ë”ì—ì„œ íŒŒí‹°í´ ë²„í¼ë¥¼ ì ‘ê·¼í•˜ì§€ ì•Šì•„ë„ ë˜ë„ë¡ íŒŒì´í”„ë¼ì¸ ìˆ˜ì •
+* í™”ìš”ì¼:
+  * íŒŒí‹°í´ ê´€ë¦¬ ë°©ì‹ ë³€ê²½ì— ë”°ë¥¸ ë²„ê·¸ ë° ê¸°ëŠ¥ ë³€ê²½ ìš”êµ¬ì‚¬í•­ í•´ê²°
+  * half type ë¯¸ì§€ì›ì— ë”°ë¼ ì§ì ‘ 16 bit float packing êµ¬í˜„
+    * shader model 6.2ë¶€í„° í™œìš©í•  ìˆ˜ ìžˆëŠ”ë°, fxcë¥¼ ì“°ê³  ìžˆì–´ í•´ë‹¹ ë²„ì „ìœ¼ë¡œ ì»´íŒŒì¼ ë¶ˆê°€ëŠ¥
+* ìˆ˜ìš”ì¼:
+  * ì„±ëŠ¥ ì¸¡ì • ë° ê²°ê³¼ ë¶„ì„
+  * bounding k-gonì„ ì°¾ëŠ” ë°©ë²•ë¡ ì— ëŒ€í•´ ê³µë¶€
+* ëª©ìš”ì¼:
+  * íŒŒí‹°í´ë“¤ì„ ping-pongí•  ë•Œ UAVë¡œ uniformí•˜ê²Œ ì ‘ê·¼í•˜ëŠ” ê°’ë“¤ì„ CBV í†µí•´ì„œ ì ‘ê·¼í•˜ë„ë¡ ë°”ê¿”ë³´ì•˜ìœ¼ë‚˜ í° ì„±ëŠ¥ ì´ë“ì€ ì—†ì—ˆìŒ
+  * [Alok Aggrwal, Minimum area circumscribing Polygons] í•™ìŠµ
+* ê¸ˆìš”ì¼:
+  * ë…¼ë¬¸ í•™ìŠµ í›„ ì ìš©í–ˆìœ¼ë‚˜ ë²„ê·¸ê°€ ì—¬ì „ížˆ ë§ŽìŒ
 
 
-##### 8ÁÖÂ÷: ¼º´É °³¼± ¹× ¸¶¹«¸® (2023.11.27. ~ 2023.11.28.)
-* ¿ù¿äÀÏ:
-  * Bounding k-gon Àû¿ë ¹× ¼º´É ÃøÁ¤
-  * ÆÄÆ¼Å¬À» ping-pongÇÏ´Â ÆÐ½º¿Í ½Ã¹Ä·¹ÀÌ¼Ç ÆÐ½º¸¦ ÅëÇÕÇÔÀ¸·Î½á ¸Þ¸ð¸® Á¢±ÙÀ» ÁÙÀÓ
-* È­¿äÀÏ:
-  * ¹ßÇ¥ ÀÚ·á ÁØºñ ¹× ÃÖÁ¾ ¹ßÇ¥
+##### 8ì£¼ì°¨: ì„±ëŠ¥ ê°œì„  ë° ë§ˆë¬´ë¦¬ (2023.11.27. ~ 2023.11.28.)
+* ì›”ìš”ì¼:
+  * Bounding k-gon ì ìš© ë° ì„±ëŠ¥ ì¸¡ì •
+  * íŒŒí‹°í´ì„ ping-pongí•˜ëŠ” íŒ¨ìŠ¤ì™€ ì‹œë®¬ë ˆì´ì…˜ íŒ¨ìŠ¤ë¥¼ í†µí•©í•¨ìœ¼ë¡œì¨ ë©”ëª¨ë¦¬ ì ‘ê·¼ì„ ì¤„ìž„
+* í™”ìš”ì¼:
+  * ë°œí‘œ ìžë£Œ ì¤€ë¹„ ë° ìµœì¢… ë°œí‘œ
 
 
 
 <hr/>
 
-### ¼¼ºÎ ±¸Çö ¼³¸í
-#### ÆÄÆ¼Å¬ ÀÚ¿ø
-* ÆÄÆ¼Å¬ Á¤º¸¸¦ ´ã´Â ¹öÆÛ¿Í ±× ÀÎµ¦½º¸¦ ´ã±â À§ÇÑ ½ºÅÃÀ» 3°³ »ç¿ë
-  + ÆÄ±«µÇ¾î ÀÖ´Â ÆÄÆ¼Å¬µéÀÇ ÀÎµ¦½º¸¦ ´ã´Â ½ºÅÃ [deads]
-    - ½ÃÀÛ ½Ã ½ºÅÃÀÌ °¡µæ Â÷ÀÖ°í, °¢ ¿ø¼Ò´Â 0¹øºÎÅÍ ÃÖ´ë ÆÄÆ¼Å¬ ¼ö±îÁö ÃÊ±âÈ­µÇ¾î ÀÖÀ½. 
-  + »ì¾ÆÀÖ´Â ÆÄÆ¼Å¬µéÀÇ ÀÎµ¦½º¸¦ ´ã´Â ½ºÅÃ 2°³ (ping-pong) [alives1, alives2]
-* RWbyteaddressbuffer.InterlockedAdd¸¦ ÀÌ¿ëÇØ Àü¿ªÀûÀ¸·Î ÆÄÆ¼Å¬ÀÇ ¼ö¸¦ µ¿±âÈ­
+### ì„¸ë¶€ êµ¬í˜„ ì„¤ëª…
+#### íŒŒí‹°í´ ìžì›
+* íŒŒí‹°í´ ì •ë³´ë¥¼ ë‹´ëŠ” ë²„í¼ì™€ ê·¸ ì¸ë±ìŠ¤ë¥¼ ë‹´ê¸° ìœ„í•œ ìŠ¤íƒì„ 3ê°œ ì‚¬ìš©
+  + íŒŒê´´ë˜ì–´ ìžˆëŠ” íŒŒí‹°í´ë“¤ì˜ ì¸ë±ìŠ¤ë¥¼ ë‹´ëŠ” ìŠ¤íƒ [deads]
+    - ì‹œìž‘ ì‹œ ìŠ¤íƒì´ ê°€ë“ ì°¨ìžˆê³ , ê° ì›ì†ŒëŠ” 0ë²ˆë¶€í„° ìµœëŒ€ íŒŒí‹°í´ ìˆ˜ê¹Œì§€ ì´ˆê¸°í™”ë˜ì–´ ìžˆìŒ. 
+  + ì‚´ì•„ìžˆëŠ” íŒŒí‹°í´ë“¤ì˜ ì¸ë±ìŠ¤ë¥¼ ë‹´ëŠ” ìŠ¤íƒ 2ê°œ (ping-pong) [alives1, alives2]
+* RWbyteaddressbuffer.InterlockedAddë¥¼ ì´ìš©í•´ ì „ì—­ì ìœ¼ë¡œ íŒŒí‹°í´ì˜ ìˆ˜ë¥¼ ë™ê¸°í™”
 
-#### ÆÄÆ¼Å¬ »ý¼º
-* ÆÄÆ¼Å¬ »ý¼º ½Ã °¢ ½º·¹µå´Â ÇÏ³ªÀÇ ÆÄÆ¼Å¬À» »ý¼ºÇÔ.
-* ÀÌ¶§ deads ½ºÅÃÀÇ ÃÖ»óÀ§¿¡¼­ Á×¾î ÀÖ´Â ÆÄÆ¼Å¬ÀÇ ÀÎµ¦½º¸¦ °¡Á®¿À¸ç, ½ºÅÃÀÇ Å©±â¸¦ 1 °¨¼Ò½ÃÅ´
-* ÆÄÆ¼Å¬À» ÃÊ±âÈ­ÇÏ°í, alives ½ºÅÃ¿¡ ÇØ´ç ÆÄÆ¼Å¬ÀÇ ÀÎµ¦½º¸¦ »ðÀÔÇÔ.
+#### íŒŒí‹°í´ ìƒì„±
+* íŒŒí‹°í´ ìƒì„± ì‹œ ê° ìŠ¤ë ˆë“œëŠ” í•˜ë‚˜ì˜ íŒŒí‹°í´ì„ ìƒì„±í•¨.
+* ì´ë•Œ deads ìŠ¤íƒì˜ ìµœìƒìœ„ì—ì„œ ì£½ì–´ ìžˆëŠ” íŒŒí‹°í´ì˜ ì¸ë±ìŠ¤ë¥¼ ê°€ì ¸ì˜¤ë©°, ìŠ¤íƒì˜ í¬ê¸°ë¥¼ 1 ê°ì†Œì‹œí‚´
+* íŒŒí‹°í´ì„ ì´ˆê¸°í™”í•˜ê³ , alives ìŠ¤íƒì— í•´ë‹¹ íŒŒí‹°í´ì˜ ì¸ë±ìŠ¤ë¥¼ ì‚½ìž…í•¨.
 
-#### ÆÄÆ¼Å¬ ÆÄ±« ¹× ½Ã¹Ä·¹ÀÌ¼Ç
-* °¢ ½º·¹µå´Â alives ¹öÆÛ¿¡¼­ ÇÏ³ªÀÇ ÆÄÆ¼Å¬À» ½Ã¹Ä·¹ÀÌ¼ÇÇÔ.
-* simulate ´Ü°è¿¡¼­ ÆÄÆ¼Å¬ÀÇ life°¡ 0 ¹Ì¸¸ÀÌ¸é deads ½ºÅÃ¿¡ ÇØ´ç ÀÎµ¦½º¸¦ »ðÀÔÇÔ.
-* ¸¸¾à ¿©ÀüÈ÷ »ì¾ÆÀÖ´Ù¸é ½Ã¹Ä·¹ÀÌ¼Ç ¿¬»êÀ» ¸¶Ä£ µÚ ping-pong ¹öÆÛÀÎ alives2 ½ºÅÃ¿¡ ÇØ´ç ÆÄÆ¼Å¬ÀÇ ÀÎµ¦½º¸¦ »ðÀÔÇÔ.
+#### íŒŒí‹°í´ íŒŒê´´ ë° ì‹œë®¬ë ˆì´ì…˜
+* ê° ìŠ¤ë ˆë“œëŠ” alives ë²„í¼ì—ì„œ í•˜ë‚˜ì˜ íŒŒí‹°í´ì„ ì‹œë®¬ë ˆì´ì…˜í•¨.
+* simulate ë‹¨ê³„ì—ì„œ íŒŒí‹°í´ì˜ lifeê°€ 0 ë¯¸ë§Œì´ë©´ deads ìŠ¤íƒì— í•´ë‹¹ ì¸ë±ìŠ¤ë¥¼ ì‚½ìž…í•¨.
+* ë§Œì•½ ì—¬ì „ížˆ ì‚´ì•„ìžˆë‹¤ë©´ ì‹œë®¬ë ˆì´ì…˜ ì—°ì‚°ì„ ë§ˆì¹œ ë’¤ ping-pong ë²„í¼ì¸ alives2 ìŠ¤íƒì— í•´ë‹¹ íŒŒí‹°í´ì˜ ì¸ë±ìŠ¤ë¥¼ ì‚½ìž…í•¨.
 
-#### ÆÄÆ¼Å¬ Á¤·Ä
+#### íŒŒí‹°í´ ì •ë ¬
 * Batcher's odd-even merge sort:
-  + ¹ÝÀý·Î ³ª´©¾î Á¤·ÄÇÑ´Ù
-  + Â¦¼ö¿Í È¦¼ö ÀÎµ¦½º·Î ³ª´©¾î Á¤·ÄÇÑ´Ù.
-  + (2l, 2l-1)À» ºñ±³ÇØ Á¤·ÄÇÑ´Ù. °¡·É 8°³ÀÇ ¿ø¼ÒÀÏ °æ¿ì (2,3), (4,5), (6,7)
-  + ÀÌ¸¦ ¹Ýº¹ÇØ Á¤·Ä ¿Ï·á
+  + ë°˜ì ˆë¡œ ë‚˜ëˆ„ì–´ ì •ë ¬í•œë‹¤
+  + ì§ìˆ˜ì™€ í™€ìˆ˜ ì¸ë±ìŠ¤ë¡œ ë‚˜ëˆ„ì–´ ì •ë ¬í•œë‹¤.
+  + (2l, 2l-1)ì„ ë¹„êµí•´ ì •ë ¬í•œë‹¤. ê°€ë ¹ 8ê°œì˜ ì›ì†Œì¼ ê²½ìš° (2,3), (4,5), (6,7)
+  + ì´ë¥¼ ë°˜ë³µí•´ ì •ë ¬ ì™„ë£Œ
 * Bitnoic sort:
-  + descending, ascneding order¸¦ ¹ø°¥¾Æ°¡¸é¼­ Á¤·ÄÇÔ
-  + ÀÌµéÀ» mergeÇÏ´Â ÀÛ¾÷µéÀ» Àç±ÍÀûÀ¸·Î ¼öÇàÇÏ¿© Á¤·Ä ¿Ï·á
-* Bitonic sort°¡ ´õ ºü¸¥ ÀÌÀ¯?
-  * data access ÆÐÅÏÀÌ ±ÔÄ¢ÀûÀÌ¶ó cache hit°¡ Àß ÀÌ·ç¾îÁú ¼ö ÀÖÀ½.
+  + descending, ascneding orderë¥¼ ë²ˆê°ˆì•„ê°€ë©´ì„œ ì •ë ¬í•¨
+  + ì´ë“¤ì„ mergeí•˜ëŠ” ìž‘ì—…ë“¤ì„ ìž¬ê·€ì ìœ¼ë¡œ ìˆ˜í–‰í•˜ì—¬ ì •ë ¬ ì™„ë£Œ
+* Bitonic sortê°€ ë” ë¹ ë¥¸ ì´ìœ ?
+  * data access íŒ¨í„´ì´ ê·œì¹™ì ì´ë¼ cache hitê°€ ìž˜ ì´ë£¨ì–´ì§ˆ ìˆ˜ ìžˆìŒ.
 
-#### ½¦ÀÌ´õ µ¿Àû »ý¼º
-* ¿¹½Ã:
+#### ì‰ì´ë” ë™ì  ìƒì„±
+* ì˜ˆì‹œ:
 ``` c++
 EmitCSBase.hlsl
 
@@ -432,14 +432,14 @@ newParticle.Velocity = local5;
 }
 ```
 
-* Base ½¦ÀÌ´õ ÆÄÀÏÀÌ ÀÔ·ÂµÇ¸ç, statements°¡ »ðÀÔµÉ ÁöÁ¡Àº "%s"·Î Ç¥½Ã
-* Graph ÀÚ·á±¸Á¶¸¦ ±â¹ÝÀ¸·Î statementsÀÇ dependency¸¦ °ü¸®
-* ÀÌµéÀ» À§»ó Á¤·Ä ÈÄ ¼øÂ÷ÀûÀ¸·Î ÄÚµå¿¡ »ðÀÔ
-  * ±íÀÌ ¿ì¼± Å½»öÀÇ ÈÄÀ§ ¼ø¼­¸¦ °Å²Ù·Î ¼øÈ¸
-* Å¬¶óÀÌ¾ðÆ®´Â HlslGenerator °´Ã¼ÀÇ ÇÔ¼ö¸¦ ÀÌ¿ëÇØ ¿øÇÏ´Â ·ÎÁ÷ »ý¼º
-  * ±¸Ã¼ÀûÀ¸·Î´Â statement node¸¦ »ý¼º ÈÄ ±×µé °£ÀÇ °ü°è¸¦ Á¤ÀÇ
-  * °¢ statement node´Â °íÀ¯ÇÑ ¹øÈ£°¡ Á¸Àç
-  * ¿¹½Ã:
+* Base ì‰ì´ë” íŒŒì¼ì´ ìž…ë ¥ë˜ë©°, statementsê°€ ì‚½ìž…ë  ì§€ì ì€ "%s"ë¡œ í‘œì‹œ
+* Graph ìžë£Œêµ¬ì¡°ë¥¼ ê¸°ë°˜ìœ¼ë¡œ statementsì˜ dependencyë¥¼ ê´€ë¦¬
+* ì´ë“¤ì„ ìœ„ìƒ ì •ë ¬ í›„ ìˆœì°¨ì ìœ¼ë¡œ ì½”ë“œì— ì‚½ìž…
+  * ê¹Šì´ ìš°ì„  íƒìƒ‰ì˜ í›„ìœ„ ìˆœì„œë¥¼ ê±°ê¾¸ë¡œ ìˆœíšŒ
+* í´ë¼ì´ì–¸íŠ¸ëŠ” HlslGenerator ê°ì²´ì˜ í•¨ìˆ˜ë¥¼ ì´ìš©í•´ ì›í•˜ëŠ” ë¡œì§ ìƒì„±
+  * êµ¬ì²´ì ìœ¼ë¡œëŠ” statement nodeë¥¼ ìƒì„± í›„ ê·¸ë“¤ ê°„ì˜ ê´€ê³„ë¥¼ ì •ì˜
+  * ê° statement nodeëŠ” ê³ ìœ í•œ ë²ˆí˜¸ê°€ ì¡´ìž¬
+  * ì˜ˆì‹œ:
 ``` c++
 UINT positionIndex = _hlslGenerator->newFloat3(0.0f, 0.0f, 0.0f);
 
@@ -464,54 +464,54 @@ _hlslGenerator->setInitialOpacity(opacityIndex);
 
 compileShaders();
 ```
-* ÀÌ¶§ ½¦ÀÌ´õÀÇ ÃÖÁ¾ Ãâ·Â °ªÀº »çÀü¿¡ Á¤ÇØÁ® ÀÖÀ½.
-  * °¡·É EmitCSÀÇ °æ¿ì InitalPosition, InitialVelocity µûÀ§¸¦ ÃÖÁ¾ Ãâ·ÂÀ¸·Î ¹ÞÀ½.
-* »ý¼ºµÈ Shader ÆÄÀÏµéÀÇ ÀÌ¸§Àº °´Ã¼ »ý¼º ½ÃÁ¡À» ÇØ½ÌÇÑ °ªÀ¸·Î ±¸ºÐ
+* ì´ë•Œ ì‰ì´ë”ì˜ ìµœì¢… ì¶œë ¥ ê°’ì€ ì‚¬ì „ì— ì •í•´ì ¸ ìžˆìŒ.
+  * ê°€ë ¹ EmitCSì˜ ê²½ìš° InitalPosition, InitialVelocity ë”°ìœ„ë¥¼ ìµœì¢… ì¶œë ¥ìœ¼ë¡œ ë°›ìŒ.
+* ìƒì„±ëœ Shader íŒŒì¼ë“¤ì˜ ì´ë¦„ì€ ê°ì²´ ìƒì„± ì‹œì ì„ í•´ì‹±í•œ ê°’ìœ¼ë¡œ êµ¬ë¶„
 * 
 
-#### ÄÃ ³ëÀÌÁî
-* 3Â÷¿ø ³ëÀÌÁî ÅØ½ºÃ³¸¦ »ý¼º (R32G32B32FLOAT)
-  * Perlin Noise¸¦ ÀÌ¿ëÇÒ ¿¹Á¤ÀÌ¾úÀ¸³ª, ±×³É ´Ü¼ø noise¸¦ »ç¿ëÇØµµ ³ª»ÚÁö ¾ÊÀº °á°ú¸¦ º¸ÀÌ¹Ç·Î Â÷ÈÄ·Î ¹Ì·ç¾úÀ½
+#### ì»¬ ë…¸ì´ì¦ˆ
+* 3ì°¨ì› ë…¸ì´ì¦ˆ í…ìŠ¤ì²˜ë¥¼ ìƒì„± (R32G32B32FLOAT)
+  * Perlin Noiseë¥¼ ì´ìš©í•  ì˜ˆì •ì´ì—ˆìœ¼ë‚˜, ê·¸ëƒ¥ ë‹¨ìˆœ noiseë¥¼ ì‚¬ìš©í•´ë„ ë‚˜ì˜ì§€ ì•Šì€ ê²°ê³¼ë¥¼ ë³´ì´ë¯€ë¡œ ì°¨í›„ë¡œ ë¯¸ë£¨ì—ˆìŒ
   * <img src="./img/noise_texture.png">
-* ÀÌ´Â º¤ÅÍ°¡ µÇ¸ç ÆÄÆ¼Å¬ÀÇ À§Ä¡¸¦ ±â¹ÝÀ¸·Î ÅØ½ºÃ³¸¦ linear sampleÇØ ¾òÀº °ªÀ¸·Î velocity¸¦ ´©Àû
+* ì´ëŠ” ë²¡í„°ê°€ ë˜ë©° íŒŒí‹°í´ì˜ ìœ„ì¹˜ë¥¼ ê¸°ë°˜ìœ¼ë¡œ í…ìŠ¤ì²˜ë¥¼ linear sampleí•´ ì–»ì€ ê°’ìœ¼ë¡œ velocityë¥¼ ëˆ„ì 
 * <img src="./img/curl_noise.webp">
 
 
-#### ºÒ ·»´õ¸µ
+#### ë¶ˆ ë Œë”ë§
 
-* ¿¹½Ã1: <img src="./img/fire_example1.webp">
-* ¿¹½Ã2: <img src="./img/fire_example2.webp">
-* ³ëµå ¿¡µðÅÍ ¿¹½Ã:
+* ì˜ˆì‹œ1: <img src="./img/fire_example1.webp">
+* ì˜ˆì‹œ2: <img src="./img/fire_example2.webp">
+* ë…¸ë“œ ì—ë””í„° ì˜ˆì‹œ:
   * <img src="./img/fire_example1_ps0_emitter.png">
   * <img src="./img/fire_example1_ps0_simulator.png">
   * <img src="./img/fire_example1_ps0_renderer.png">
-* ±¸Çö ¹æ¹ý
+* êµ¬í˜„ ë°©ë²•
   * Particle systems
-    * À§·Î ¿Ã¶ó°¡´Â ºÒ²ÉÀ» Ç¥ÇöÇÏ´Â particle system
-    * ¿¬±â¸¦ Ç¥ÇöÇÏ´Â particle system
-    * ºÒ¾¾¸¦ Ç¥ÇöÇÏ´Â particle system
-    * Áß¾Ó ºÒ²ÉÀ» Ç¥ÇöÇÏ´Â particle system
-  * ºÒ²É°ú ¿¬±â´Â subuv ÅØ½ºÃ³¸¦ ÀÌ¿ëÇØ¼­ lifetimeÀ» ±â¹ÝÀ¸·Î ¾Ö´Ï¸ÞÀÌÆÃµÊ.
+    * ìœ„ë¡œ ì˜¬ë¼ê°€ëŠ” ë¶ˆê½ƒì„ í‘œí˜„í•˜ëŠ” particle system
+    * ì—°ê¸°ë¥¼ í‘œí˜„í•˜ëŠ” particle system
+    * ë¶ˆì”¨ë¥¼ í‘œí˜„í•˜ëŠ” particle system
+    * ì¤‘ì•™ ë¶ˆê½ƒì„ í‘œí˜„í•˜ëŠ” particle system
+  * ë¶ˆê½ƒê³¼ ì—°ê¸°ëŠ” subuv í…ìŠ¤ì²˜ë¥¼ ì´ìš©í•´ì„œ lifetimeì„ ê¸°ë°˜ìœ¼ë¡œ ì• ë‹ˆë©”ì´íŒ…ë¨.
     * <img src="./FullyGpuParticleSystem/Textures/fire_subuv.png">
-    * ¾Ö´Ï¸ÞÀÌ¼Ç ºí·»µùÀº ÇÏÁö ¾Ê¾ÒÀ½!
+    * ì• ë‹ˆë©”ì´ì…˜ ë¸”ë Œë”©ì€ í•˜ì§€ ì•Šì•˜ìŒ!
 
-#### ¸®º» ·»´õ¸µ
-* 1Â÷Àû ±¸Çö ¸ñÇ¥:
+#### ë¦¬ë³¸ ë Œë”ë§
+* 1ì°¨ì  êµ¬í˜„ ëª©í‘œ:
   * https://youtu.be/Zn9-U5vQl3g?si=OwzghEU3Dq-Bh-fX&t=155
-  * Spawntime ±â¹ÝÀ¸·Î particle Á¤·Ä ÈÄ
-  * ÀÌµéÀ» Áö³ª´Â spline(Catmull-rom) ·»´õ¸µ
-  * ÀûÀýÇÑ ·¹ÆÛ·±½º¸¦ Ã£Áö ¸øÇßÀ¸¹Ç·Î, ³» ¸¾´ë·Î ±¸ÇöÇÑ´Ù!
-* Á¤·Ä
-  * SpawntimeÀ¸·Î ÇÏ·Á°í ÇßÀ¸³ª, Ãß°¡ÀûÀÎ ÀÎÀÚ°¡ ÇÊ¿äÇÔ. ¿Ö³ÄÇÏ¸é:
-    * ÇÑ ÇÁ·¹ÀÓ¿¡¼­ °°Àº spawntimeÀ» °¡Áø ¿©·¯ ÆÄÆ¼Å¬µéÀÌ »ý¼ºµÊ
-    * Bitonic sort´Â stableÇÑ sort°¡ ¾Æ´Ò °ÍÀÌ¹Ç·Î, spawntimeÀÌ °°Àº ÆÄÆ¼Å¬µéÀÇ »ó´ëÀû ¼ø¼­°¡ º¸Á¸µÈ´Ù´Â º¸ÀåÀÌ ¾øÀ½
-    * µû¶ó¼­ spawn ½Ã ÇØ´ç dispatch thread id¸¦ ±â·ÏÇÏ°í ÀÌ ¿ª½Ã Á¤·Ä¿¡ °ü¿©ÇÏµµ·Ï ¼³Á¤
-* Ribbon »ý¼º
-  * TessellationÀ» ÀÌ¿ë
-    * ÀÔ·Â: 4°³ÀÇ Control points C0, C1, C2, C3
-    * C1°ú C2 À§ ¾Æ·¡·Î Á¡À» »ý¼ºÇØ quad ±¸¼º ÈÄ tessellation
+  * Spawntime ê¸°ë°˜ìœ¼ë¡œ particle ì •ë ¬ í›„
+  * ì´ë“¤ì„ ì§€ë‚˜ëŠ” spline(Catmull-rom) ë Œë”ë§
+  * ì ì ˆí•œ ë ˆí¼ëŸ°ìŠ¤ë¥¼ ì°¾ì§€ ëª»í–ˆìœ¼ë¯€ë¡œ, ë‚´ ë§˜ëŒ€ë¡œ êµ¬í˜„í•œë‹¤!
+* ì •ë ¬
+  * Spawntimeìœ¼ë¡œ í•˜ë ¤ê³  í–ˆìœ¼ë‚˜, ì¶”ê°€ì ì¸ ì¸ìžê°€ í•„ìš”í•¨. ì™œëƒí•˜ë©´:
+    * í•œ í”„ë ˆìž„ì—ì„œ ê°™ì€ spawntimeì„ ê°€ì§„ ì—¬ëŸ¬ íŒŒí‹°í´ë“¤ì´ ìƒì„±ë¨
+    * Bitonic sortëŠ” stableí•œ sortê°€ ì•„ë‹ ê²ƒì´ë¯€ë¡œ, spawntimeì´ ê°™ì€ íŒŒí‹°í´ë“¤ì˜ ìƒëŒ€ì  ìˆœì„œê°€ ë³´ì¡´ëœë‹¤ëŠ” ë³´ìž¥ì´ ì—†ìŒ
+    * ë”°ë¼ì„œ spawn ì‹œ í•´ë‹¹ dispatch thread idë¥¼ ê¸°ë¡í•˜ê³  ì´ ì—­ì‹œ ì •ë ¬ì— ê´€ì—¬í•˜ë„ë¡ ì„¤ì •
+* Ribbon ìƒì„±
+  * Tessellationì„ ì´ìš©
+    * ìž…ë ¥: 4ê°œì˜ Control points C0, C1, C2, C3
+    * C1ê³¼ C2 ìœ„ ì•„ëž˜ë¡œ ì ì„ ìƒì„±í•´ quad êµ¬ì„± í›„ tessellation
     * <img src="./img/ribbon_hull_shader.png">
-    * Catmull-rom splineÀ» ÀÌ¿ëÇØ C1°ú C2 »çÀÌ ¼¼ºÐµÈ Á¡µéÀÇ À§Ä¡¸¦ Á¶Á¤
+    * Catmull-rom splineì„ ì´ìš©í•´ C1ê³¼ C2 ì‚¬ì´ ì„¸ë¶„ëœ ì ë“¤ì˜ ìœ„ì¹˜ë¥¼ ì¡°ì •
     ``` C++
     ...
 	float t = uv.x;
@@ -533,9 +533,9 @@ compileShaders();
 	float3 pos = lerp(upPosU, downPosU, uv.y);
     ...
     ```
-  * Control Points ÀÔ·Â ¹æ½Ä
-    * Index View Buffer´Â 0ºÎÅÍ maxParticleCount±îÁö Ã¤¿öÁ® ÀÖÀ½
-    * Indirect dispatch¸¦ ÀÌ¿ëÇØ control points¸¦ ÀÔ·Â Á¶¸³±â¿¡ ³ÖÀ½
+  * Control Points ìž…ë ¥ ë°©ì‹
+    * Index View BufferëŠ” 0ë¶€í„° maxParticleCountê¹Œì§€ ì±„ì›Œì ¸ ìžˆìŒ
+    * Indirect dispatchë¥¼ ì´ìš©í•´ control pointsë¥¼ ìž…ë ¥ ì¡°ë¦½ê¸°ì— ë„£ìŒ
         ``` C++
         [numthreads(256, 1, 1)]
         void RibbonComputeIndirectCommandsCS(int3 dispatchThreadId : SV_DispatchThreadID)
@@ -559,56 +559,56 @@ compileShaders();
         }
         ```
     * <img src="./img/ribbon_input.png">
-    * ¹®Á¦Á¡: 0\~1°ú n-1\~nÀÇ ribbonÀÌ ¿¬°áµÇÁö ¾ÊÀ½.
-    * µû¶ó¼­ index bufferÀÇ ¾Õ ºÎºÐ¿¡ 0À» Ãß°¡·Î »ðÀÔÇÏ¿© Ã¹ ¹øÂ° ribbonÀÇ °æ¿ì control point°¡ 0, 0, 1, 2·Î ÀÔ·ÂµÇ°Ô ÇÏ¿© 0~1ÀÇ ÆÄÆ¼Å¬À» ÀÕ°Ô ÇÔ.
-    * ¸¶Âù°¡Áö·Î ¸¶Áö¸· ribbonÀÇ °æ¿ì numAlives¸¦ È®ÀÎÇØ¼­ ÇØ´ç index¸¦ º¸Á¤ÇÏ°Ô²û ÇÔ (n-2, n-1, n, n+1) => (n-2, n-1, n, n)
-    * ÀÌ´Â vid·Î ÀÔ·ÂÀÌ µÇ¸ç, ÀÌ¸¦ ÀÎµ¦½º·Î ÀÌ¿ëÇØ particle buffer¿¡ Á¢±Ù
+    * ë¬¸ì œì : 0\~1ê³¼ n-1\~nì˜ ribbonì´ ì—°ê²°ë˜ì§€ ì•ŠìŒ.
+    * ë”°ë¼ì„œ index bufferì˜ ì•ž ë¶€ë¶„ì— 0ì„ ì¶”ê°€ë¡œ ì‚½ìž…í•˜ì—¬ ì²« ë²ˆì§¸ ribbonì˜ ê²½ìš° control pointê°€ 0, 0, 1, 2ë¡œ ìž…ë ¥ë˜ê²Œ í•˜ì—¬ 0~1ì˜ íŒŒí‹°í´ì„ ìž‡ê²Œ í•¨.
+    * ë§ˆì°¬ê°€ì§€ë¡œ ë§ˆì§€ë§‰ ribbonì˜ ê²½ìš° numAlivesë¥¼ í™•ì¸í•´ì„œ í•´ë‹¹ indexë¥¼ ë³´ì •í•˜ê²Œë” í•¨ (n-2, n-1, n, n+1) => (n-2, n-1, n, n)
+    * ì´ëŠ” vidë¡œ ìž…ë ¥ì´ ë˜ë©°, ì´ë¥¼ ì¸ë±ìŠ¤ë¡œ ì´ìš©í•´ particle bufferì— ì ‘ê·¼
   * Color, Opacity interpolation
-    * Pixel shader±îÁö °¢ segmentÀÇ uv°ªÀ» Àü´ÞÇÏ¸ç, ÀÌ¸¦ ÀÌ¿ëÇØ spline º¸°£ÇÑ °Í°ú °°Àº ¹æ½ÄÀ¸·Î º¸°£.
+    * Pixel shaderê¹Œì§€ ê° segmentì˜ uvê°’ì„ ì „ë‹¬í•˜ë©°, ì´ë¥¼ ì´ìš©í•´ spline ë³´ê°„í•œ ê²ƒê³¼ ê°™ì€ ë°©ì‹ìœ¼ë¡œ ë³´ê°„.
   * Texture Coordinate
-    * ½ÇÇèÀ» À§ÇÑ texture: 
+    * ì‹¤í—˜ì„ ìœ„í•œ texture: 
       * <img src="./FullyGpuParticleSystem/Textures/uv_mapper.png">
-    * 3°¡Áö ÇüÅÂ·Î Texture mappingÀ» ÇØº¸¾ÒÀ½: Segment based, Stretched, Distance based
+    * 3ê°€ì§€ í˜•íƒœë¡œ Texture mappingì„ í•´ë³´ì•˜ìŒ: Segment based, Stretched, Distance based
     * Segment based
-      * °¢ ÆÄÆ¼Å¬µéÀ» ÀÕ´Â ÇÏ³ªÀÇ segment°¡ 0~1ÀÇ Texture Coordinate¸¦ °¡Áü
+      * ê° íŒŒí‹°í´ë“¤ì„ ìž‡ëŠ” í•˜ë‚˜ì˜ segmentê°€ 0~1ì˜ Texture Coordinateë¥¼ ê°€ì§
       * <img src="./img/ribbon_segment_based.png">
       * <img src="./img/ribbon_texture_segment.webp">
     * Stretched
-      * ½ÃÀÛ ÆÄÆ¼Å¬ºÎÅÍ ³¡ ÆÄÆ¼Å¬±îÁö 0~1ÀÇ Texture Coordinate¸¦ °¡Áü
+      * ì‹œìž‘ íŒŒí‹°í´ë¶€í„° ë íŒŒí‹°í´ê¹Œì§€ 0~1ì˜ Texture Coordinateë¥¼ ê°€ì§
       * <img src="./img/ribbon_stretched.png">
       * <img src="./img/ribbon_texture_stretched.webp">
     * Distance based
-      * ¼¼°è ÁÂÇ¥ ±âÁØÀ¸·Î ÆÄÆ¼Å¬ »çÀÌÀÇ °Å¸®¸¦ ±Ù»çÇØ °Å¸®¸¦ ±âÁØÀ¸·Î texture coordinate¸¦ ºÎ¿©ÇØ tilingÇÔ
+      * ì„¸ê³„ ì¢Œí‘œ ê¸°ì¤€ìœ¼ë¡œ íŒŒí‹°í´ ì‚¬ì´ì˜ ê±°ë¦¬ë¥¼ ê·¼ì‚¬í•´ ê±°ë¦¬ë¥¼ ê¸°ì¤€ìœ¼ë¡œ texture coordinateë¥¼ ë¶€ì—¬í•´ tilingí•¨
       * <img src="./img/ribbon_distance_based.png">
       * <img src="./img/ribbon_texture_distancebased.webp">
-      * Catmull-rom splineÀÌ ÀÌ·ç´Â È£ÀÇ ±æÀÌ¸¦ ±¸ÇØº¸·Á ÇßÀ¸³ª ÀÌ´Â ¾î·Á¿ò
-      * ¸¸µé¾îÁö´Â splineÀÇ °î·üÀÌ »ý°¢º¸´Ù Å©Áö ¾Ê°í ¹æÇâ ÀüÈ¯µµ ±Þ°ÝÇÏ°Ô ÀÌ·ç¾îÁö¹Ç·Î, ´Ü¼øÈ÷ Á÷¼± °Å¸®¸¦ ÀÌ¿ëÇØ¼­ ±Ù»çÇØµµ ÀûÀýÇÑ °á°ú¹°ÀÌ ³ª¿Ã °ÍÀÌ¶ó°í »ý°¢ÇÏ¿´À½
-      * i¹øÂ° ÆÄÆ¼Å¬°ú i-1¹øÂ° ÆÄÆ¼Å¬ »çÀÌÀÇ °Å¸®¸¦ ÀüºÎ ±¸ÇÏ°í ÀÌ¸¦ °¢°¢ÀÇ ÆÄÆ¼Å¬µéÀÌ Á¤º¸¸¦ À¯ÁöÇÏÁö¸¸, ÀÌ°Í¸¸À¸·Î´Â ºÎÁ·ÇÔ
-        * ¿Ö³ÄÇÏ¸é tilingÀÌ ÀÚ¿¬½º·´°Ô ÀÌ·ç¾îÁö°Ô ÇÏ±â À§ÇØ¼­´Â ÀÌÀü segmentÀÇ ÅØ½ºÃ³ ÁÂÇ¥°ªÀ» ¾Ë¾Æ¾ß ÇÏ±â ¶§¹®!
-        * Áï, "´©ÀûÇÕ"ÀÌ ÇÊ¿äÇÔ
+      * Catmull-rom splineì´ ì´ë£¨ëŠ” í˜¸ì˜ ê¸¸ì´ë¥¼ êµ¬í•´ë³´ë ¤ í–ˆìœ¼ë‚˜ ì´ëŠ” ì–´ë ¤ì›€
+      * ë§Œë“¤ì–´ì§€ëŠ” splineì˜ ê³¡ë¥ ì´ ìƒê°ë³´ë‹¤ í¬ì§€ ì•Šê³  ë°©í–¥ ì „í™˜ë„ ê¸‰ê²©í•˜ê²Œ ì´ë£¨ì–´ì§€ë¯€ë¡œ, ë‹¨ìˆœížˆ ì§ì„  ê±°ë¦¬ë¥¼ ì´ìš©í•´ì„œ ê·¼ì‚¬í•´ë„ ì ì ˆí•œ ê²°ê³¼ë¬¼ì´ ë‚˜ì˜¬ ê²ƒì´ë¼ê³  ìƒê°í•˜ì˜€ìŒ
+      * ië²ˆì§¸ íŒŒí‹°í´ê³¼ i-1ë²ˆì§¸ íŒŒí‹°í´ ì‚¬ì´ì˜ ê±°ë¦¬ë¥¼ ì „ë¶€ êµ¬í•˜ê³  ì´ë¥¼ ê°ê°ì˜ íŒŒí‹°í´ë“¤ì´ ì •ë³´ë¥¼ ìœ ì§€í•˜ì§€ë§Œ, ì´ê²ƒë§Œìœ¼ë¡œëŠ” ë¶€ì¡±í•¨
+        * ì™œëƒí•˜ë©´ tilingì´ ìžì—°ìŠ¤ëŸ½ê²Œ ì´ë£¨ì–´ì§€ê²Œ í•˜ê¸° ìœ„í•´ì„œëŠ” ì´ì „ segmentì˜ í…ìŠ¤ì²˜ ì¢Œí‘œê°’ì„ ì•Œì•„ì•¼ í•˜ê¸° ë•Œë¬¸!
+        * ì¦‰, "ëˆ„ì í•©"ì´ í•„ìš”í•¨
         * <img src="./img/ribbon_distance_based_why_prefix_sum.png">
-      * ´©ÀûÇÕÀº Brent-kung adder¸¦ ÀÌ¿ëÇØ º´·ÄÀûÀ¸·Î ¿¬»êÇÏ¿´À½
+      * ëˆ„ì í•©ì€ Brent-kung adderë¥¼ ì´ìš©í•´ ë³‘ë ¬ì ìœ¼ë¡œ ì—°ì‚°í•˜ì˜€ìŒ
         * <img src="./img/brent_kung_adder.png">
-      * ÀÌ¸¦ ÅëÇØ Ã¹ ÆÄÆ¼Å¬·ÎºÎÅÍ °¢ ÆÄÆ¼Å¬±îÁöÀÇ °Å¸®¸¦ °è»êÇÒ ¼ö ÀÖÀ¸¸ç, ÀÌ °ªÀ» ±×´ë·Î(È¤Àº scalingÇÏ¿©) texture coordinate·Î È°¿ëÇÔ
+      * ì´ë¥¼ í†µí•´ ì²« íŒŒí‹°í´ë¡œë¶€í„° ê° íŒŒí‹°í´ê¹Œì§€ì˜ ê±°ë¦¬ë¥¼ ê³„ì‚°í•  ìˆ˜ ìžˆìœ¼ë©°, ì´ ê°’ì„ ê·¸ëŒ€ë¡œ(í˜¹ì€ scalingí•˜ì—¬) texture coordinateë¡œ í™œìš©í•¨
 
-#### ¼º´É °³¼± ±â·Ï
-* PIX Debugger¸¦ È°¿ëÇÏ¿´À½ (°¢ ÆÐ½º¿¡¼­ ÀÌº¥Æ® ¸¶Å·) [WinPixEventRuntime](https://devblogs.microsoft.com/pix/winpixeventruntime/)
-* ´Ù¾çÇÑ »óÈ²À» °í·ÁÇÏ¿© ½Ã°£À» ÃøÁ¤ÇÏ¿´À½
-  * ÆÄÆ¼Å¬ÀÇ ¼ö
-  * ·»´õ¸µ ¹æ¹ý(½ºÇÁ¶óÀÌÆ®, ¸®º»)
-  * ºí·»µù ¹æ¹ý(ºÒÅõ¸í, ¹ÝÅõ¸í)
-  * ÆÄÆ¼Å¬ Å©±âÀÇ °æ¿ì opaque¿¡¼­ »ý°¢º¸´Ù Å« ¿µÇâÀ» ¹ÌÄ¡Áö ¾Ê¾Æ °í·ÁÇÏÁö ¾ÊÀ½ (additive blendingÀÇ °æ¿ì ºñ·ÊÇØ¼­ ´Ã¾î³²)
-* ¼º´É ÃøÁ¤ È¯°æ ±¸¼º
-  * ÇØ»óµµ: FHD (º¸´Ù ¾à°£ ÀÛÀ½)
-  * ÆÄÆ¼Å¬Àº È­¸é ÀüÃ¼¿¡ ºÐÆ÷µÇ¾î ·»´õ¸µ
+#### ì„±ëŠ¥ ê°œì„  ê¸°ë¡
+* PIX Debuggerë¥¼ í™œìš©í•˜ì˜€ìŒ (ê° íŒ¨ìŠ¤ì—ì„œ ì´ë²¤íŠ¸ ë§ˆí‚¹) [WinPixEventRuntime](https://devblogs.microsoft.com/pix/winpixeventruntime/)
+* ë‹¤ì–‘í•œ ìƒí™©ì„ ê³ ë ¤í•˜ì—¬ ì‹œê°„ì„ ì¸¡ì •í•˜ì˜€ìŒ
+  * íŒŒí‹°í´ì˜ ìˆ˜
+  * ë Œë”ë§ ë°©ë²•(ìŠ¤í”„ë¼ì´íŠ¸, ë¦¬ë³¸)
+  * ë¸”ë Œë”© ë°©ë²•(ë¶ˆíˆ¬ëª…, ë°˜íˆ¬ëª…)
+  * íŒŒí‹°í´ í¬ê¸°ì˜ ê²½ìš° opaqueì—ì„œ ìƒê°ë³´ë‹¤ í° ì˜í–¥ì„ ë¯¸ì¹˜ì§€ ì•Šì•„ ê³ ë ¤í•˜ì§€ ì•ŠìŒ (additive blendingì˜ ê²½ìš° ë¹„ë¡€í•´ì„œ ëŠ˜ì–´ë‚¨)
+* ì„±ëŠ¥ ì¸¡ì • í™˜ê²½ êµ¬ì„±
+  * í•´ìƒë„: FHD (ë³´ë‹¤ ì•½ê°„ ìž‘ìŒ)
+  * íŒŒí‹°í´ì€ í™”ë©´ ì „ì²´ì— ë¶„í¬ë˜ì–´ ë Œë”ë§
   * Lifetime: 3s
-  * ¿¹½Ã
+  * ì˜ˆì‹œ
     * Sprite
       * <img src="./img/performance_test_sprite_example.png">
     * Ribbon
       * <img src="./img/performance_test_ribbon_example.png">
-* ¼º´É ÃøÁ¤ 
-  * °³¼± ÀÌÀü
+* ì„±ëŠ¥ ì¸¡ì • 
+  * ê°œì„  ì´ì „
 
     | \# of Particles | Renderer Type | Blending Type | Ribbon UV Mode    | Emission | Simulation | Post-simulation | Pre-sort | Sort     | Pre-prefix Sum | Prefix Sum | Computing Indirect Commands | Indirect Drawing | Total     |
     | --------------- | ------------- | ------------- | ----------------- | -------- | ---------- | --------------- | -------- | -------- | -------------- | ---------- | --------------------------- | ---------------- | --------- |
@@ -616,31 +616,31 @@ compileShaders();
     | 10,000          | Ribbon        | Opaque        | Segment based     | 0.005984 | 0.057088   | 0.001088        | 0.042048 | 0.450976 | 0.000000       | 0.000000   | 0.032448                    | <b>4.077952</b>         | 4.667584  |
     | 10,000          | Ribbon        | Opaque        | Distance based UV | 0.005216 | 0.059200   | 0.001088        | 0.042208 | 0.463328 | 0.038752       | 0.873888   | 0.032352                    | <b>3.980608</b>         | 5.496640  |
 
-* ÆÄÆ¼Å¬ ½Ã½ºÅÛ ±¸Á¶
+* íŒŒí‹°í´ ì‹œìŠ¤í…œ êµ¬ì¡°
   * <img src="./img/particle_system_before.png">
-  * ~~1Â÷Àû ¸ñÇ¥: numDeads´Â numAlives¿Í maxParticleCount¿¡ ÀÇÇØ¼­ À¯µµµÉ ¼ö ÀÖ´Ù. (atomic operation ÇÊ¿ä X)~~
-  * ~~Áú¹®: Áö±ÝÀº ÀÎµ¦½º¸¸À» ´Ù·ç°í ÀÌ¸¦ ±â¹ÝÀ¸·Î ÆÄÆ¼Å¬ ¹öÆÛ¸¦ ÂüÁ¶ÇÏ°í ÀÖ´Âµ¥, ÀÎµ¦½º°¡ ¾Æ´Ï¶ó Á÷Á¢ ÆÄÆ¼Å¬ ¹öÆÛ¸¦ ´Ù·ç°í °ªÀ» ´Ù·ç´Â ÇüÅÂ·Î ¹Ù²Ù¸é ¼º´ÉÀÌ ¸¹ÀÌ °³¼±µÉ±î?~~
-  * Spawnrate, lifetimeÀ» ¾Ë¸é Á×À» ÆÄÆ¼Å¬µéÀÇ ¼ö¸¦ ¿¹ÃøÇÒ ¼ö ÀÖÀ¸¹Ç·Î ¸ðµç ÆÄÆ¼Å¬µé¿¡ ´ëÇØ¼­ Á×À½À» È®ÀÎÇÒ ÇÊ¿ä°¡ ¾ø´Ù.
-    * µû¶ó¼­ ÃÖ¼ÒÇÑÀÇ ÆÄÆ¼Å¬µé¸¸ atomicÇÏ°Ô ping-pong buffer·Î ¿Å±â°í ³ª¸ÓÁö´Â parallelÇÏ°Ô ÀÌµ¿
+  * ~~1ì°¨ì  ëª©í‘œ: numDeadsëŠ” numAlivesì™€ maxParticleCountì— ì˜í•´ì„œ ìœ ë„ë  ìˆ˜ ìžˆë‹¤. (atomic operation í•„ìš” X)~~
+  * ~~ì§ˆë¬¸: ì§€ê¸ˆì€ ì¸ë±ìŠ¤ë§Œì„ ë‹¤ë£¨ê³  ì´ë¥¼ ê¸°ë°˜ìœ¼ë¡œ íŒŒí‹°í´ ë²„í¼ë¥¼ ì°¸ì¡°í•˜ê³  ìžˆëŠ”ë°, ì¸ë±ìŠ¤ê°€ ì•„ë‹ˆë¼ ì§ì ‘ íŒŒí‹°í´ ë²„í¼ë¥¼ ë‹¤ë£¨ê³  ê°’ì„ ë‹¤ë£¨ëŠ” í˜•íƒœë¡œ ë°”ê¾¸ë©´ ì„±ëŠ¥ì´ ë§Žì´ ê°œì„ ë ê¹Œ?~~
+  * Spawnrate, lifetimeì„ ì•Œë©´ ì£½ì„ íŒŒí‹°í´ë“¤ì˜ ìˆ˜ë¥¼ ì˜ˆì¸¡í•  ìˆ˜ ìžˆìœ¼ë¯€ë¡œ ëª¨ë“  íŒŒí‹°í´ë“¤ì— ëŒ€í•´ì„œ ì£½ìŒì„ í™•ì¸í•  í•„ìš”ê°€ ì—†ë‹¤.
+    * ë”°ë¼ì„œ ìµœì†Œí•œì˜ íŒŒí‹°í´ë“¤ë§Œ atomicí•˜ê²Œ ping-pong bufferë¡œ ì˜®ê¸°ê³  ë‚˜ë¨¸ì§€ëŠ” parallelí•˜ê²Œ ì´ë™
     * <img src="./img/particle_system_after.png">
-    * ÇÏÁö¸¸ simulation ¼º´ÉÀº ¿ÀÈ÷·Á ¶³¾îÁü: ÆÄÆ¼Å¬À» ¿Å±æ ¶§, simulationÀ» ÇÒ ¶§ µÎ ¹ø particle ¹öÆÛ¿¡ ¾²±â ¿¬»êÀ» ÇÏ°Ô µÇ¾ú±â ¶§¹®.
-    * ´Ù¸¸ ÆÄÆ¼Å¬µéÀÌ ÆòÇàÇÏ°Ô ÀÌµ¿µÇ¹Ç·Î sort ¼Ò¿ä°¡ ¾ø¾îÁü.
-    * º¯°æ Àü:
+    * í•˜ì§€ë§Œ simulation ì„±ëŠ¥ì€ ì˜¤ížˆë ¤ ë–¨ì–´ì§: íŒŒí‹°í´ì„ ì˜®ê¸¸ ë•Œ, simulationì„ í•  ë•Œ ë‘ ë²ˆ particle ë²„í¼ì— ì“°ê¸° ì—°ì‚°ì„ í•˜ê²Œ ë˜ì—ˆê¸° ë•Œë¬¸.
+    * ë‹¤ë§Œ íŒŒí‹°í´ë“¤ì´ í‰í–‰í•˜ê²Œ ì´ë™ë˜ë¯€ë¡œ sort ì†Œìš”ê°€ ì—†ì–´ì§.
+    * ë³€ê²½ ì „:
    
     | \# of Particles | Renderer Type  | Ribbon UV Mode    | Emission | Simulation | Post-simulation | Pre-sort     | Sort       | Pre-prefix Sum | Prefix Sum | Computing Indirect Commands | Indirect Drawing | Total     |
     | --------------- | -------------  | ----------------- | -------- | ---------- | --------------- | ------------ | ---------- | -------------- | ---------- | --------------------------- | ---------------- | --------- |
     | 1,000,000       | Sprite         | \-                | 0.032384 | <b>7.684832</b>   | 0.001088        | 0.000000     | 0.000000   | 0.000000       | 0.000000   | 0.001728                    | <b>8.164768</b>         | 15.884800 |
     | 10,000          | Ribbon         | Distance based UV | 0.005568 | 0.126208   | 0.001088        | <b>4.707200</b>     | <b>8.149344</b>   | 0.374080       | 0.521722   | 0.001888                    | <b>3.070464</b>         | 16.957562 |
 
-    * º¯°æ ÈÄ:
+    * ë³€ê²½ í›„:
  
     | \# of Particles | Renderer Type | Ribbon UV Mode    | Emission | Destroy    | MoveAlives      | Post-Destroy | Simulation | Pre-prefix Sum | Prefix Sum | Computing Indirect Commands | Indirect Drawing | Total     |
     | --------------- | ------------- | ----------------- | -------- | ---------- | --------------- | ------------ | ---------- | -------------- | ---------- | --------------------------- | ---------------- | --------- |
     | 1,000,000       | Sprite        | \-                | 0.043008 | 0.035520   | <b>7.388256</b>        | 0.000445     | 1.781856   | 0.000000       | 0.000000   | 0.000992                    | <b>8.482816</b>         | 17.732893 |
     | 10,000          | Ribbon        | Distance based UV | 0.005728 | 0.001600   | 0.087872        | 0.000544     | 0.046208   | 0.045984       | 0.567296   | 0.001120                    | <b>4.250624</b>         | 5.006976  |
 
-  * memory bandwidth¸¦ ÃÖ¼ÒÈ­ÇÏ±â À§ÇØ ÆÄÆ¼Å¬ ±¸Á¶Ã¼ÀÇ Å©±â¸¦ ÁÙÀÓ.
-    * º¯°æ Àü: 112 byte
+  * memory bandwidthë¥¼ ìµœì†Œí™”í•˜ê¸° ìœ„í•´ íŒŒí‹°í´ êµ¬ì¡°ì²´ì˜ í¬ê¸°ë¥¼ ì¤„ìž„.
+    * ë³€ê²½ ì „: 112 byte
     ``` C++
     struct Particle
     {
@@ -668,7 +668,7 @@ compileShaders();
 	    float3 Pad;
     };
     ```
-    * º¯°æ ÈÄ: 40 byte
+    * ë³€ê²½ í›„: 40 byte
 
     ``` C++
     struct Particle
@@ -687,7 +687,7 @@ compileShaders();
 	    uint EndColor;
     };
     ```
-    * ColorÀÇ °æ¿ì 8bit 4°³¸¦ packing
+    * Colorì˜ ê²½ìš° 8bit 4ê°œë¥¼ packing
     ```
     uint packUnorm4ToUint(float4 unpackedData)
     {
@@ -729,7 +729,7 @@ compileShaders();
 	    b = f16tof32(input & 0x0000FFFF);
     }
     ```
-    * ºñ±³:
+    * ë¹„êµ:
 
     | Particle Size            | MoveAlives | Simulation |
     | ------------------------ | ---------- | ---------- |
@@ -741,58 +741,58 @@ compileShaders();
     | 44byte                   | 2.040000   | 1.039904   |
     | 40byte                   | 1.737888   | 0.893024   |
 
-    * ÆÄÆ¼Å¬À» º¹»çÇÏ´Â ºñ¿ë¿¡ ´ëÇÑ ºÐ¼®:
-      * ´ÙÀ½¿¡ µû¸£¸é 16 byte stride¸¦ ÁöÅ°´Â °ÍÀÌ ¼º´É¿¡ À¯¸®ÇÏ´Ù°í ÇÏ´Âµ¥, ÀÌ °æ¿ì¿¡´Â ´Ü¼øÈ÷ byte size°¡ ÀÛÀº °ÍÀÌ À¯¸®ÇßÀ½.
+    * íŒŒí‹°í´ì„ ë³µì‚¬í•˜ëŠ” ë¹„ìš©ì— ëŒ€í•œ ë¶„ì„:
+      * ë‹¤ìŒì— ë”°ë¥´ë©´ 16 byte strideë¥¼ ì§€í‚¤ëŠ” ê²ƒì´ ì„±ëŠ¥ì— ìœ ë¦¬í•˜ë‹¤ê³  í•˜ëŠ”ë°, ì´ ê²½ìš°ì—ëŠ” ë‹¨ìˆœížˆ byte sizeê°€ ìž‘ì€ ê²ƒì´ ìœ ë¦¬í–ˆìŒ.
         * [Understanding Structured Buffer Performance](https://developer.nvidia.com/content/understanding-structured-buffer-performance)
-        * ´Ù¸¸ simulationÂÊ¿¡¼­´Â ÇØ´ç ¿øÄ¢ÀÌ Àß ÁöÄÑÁö´Â °ÍÀ¸·Î º¸ÀÓ.
-      * À§ÀÇ °á°ú´Â coalescing, access pattern µî ´Ù¾çÇÑ ¿ä¼Ò°¡ ÀÛ¿ëÇß´Ù°í º¸ÀÌ´Âµ¥, ÇÏµå¿þ¾îÀÇ Áö½Ä ºÎÁ·À¸·Î ¸íÈ®ÇÏ°Ô Â¤À» ¼ö´Â ¾øÀ» °Í °°À½.
-      * Áú¹®:
-        * 64, 48, 44, 40ÀÇ simluation ¼Óµµ¿¡ ´ëÇØ: memory access patternÀÌ ¿µÇâÀ» ÁØ °ÍÀÏÁö?
+        * ë‹¤ë§Œ simulationìª½ì—ì„œëŠ” í•´ë‹¹ ì›ì¹™ì´ ìž˜ ì§€ì¼œì§€ëŠ” ê²ƒìœ¼ë¡œ ë³´ìž„.
+      * ìœ„ì˜ ê²°ê³¼ëŠ” coalescing, access pattern ë“± ë‹¤ì–‘í•œ ìš”ì†Œê°€ ìž‘ìš©í–ˆë‹¤ê³  ë³´ì´ëŠ”ë°, í•˜ë“œì›¨ì–´ì˜ ì§€ì‹ ë¶€ì¡±ìœ¼ë¡œ ëª…í™•í•˜ê²Œ ì§šì„ ìˆ˜ëŠ” ì—†ì„ ê²ƒ ê°™ìŒ.
+      * ì§ˆë¬¸:
+        * 64, 48, 44, 40ì˜ simluation ì†ë„ì— ëŒ€í•´: memory access patternì´ ì˜í–¥ì„ ì¤€ ê²ƒì¼ì§€?
 
 
 ### Bounding Mode
-* SpriteÀÇ texture¿¡´Â opacity°¡ ÀÖ°í ÀÌ¸¦ ÀÌ¿ëÇØ ÇÈ¼¿À» ±â°¢ÇÒ ¼ö ÀÖÀ½
-  * ÇÏÁö¸¸ È­¸é¿¡¼­ ±×·ÁÁö´Â ´ëºÎºÐ ÇÈ¼¿ÀÇ opacity°¡ 0ÀÎ °æ¿ì, overdraw¸¦ ¹ß»ý½ÃÅ´.
+* Spriteì˜ textureì—ëŠ” opacityê°€ ìžˆê³  ì´ë¥¼ ì´ìš©í•´ í”½ì…€ì„ ê¸°ê°í•  ìˆ˜ ìžˆìŒ
+  * í•˜ì§€ë§Œ í™”ë©´ì—ì„œ ê·¸ë ¤ì§€ëŠ” ëŒ€ë¶€ë¶„ í”½ì…€ì˜ opacityê°€ 0ì¸ ê²½ìš°, overdrawë¥¼ ë°œìƒì‹œí‚´.
   * <img src="./img/scratch.png">
-  * µû¶ó¼­ quad°¡ ¾Æ´Ñ bounding n-gonÀ» »ý¼ºÇØ ±×¸®´Â °ÍÀÌ ´õ À¯¸®ÇÒ ¼ö ÀÖÀ½:
+  * ë”°ë¼ì„œ quadê°€ ì•„ë‹Œ bounding n-gonì„ ìƒì„±í•´ ê·¸ë¦¬ëŠ” ê²ƒì´ ë” ìœ ë¦¬í•  ìˆ˜ ìžˆìŒ:
   * <img src="./img/bounding_scratch_wireframe.png">
-  * ÀýÂ÷:
-    * ÅØ½ºÃ³·ÎºÎÅÍ °æ°è¶ó ÇÒ ¼ö ÀÖ´Â ÇÈ¼¿µéÀ» ¼±Á¤
-      * °¢ Çà¸¶´Ù ¾çÂÊ ³¡¿¡¼­ opacity°¡ threshold ÀÌ»óÀÎ ÇÈ¼¿À» ¼±Á¤ (N by N ÅØ½ºÃ³ÀÏ °æ¿ì ÃÖ´ë 2N °³ÀÇ ÇÈ¼¿ ¼±ÅÃ)
-    * ¼±ÅÃµÈ ÇÈ¼¿µéÀ» ±â¹ÝÀ¸·Î convex hull »ý¼º
-      * Braham scan ¾Ë°í¸®ÁòÀ» ±â¹ÝÀ¸·Î ÇÏ¿´À½
-    * »ý¼ºµÈ convex hullÀ» ±â¹ÝÀ¸·Î bounding n-gonÀ» »ý¼º
-      * ÇöÀç nÀº 8·Î hard-coded
-    * ¼º´É ºñ±³
-      * »óÈ²1: ÀüÃ¼ ÆÄÆ¼Å¬Àº 3500°³, ÇÏ³ªÀÇ ÆÄÆ¼Å¬Àº quad ±âÁØÀ¸·Î ´ë·« È­¸éÀ» 15% ÀÌ»ó Ã¤¿ì°í, ¹ÝÀý ÀÌ»óÀº ±â°¢µÊ. ´ÙÀ½ ±×¸² Âü°í:
+  * ì ˆì°¨:
+    * í…ìŠ¤ì²˜ë¡œë¶€í„° ê²½ê³„ë¼ í•  ìˆ˜ ìžˆëŠ” í”½ì…€ë“¤ì„ ì„ ì •
+      * ê° í–‰ë§ˆë‹¤ ì–‘ìª½ ëì—ì„œ opacityê°€ threshold ì´ìƒì¸ í”½ì…€ì„ ì„ ì • (N by N í…ìŠ¤ì²˜ì¼ ê²½ìš° ìµœëŒ€ 2N ê°œì˜ í”½ì…€ ì„ íƒ)
+    * ì„ íƒëœ í”½ì…€ë“¤ì„ ê¸°ë°˜ìœ¼ë¡œ convex hull ìƒì„±
+      * Braham scan ì•Œê³ ë¦¬ì¦˜ì„ ê¸°ë°˜ìœ¼ë¡œ í•˜ì˜€ìŒ
+    * ìƒì„±ëœ convex hullì„ ê¸°ë°˜ìœ¼ë¡œ bounding n-gonì„ ìƒì„±
+      * í˜„ìž¬ nì€ 8ë¡œ hard-coded
+    * ì„±ëŠ¥ ë¹„êµ
+      * ìƒí™©1: ì „ì²´ íŒŒí‹°í´ì€ 3500ê°œ, í•˜ë‚˜ì˜ íŒŒí‹°í´ì€ quad ê¸°ì¤€ìœ¼ë¡œ ëŒ€ëžµ í™”ë©´ì„ 15% ì´ìƒ ì±„ìš°ê³ , ë°˜ì ˆ ì´ìƒì€ ê¸°ê°ë¨. ë‹¤ìŒ ê·¸ë¦¼ ì°¸ê³ :
         * <img src="./img/bounding_example.png">
-        * ÅØ½ºÃ³:
+        * í…ìŠ¤ì²˜:
           * <img src="./img/circle.png">
-        * ¼º´ÉÇ¥:
+        * ì„±ëŠ¥í‘œ:
 
         |              | \# of Particles | Renderer Type | Blending Type | Indirect Drawing |
         | ------------ | --------------- | ------------- | ------------- | ---------------- |
-        | Bounding Àû¿ëX | 3,500           | Sprite        | Additive      | 20.674528        |
-        | Bounding Àû¿ëO | 3,500           | Sprite        | Additive      | 16.544576        |
-      * »óÈ²2: ÀüÃ¼ ÆÄÆ¼Å¬Àº 100¸¸ °³, ÀüÃ¼ÀûÀ¸·Î ÆÛÁ®ÀÖ¾î ÇÏ³ªÀÇ ÆÄÆ¼Å¬Àº È­¸éÀ» ¸î ÇÈ¼¿ Â÷ÁöÇÏÁö ¾ÊÀ½.
+        | Bounding ì ìš©X | 3,500           | Sprite        | Additive      | 20.674528        |
+        | Bounding ì ìš©O | 3,500           | Sprite        | Additive      | 16.544576        |
+      * ìƒí™©2: ì „ì²´ íŒŒí‹°í´ì€ 100ë§Œ ê°œ, ì „ì²´ì ìœ¼ë¡œ í¼ì ¸ìžˆì–´ í•˜ë‚˜ì˜ íŒŒí‹°í´ì€ í™”ë©´ì„ ëª‡ í”½ì…€ ì°¨ì§€í•˜ì§€ ì•ŠìŒ.
         * <img src="./img/bounding_example_2.png">
-        * ¼º´ÉÇ¥:
+        * ì„±ëŠ¥í‘œ:
 
         |                | \# of Particles | Renderer Type | Blending Type | Indirect Drawing |
         | -------------- | --------------- | ------------- | ------------- | ---------------- |
-        | Bounding Àû¿ëX | 1,000,000       | Sprite        | Additive      | 7.412736         |
-        | Bounding Àû¿ëO | 1,000,000       | Sprite        | Additive      | 9.781248         |
-  * °á·Ð
-    * ·»´õ¸µ ½Ã ½ÇÁúÀûÀ¸·Î ±â°¢µÇ´Â ÇÈ¼¿ÀÌ ¸¹À» ¶§ À¯¿ëÇÒ ¼ö ÀÖÀ½.
-    * Quad°¡ ¾Æ´Ñ n-gonÀ» »ý¼ºÇÏ´Âµ¥ µå´Â ºñ¿ëÀ» ÀûÀýÈ÷ °í·ÁÇØ¾ß ÇÒ °Í.
-    * °¡Àå ÁÁÀº ¹æ¹ýÀº ÀÌ·¯ÇÑ boundingÀÌ ÇÊ¿ä¾øµµ·Ï ÅØ½ºÃ³ ¹× ÆÄÆ¼Å¬ È¿°ú¿Í °ü·ÃÇÑ ¾ÆÆ¼½ºÆ®ÀÇ Áö¿øÀ» ¹Þ´Â °Í!
+        | Bounding ì ìš©X | 1,000,000       | Sprite        | Additive      | 7.412736         |
+        | Bounding ì ìš©O | 1,000,000       | Sprite        | Additive      | 9.781248         |
+  * ê²°ë¡ 
+    * ë Œë”ë§ ì‹œ ì‹¤ì§ˆì ìœ¼ë¡œ ê¸°ê°ë˜ëŠ” í”½ì…€ì´ ë§Žì„ ë•Œ ìœ ìš©í•  ìˆ˜ ìžˆìŒ.
+    * Quadê°€ ì•„ë‹Œ n-gonì„ ìƒì„±í•˜ëŠ”ë° ë“œëŠ” ë¹„ìš©ì„ ì ì ˆížˆ ê³ ë ¤í•´ì•¼ í•  ê²ƒ.
+    * ê°€ìž¥ ì¢‹ì€ ë°©ë²•ì€ ì´ëŸ¬í•œ boundingì´ í•„ìš”ì—†ë„ë¡ í…ìŠ¤ì²˜ ë° íŒŒí‹°í´ íš¨ê³¼ì™€ ê´€ë ¨í•œ ì•„í‹°ìŠ¤íŠ¸ì˜ ì§€ì›ì„ ë°›ëŠ” ê²ƒ!
 
 
 
 
 <hr/>
 
-### Âü°í¹®Çå ¹× ÄÚµå
+### ì°¸ê³ ë¬¸í—Œ ë° ì½”ë“œ
 * Particle System
   * [William T. Reeves, particle systems - a technique for modeling a class of fuzzy objects](https://www.lri.fr/~mbl/ENS/IG2/devoir2/files/docs/fuzzyParticles.pdf)
   * [Lutz Lata, Building a Million Particle System](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=b5aa42d88a178b264f4ceb3ddb67d3d00ecbc631)
@@ -806,7 +806,7 @@ compileShaders();
 
 * Ribbon Trail
   * [Ribbon and Trail](https://doc.stride3d.net/4.0/en/manual/particles/ribbons-and-trails.html)
-  * [Smooth Particle Ribbons Through Hardware Accelerated Tessellation](https://www.diva-portal.org/smash/get/diva2:1692949/FULLTEXT01.pdf) - ¿©±â¿¡ ³ª¿Â ¹æ¹ý·ÐÀ» È°¿ëÇÏÁö´Â ¾Ê¾ÒÀ½.
+  * [Smooth Particle Ribbons Through Hardware Accelerated Tessellation](https://www.diva-portal.org/smash/get/diva2:1692949/FULLTEXT01.pdf) - ì—¬ê¸°ì— ë‚˜ì˜¨ ë°©ë²•ë¡ ì„ í™œìš©í•˜ì§€ëŠ” ì•Šì•˜ìŒ.
   * [Bezier Curve](https://www.particleincell.com/2012/bezier-splines/)
   * [Catmull-Rom Curve](https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline)
   * [Catmull-Rom Spline](https://www.mvps.org/directx/articles/catmull/)
